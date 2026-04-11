@@ -19,7 +19,22 @@ export default async function PostPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const post = await client.fetch<SanityDocument>(POST_QUERY, await params, options);
+  const resolvedParams = await params;
+  const post = await client.fetch<SanityDocument>(
+    POST_QUERY,
+    resolvedParams,
+    options
+  );
+
+  if (!post) {
+    return (
+      <main className="container mx-auto min-h-screen max-w-3xl p-8">
+        <Link href="/" className="hover:underline">← Back to posts</Link>
+        <h1 className="text-4xl font-bold mt-8">Post not found</h1>
+      </main>
+    );
+  }
+
   const postImageUrl = post.image
     ? urlFor(post.image)?.width(550).height(310).url()
     : null;
@@ -29,16 +44,19 @@ export default async function PostPage({
       <Link href="/" className="hover:underline">
         ← Back to posts
       </Link>
+      
       {postImageUrl && (
         <img
           src={postImageUrl}
-          alt={post.title}
+          alt={post.title || "Post image"}
           className="aspect-video rounded-xl"
           width="550"
           height="310"
         />
       )}
+
       <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
+      
       <div className="prose">
         <p>Published: {new Date(post.publishedAt).toLocaleDateString()}</p>
         {Array.isArray(post.body) && <PortableText value={post.body} />}
