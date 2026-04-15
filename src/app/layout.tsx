@@ -16,11 +16,13 @@ const geistMono = Geist_Mono({
 
 const options = { next: { revalidate: 30 } };
 
-const DATA_QUERY = `*[_type == "settings"][0]{ title, description }`;
+const DATA_QUERY = `*[_type == "siteSettings"][0]{ title, description }`;
 
 export async function generateMetadata(): Promise<Metadata> {
   
-  const settings = await client.fetch<SanityDocument>(DATA_QUERY, {}, options);
+  const settings = await client.fetch<any>(DATA_QUERY, {}, options);
+
+  console.log("Sanity Metadata Result:", settings);
 
   return {
     title: {
