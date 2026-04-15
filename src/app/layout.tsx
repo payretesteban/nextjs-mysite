@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { type SanityDocument } from "next-sanity";
+import { settingsQuery } from "@/sanity/lib/queries";
 import { Geist, Geist_Mono } from "next/font/google";
 import { client } from "@/sanity/client";
 import "./globals.css";
@@ -14,22 +14,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const options = { next: { revalidate: 30 } };
-
-const DATA_QUERY = `*[_type == "siteSettings"][0]{ title, description }`;
-
 export async function generateMetadata(): Promise<Metadata> {
   
-  const settings = await client.fetch<any>(DATA_QUERY, {}, options);
+const settings = await client.fetch(settingsQuery, {}, { next: { revalidate: 30 } });
 
-  console.log("Sanity Metadata Result:", settings);
+  const fallbackTitle = "Esteban Payret | Tech Lead";
+  const fallbackDesc = "Software Engineering Manager and Tech Lead.";
 
   return {
     title: {
-      default: settings?.title || "Esteban Payret | Tech Lead",
-      template: "%s | Esteban Payret",
+      default: settings?.title || fallbackTitle,
+      template: `%s | ${settings?.title || "Esteban Payret"}`,
     },
-    description: settings?.description || "Software Engineering Manager and Tech Lead.",
+    description: settings?.description || fallbackDesc,
   };
 }
 

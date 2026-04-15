@@ -29,7 +29,7 @@ export default async function PostPage({
   if (!post) {
     return (
       <main className="container mx-auto min-h-screen max-w-3xl p-8">
-        <Link href="/" className="hover:underline">← Back to posts</Link>
+        <Link href="/" className="hover:underline">← Back</Link>
         <h1 className="text-4xl font-bold mt-8">Post not found</h1>
       </main>
     );
