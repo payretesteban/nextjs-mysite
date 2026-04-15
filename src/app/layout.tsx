@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { type SanityDocument } from "next-sanity";
 import { Geist, Geist_Mono } from "next/font/google";
+import { client } from "@/sanity/client";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,13 +14,25 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Esteban Payret | Tech Lead & People Manager",
-    template: "%s | Esteban Payret"
-  },
-  description: "Software Engineering Manager and Technical Lead specializing in React, AWS, and scaling high-performing teams.",
-};
+const options = { next: { revalidate: 30 } };
+
+const DATA_QUERY = `{
+  "settings": *[_type == "settings"][0] {...}
+}`;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await client.fetch<{
+      settings: SanityDocument[];
+    }>(DATA_QUERY, {}, options);
+
+  return {
+    title: {
+      default: settings?.title || "Esteban Payret | Tech Lead",
+      template: "%s | Esteban Payret",
+    },
+    description: settings?.description || "Software Engineering Manager and Technical Lead specializing in React, AWS, and scaling high-performing teams.",
+  };
+}
 
 export default function RootLayout({
   children,
