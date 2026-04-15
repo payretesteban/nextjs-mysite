@@ -16,21 +16,18 @@ const geistMono = Geist_Mono({
 
 const options = { next: { revalidate: 30 } };
 
-const DATA_QUERY = `{
-  "settings": *[_type == "settings"][0] {...}
-}`;
+const DATA_QUERY = `*[_type == "settings"][0]{ title, description }`;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await client.fetch<{
-      settings: SanityDocument[];
-    }>(DATA_QUERY, {}, options);
+  
+  const settings = await client.fetch<SanityDocument>(DATA_QUERY, {}, options);
 
   return {
     title: {
       default: settings?.title || "Esteban Payret | Tech Lead",
       template: "%s | Esteban Payret",
     },
-    description: settings?.description || "Software Engineering Manager and Technical Lead specializing in React, AWS, and scaling high-performing teams.",
+    description: settings?.description || "Software Engineering Manager and Tech Lead.",
   };
 }
 
