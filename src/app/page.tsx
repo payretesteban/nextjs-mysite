@@ -37,9 +37,6 @@ export default async function IndexPage() {
           <li className="hover:underline" key={post._id}>
             <Link href={`/${post.slug.current}`}>
               <h2 className="text-xl font-semibold">{post.title}</h2>
-              <p className="text-slate-500 text-sm">
-                {new Date(post.publishedAt).toLocaleDateString()}
-              </p>
             </Link>
           </li>
         ))}
