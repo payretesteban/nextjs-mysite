@@ -1,42 +1,16 @@
 import Link from "next/link";
-import { type SanityDocument } from "next-sanity";
 import { client } from "@/sanity/client";
 import { PortableText } from "@portabletext/react";
 import imageUrlBuilder from "@sanity/image-url";
-
-interface ProfileData {
-  name: string;
-  headline: string;
-  bio: any[]; 
-  profileImage?: {
-    asset: any;
-    alt?: string;
-  };
-}
-
-const DATA_QUERY = `{
-  "posts": *[_type == "post" && defined(slug.current)] | order(publishedAt desc)[0...12] {
-    _id, title, slug, publishedAt
-  },
-  "links": *[_type == "link"] | order(category asc) {
-    _id, title, url, category, icon
-  },
-  "profile": *[_type == "profile"][0] {...}
-}`;
+import { getIndexPageData } from "@/lib/data";
 
 const builder = imageUrlBuilder(client);
 function urlFor(source: any) {
   return builder.image(source);
 }
 
-const options = { next: { revalidate: 30 } };
-
 export default async function IndexPage() {
-  const { posts, links, profile } = await client.fetch<{
-    profile: ProfileData;
-    posts: SanityDocument[];
-    links: SanityDocument[];
-  }>(DATA_QUERY, {}, options);
+  const { posts, links, profile } = await getIndexPageData();
 
   return (
     <main className="container mx-auto min-h-screen max-w-3xl p-8">
