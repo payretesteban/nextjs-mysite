@@ -1,13 +1,8 @@
 import Link from "next/link";
 import { client } from "@/sanity/client";
 import { PortableText } from "@portabletext/react";
-import imageUrlBuilder from "@sanity/image-url";
 import { getIndexPageData } from "@/lib/data";
-
-const builder = imageUrlBuilder(client);
-function urlFor(source: any) {
-  return builder.image(source);
-}
+import { urlFor } from "@/lib/image";
 
 export default async function IndexPage() {
   const { posts, links, profile } = await getIndexPageData();
