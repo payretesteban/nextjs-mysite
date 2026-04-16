@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { client } from "@/sanity/client";
 import { PortableText } from "@portabletext/react";
 import { getIndexPageData } from "@/lib/data";
 import { urlFor } from "@/lib/image";
@@ -28,22 +27,6 @@ export default async function IndexPage() {
           </div>
         </section>
       )}
-      {/* --- Links Section --- */}
-      <section className="mb-12">
-        <div className="flex gap-4">
-          {links.map((link) => (
-            <a
-              key={link._id}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium transition-colors"
-            >
-              {link.title}
-            </a>
-          ))}
-        </div>
-      </section>
 
       <hr className="mb-12 border-slate-200" />
 
