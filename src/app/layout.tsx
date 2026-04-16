@@ -1,5 +1,6 @@
 import { getSiteMetadata } from "@/lib/seo";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import Header from "./header";
 import Footer from "./footer";
 import "./globals.css";
@@ -26,13 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-white text-slate-900">
-        <Header />
-        
+        <Header />        
         <main className="flex-grow">
           {children}
-        </main>
-        
+        </main>        
         <Footer />
+        <SpeedInsights />
       </body>
     </html>
   );
