@@ -1,4 +1,4 @@
-This is a personal projectg for my website at estebanpayret.com using Sanity CMS and Next.JS
+This is a personal projectg for my website at [estebanpayret.com](https://www.estebanpayret.com) using Sanity CMS and Next.JS
 
 ## Getting Started
 
