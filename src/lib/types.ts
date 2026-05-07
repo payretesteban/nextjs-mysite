@@ -7,6 +7,7 @@ export interface SanityLink {
   category?: string;
   icon?: string;
   class?: string;
+  external?: boolean;
 }
 
 export interface SanityPost {
