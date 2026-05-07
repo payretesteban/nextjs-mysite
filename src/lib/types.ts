@@ -6,6 +6,7 @@ export interface SanityLink {
   url: string;
   category?: string;
   icon?: string;
+  class?: string;
 }
 
 export interface SanityPost {
@@ -15,6 +16,7 @@ export interface SanityPost {
   slug: {
     current: string;
   };
+  featured: boolean;
 }
 
 export interface SanityProfile {

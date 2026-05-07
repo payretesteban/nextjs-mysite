@@ -1,14 +1,15 @@
 import Link from "next/link";
+
 import { PortableText } from "@portabletext/react";
 import { getIndexPageData } from "@/lib/data";
 import { urlFor } from "@/lib/image";
 
+
 export default async function IndexPage() {
-  const { posts, links, profile } = await getIndexPageData();
+  const { posts, profile } = await getIndexPageData();
 
   return (
     <main className="container mx-auto min-h-screen max-w-3xl p-8">
-      {/* --- About Me Section --- */}
       {profile && (
         <section className="mb-12 flex flex-col md:flex-row gap-8 items-start">
           {profile.profileImage && (
@@ -30,13 +31,19 @@ export default async function IndexPage() {
 
       <hr className="mb-12 border-slate-200" />
 
-      {/* --- Posts Section --- */}
-      <h1 className="text-4xl font-bold mb-8">Posts</h1>
+      <h1 className={`text-4xl font-bold mb-8`}>Posts</h1>
       <ul className="flex flex-col gap-y-4">
         {posts.map((post) => (
           <li className="hover:underline" key={post._id}>
             <Link href={`/${post.slug.current}`}>
-              <h2 className="text-xl font-semibold">{post.title}</h2>
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                {post.title}
+                 {post.featured && (
+                  <span className="text-xs bg-yellow-400 text-black px-2 py-1 rounded-full uppercase tracking-wide">
+                    Featured
+                  </span>
+                )}
+              </h2>
             </Link>
           </li>
         ))}

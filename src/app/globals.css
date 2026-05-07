@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #ffffff;
@@ -23,4 +24,30 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.funky {
+  background: linear-gradient(270deg, #e0f7fa, #e1f5fe, #f3e5f5, #fff3e0, #f1f8e9);
+  background-size: 400% 400% !important;
+  
+  
+  color: #1a1a1a !important; 
+  border: 1px solid #ddd;
+  
+  animation: lightRotate 8s ease infinite !important;
+  
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.funky:hover {
+  transform: scale(1.02);
+}
+
+@keyframes lightRotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }

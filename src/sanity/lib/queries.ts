@@ -8,18 +8,21 @@ export const settingsQuery = defineQuery(`
 `);
 
 export const indexPageQuery = defineQuery(`{
-  "posts": *[_type == "post" && defined(slug.current)] | order(publishedAt desc)[0...12] {
+  "posts": *[_type == "post" && defined(slug.current)] | order(coalesce(featured, false) desc, publishedAt desc)[0...12] {
     _id, 
     title, 
     slug, 
-    publishedAt 
+    publishedAt,
+    featured
   },
-  "links": *[_type == "link"] | order(category asc) {
+  "links": *[_type == "link"] | order(sort asc) {
     _id, 
     title, 
     url, 
     category, 
-    icon 
+    icon,
+    class,
+    sort 
   },
   "profile": *[_type == "profile"][0] {
     name,
