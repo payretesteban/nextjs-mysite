@@ -1,8 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { SanityLink } from "@/lib/types";
 
-export default function Header({ links }) {
+export default function Header({ links }: { links: SanityLink[] }) {
   const pathname = usePathname();
 
   const visibleLinks =
