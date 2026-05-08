@@ -7,6 +7,12 @@ export const settingsQuery = defineQuery(`
     } 
 `);
 
+export const animationsQuery = defineQuery(`
+  *[_type == "animations"] {
+    class
+    } 
+`);
+
 export const indexPageQuery = defineQuery(`{
   "posts": *[_type == "post" && defined(slug.current)] | order(coalesce(featured, false) desc, publishedAt desc)[0...12] {
     _id, 

@@ -3,11 +3,12 @@ import Link from "next/link";
 import { PortableText } from "@portabletext/react";
 import { getIndexPageData } from "@/lib/data";
 import { urlFor } from "@/lib/image";
+import AnimatedHeadline from "@/lib/animations";
 
 
 export default async function IndexPage() {
   const { posts, profile } = await getIndexPageData();
-
+    
   return (
     <main className="container mx-auto min-h-screen max-w-3xl p-8">
       {profile && (
@@ -21,7 +22,7 @@ export default async function IndexPage() {
           )}
           <div>
             <h1 className="text-4xl font-bold">{profile.name}</h1>
-            <p className="text-xl text-slate-600 mb-4">{profile.headline}</p>
+            <AnimatedHeadline headline={profile.headline} />
             <div className="prose prose-slate">
               <PortableText value={profile.bio} />
             </div>
