@@ -9,6 +9,14 @@ import {
   useEffect,
 } from "react";
 
+const HARDCODED_ANIMATIONS = [
+  { class: "animate-bounce" },
+  { class: "animate-spin" },
+  { class: "animate-pulse" },
+  { class: "animate-ping" },
+  { class: "animate-wiggle" },
+];
+
 type Animation = {
   class: string;
 };
@@ -16,7 +24,7 @@ type Animation = {
 type AnimationContextType = {
   animationClass: string;
   timeLeft: number;
-  getNextAnimation: (animations: Animation[]) => void;
+  getNextAnimation: () => void;
 };
 
 const AnimationContext = createContext<AnimationContextType | undefined>(undefined);
@@ -31,7 +39,8 @@ export function AnimationProvider({ children }: { children: ReactNode }) {
   const [animationClass, setAnimationClass] = useState("");
   const [queue, setQueue] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState(0);
-  const [isMounted, setIsMounted] = useState(false); 
+  const [isMounted, setIsMounted] = useState(false);
+
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -45,14 +54,13 @@ export function AnimationProvider({ children }: { children: ReactNode }) {
     if (intervalRef.current) clearInterval(intervalRef.current);
   }
 
-  function getNextAnimation(animations: Animation[]) {
-    
+  function getNextAnimation() {
     if (!isMounted) return;
 
     let updatedQueue = [...queue];
 
     if (updatedQueue.length === 0) {
-      updatedQueue = shuffleArray(animations.map((a) => a.class));
+      updatedQueue = shuffleArray(HARDCODED_ANIMATIONS.map((a) => a.class));
     }
 
     const nextAnimation = updatedQueue[0];
@@ -63,13 +71,7 @@ export function AnimationProvider({ children }: { children: ReactNode }) {
 
     setTimeLeft(ANIMATION_DURATION);
     intervalRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          if (intervalRef.current) clearInterval(intervalRef.current);
-          return 0;
-        }
-        return prev - 1;
-      });
+      setTimeLeft((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
 
     timeoutRef.current = setTimeout(() => {
@@ -80,13 +82,7 @@ export function AnimationProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AnimationContext.Provider
-      value={{
-        animationClass,
-        timeLeft,
-        getNextAnimation,
-      }}
-    >
+    <AnimationContext.Provider value={{ animationClass, timeLeft, getNextAnimation }}>
       {children}
     </AnimationContext.Provider>
   );

@@ -10,10 +10,8 @@ type Animation = {
 
 export default function Header({
   links,
-  animations,
 }: {
   links: SanityLink[];
-  animations: Animation[];
 }) {
   const pathname = usePathname();
 
@@ -49,7 +47,7 @@ export default function Header({
               onClick={(e) => {
                 if (isFunky) {
                   e.preventDefault();
-                  getNextAnimation(animations);
+                  getNextAnimation();
                 }
               }}
               className={`px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:text-gray-600 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg text-sm font-medium transition-colors ${link.class}`}

@@ -3,9 +3,6 @@ import { getIndexPageData } from "@/lib/data";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AnimationProvider } from "./context/AnimationContext";
-import { animationsQuery } from "@/sanity/lib/queries";
-import { client } from "@/sanity/client";
-
 import Header from "./header";
 import Footer from "./footer";
 import "./globals.css";
@@ -13,13 +10,13 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-  display: "swap", // 1. Add this to prevent the "preload not used" warning
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-  display: "swap", // 2. Add this here too
+  display: "swap",
 });
 
 export async function generateMetadata() {
@@ -32,17 +29,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const { links } = await getIndexPageData();
-  const animations = await client.fetch(animationsQuery);
 
   return (
-    <html 
-      lang="en" 
-      // 3. Ensure these variables are actually applied to the class
+    <html
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className={`${geistSans.className} min-h-full flex flex-col bg-white text-slate-900`}>
-        <AnimationProvider>
-          <Header links={links} animations={animations} />
+        <AnimationProvider>          
+          <Header links={links} /> 
           <main className="flex-grow">{children}</main>
           <Footer />
         </AnimationProvider>
