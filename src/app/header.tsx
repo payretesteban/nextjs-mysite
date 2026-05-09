@@ -4,29 +4,15 @@ import { usePathname } from "next/navigation";
 import { SanityLink } from "@/lib/types";
 import { useAnimation } from "./context/AnimationContext";
 
-type Animation = {
-  class: string;
-};
-
-export default function Header({
-  links,
-}: {
-  links: SanityLink[];
-}) {
+export default function Header({ links }: { links: SanityLink[] }) {
   const pathname = usePathname();
-
-  const {
-    getNextAnimation,
-    animationClass,
-    timeLeft,
-  } = useAnimation();
+  const { getNextAnimation, animationClass, timeLeft } = useAnimation();
 
   const animationsRunning = animationClass !== "";
 
+  // Only show internal links on the home page
   const visibleLinks =
-    pathname === "/"
-      ? links
-      : links.filter((l) => l.category !== "internal");
+    pathname === "/" ? links : links.filter((l) => l.category !== "internal");
 
   return (
     <header className="container mx-auto max-w-3xl p-8 pb-0">
@@ -39,15 +25,11 @@ export default function Header({
               key={link._id}
               href={link.url}
               target={link.external ? "_blank" : "_self"}
-              rel={
-                link.external
-                  ? "noopener noreferrer"
-                  : undefined
-              }
+              rel={link.external ? "noopener noreferrer" : undefined}
               onClick={(e) => {
                 if (isFunky) {
                   e.preventDefault();
-                  getNextAnimation();
+                  getNextAnimation(); // No arguments needed now!
                 }
               }}
               className={`px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:text-gray-600 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg text-sm font-medium transition-colors ${link.class}`}
