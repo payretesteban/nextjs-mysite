@@ -17,8 +17,11 @@ export default function Header({
 }) {
   const pathname = usePathname();
 
-  const { getNextAnimation, animationClass } =
-    useAnimation();
+  const {
+  getNextAnimation,
+  animationClass,
+  timeLeft,
+} = useAnimation();
 
   const visibleLinks =
     pathname === "/"
@@ -56,8 +59,8 @@ export default function Header({
               className={`px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:text-gray-600 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg text-sm font-medium transition-colors ${link.class}`}
             >
               {isFunky && animationsRunning
-                ? "More Fun"
-                : link.title}
+            ? `More Fun (${timeLeft})`
+            : link.title}
             </a>
           );
         })}

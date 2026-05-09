@@ -14,6 +14,7 @@ type Animation = {
 
 type AnimationContextType = {
   animationClass: string;
+  timeLeft: number;
   getNextAnimation: (animations: Animation[]) => void;
 };
 
@@ -25,16 +26,37 @@ function shuffleArray<T>(array: T[]) {
   return [...array].sort(() => Math.random() - 0.5);
 }
 
+const ANIMATION_DURATION = 10;
+
 export function AnimationProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  const [animationClass, setAnimationClass] = useState("");
+  const [animationClass, setAnimationClass] =
+    useState("");
 
   const [queue, setQueue] = useState<string[]>([]);
 
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [timeLeft, setTimeLeft] = useState(0);
+
+  const timeoutRef = useRef<NodeJS.Timeout | null>(
+    null
+  );
+
+  const intervalRef = useRef<NodeJS.Timeout | null>(
+    null
+  );
+
+  function clearTimers() {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  }
 
   function getNextAnimation(animations: Animation[]) {
     let updatedQueue = queue;
@@ -51,19 +73,39 @@ export function AnimationProvider({
 
     setQueue(updatedQueue.slice(1));
 
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+    clearTimers();
 
+    // start countdown
+    setTimeLeft(ANIMATION_DURATION);
+
+    intervalRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+          }
+
+          return 0;
+        }
+
+        return prev - 1;
+      });
+    }, 1000);
+
+    // stop animation
     timeoutRef.current = setTimeout(() => {
       setAnimationClass("");
-    }, 10000);
+      setTimeLeft(0);
+
+      clearTimers();
+    }, ANIMATION_DURATION * 1000);
   }
 
   return (
     <AnimationContext.Provider
       value={{
         animationClass,
+        timeLeft,
         getNextAnimation,
       }}
     >
