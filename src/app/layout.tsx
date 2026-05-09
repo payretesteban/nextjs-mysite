@@ -13,11 +13,13 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap", // 1. Add this to prevent the "preload not used" warning
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap", // 2. Add this here too
 });
 
 export async function generateMetadata() {
@@ -33,16 +35,15 @@ export default async function RootLayout({
   const animations = await client.fetch(animationsQuery);
 
   return (
-    <html
-      lang="en"
+    <html 
+      lang="en" 
+      // 3. Ensure these variables are actually applied to the class
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-white text-slate-900">
+      <body className={`${geistSans.className} min-h-full flex flex-col bg-white text-slate-900`}>
         <AnimationProvider>
           <Header links={links} animations={animations} />
-
           <main className="flex-grow">{children}</main>
-
           <Footer />
         </AnimationProvider>
         <SpeedInsights />
