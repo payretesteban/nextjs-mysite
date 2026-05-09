@@ -36,16 +36,16 @@ export default async function IndexPage() {
       <ul className="flex flex-col gap-y-4">
         {posts.map((post) => (
           <li className="hover:underline" key={post._id}>
-            <Link href={`/${post.slug.current}`}>
-              <h2 className="text-xl font-semibold flex items-center gap-2">
-                {post.title}
-                 {post.featured && (
-                  <span className="text-xs bg-yellow-400 text-black px-2 py-1 rounded-full uppercase tracking-wide">
-                    Featured
-                  </span>
-                )}
-              </h2>
-            </Link>
+          <Link href={`/${post.slug.current}`}>
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              {post.title}
+              {post.featured && (
+                <span className="text-xs bg-yellow-400 text-black px-2 py-1 rounded-full uppercase tracking-wide">
+                  Featured
+                </span>
+              )}
+            </h2>
+          </Link>
           </li>
         ))}
       </ul>
