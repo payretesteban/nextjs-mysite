@@ -6,6 +6,7 @@ import {
   useState,
   ReactNode,
   useRef,
+  useEffect,
 } from "react";
 
 type Animation = {
@@ -18,9 +19,7 @@ type AnimationContextType = {
   getNextAnimation: (animations: Animation[]) => void;
 };
 
-const AnimationContext = createContext<
-  AnimationContextType | undefined
->(undefined);
+const AnimationContext = createContext<AnimationContextType | undefined>(undefined);
 
 function shuffleArray<T>(array: T[]) {
   return [...array].sort(() => Math.random() - 0.5);
@@ -28,75 +27,54 @@ function shuffleArray<T>(array: T[]) {
 
 const ANIMATION_DURATION = 10;
 
-export function AnimationProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  const [animationClass, setAnimationClass] =
-    useState("");
-
+export function AnimationProvider({ children }: { children: ReactNode }) {
+  const [animationClass, setAnimationClass] = useState("");
   const [queue, setQueue] = useState<string[]>([]);
-
   const [timeLeft, setTimeLeft] = useState(0);
+  const [isMounted, setIsMounted] = useState(false); 
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const timeoutRef = useRef<NodeJS.Timeout | null>(
-    null
-  );
-
-  const intervalRef = useRef<NodeJS.Timeout | null>(
-    null
-  );
+  useEffect(() => {
+    setIsMounted(true);
+    return () => clearTimers();
+  }, []);
 
   function clearTimers() {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
   }
 
   function getNextAnimation(animations: Animation[]) {
-    let updatedQueue = queue;
+    
+    if (!isMounted) return;
+
+    let updatedQueue = [...queue];
 
     if (updatedQueue.length === 0) {
-      updatedQueue = shuffleArray(
-        animations.map((a) => a.class)
-      );
+      updatedQueue = shuffleArray(animations.map((a) => a.class));
     }
 
     const nextAnimation = updatedQueue[0];
-
     setAnimationClass(nextAnimation);
-
     setQueue(updatedQueue.slice(1));
 
     clearTimers();
 
-    // start countdown
     setTimeLeft(ANIMATION_DURATION);
-
     intervalRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-          }
-
+          if (intervalRef.current) clearInterval(intervalRef.current);
           return 0;
         }
-
         return prev - 1;
       });
     }, 1000);
 
-    // stop animation
     timeoutRef.current = setTimeout(() => {
       setAnimationClass("");
       setTimeLeft(0);
-
       clearTimers();
     }, ANIMATION_DURATION * 1000);
   }
@@ -116,12 +94,8 @@ export function AnimationProvider({
 
 export function useAnimation() {
   const context = useContext(AnimationContext);
-
   if (!context) {
-    throw new Error(
-      "useAnimation must be used inside AnimationProvider"
-    );
+    throw new Error("useAnimation must be used inside AnimationProvider");
   }
-
   return context;
 }
