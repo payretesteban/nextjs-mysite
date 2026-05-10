@@ -41,7 +41,6 @@ export default async function RootLayout({
           <main className="flex-grow">{children}</main>
           <Footer />
         </AnimationProvider>
-        <SpeedInsights />
       </body>
     </html>
   );
