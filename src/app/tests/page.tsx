@@ -14,9 +14,6 @@ export default function TestsPage() {
   return (
     <div className="container mx-auto min-h-screen max-w-3xl p-8">
       <section className="mb-10">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          Quality
-        </p>
         <h1 className="text-4xl font-bold">Test Suite</h1>
         <p className="mt-3 max-w-xl text-slate-600 dark:text-slate-400">
           This site is covered by unit and component tests written with Vitest and
