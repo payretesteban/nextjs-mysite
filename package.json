@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/capture-test-results.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:capture": "node scripts/capture-test-results.mjs"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",
