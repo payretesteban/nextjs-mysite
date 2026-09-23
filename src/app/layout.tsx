@@ -28,7 +28,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { links } = await getIndexPageData();
+  const { links, profile } = await getIndexPageData();
 
   return (
     <html
@@ -37,7 +37,7 @@ export default async function RootLayout({
     >
       <body className={`${geistSans.className} min-h-full flex flex-col bg-white text-slate-900`}>
         <AnimationProvider>          
-          <Header links={links} /> 
+          <Header links={links} name={profile?.name} />
           <main className="flex-grow">{children}</main>
           <Footer />
         </AnimationProvider>
