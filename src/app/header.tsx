@@ -12,6 +12,15 @@ const FULL_MENU_PATHS = ["/", "/tests"];
 
 const noopSubscribe = () => () => {};
 
+/**
+ * False during the server render and hydration, true afterwards. Anything that depends on the
+ * current URL must wait for this: the server-rendered layout doesn't always know the pathname,
+ * and rendering different menu items on the client causes a hydration error (React #418).
+ */
+function useHydrated() {
+  return useSyncExternalStore(noopSubscribe, () => true, () => false);
+}
+
 /** ⌘K on Apple devices, Ctrl K elsewhere (server render assumes Ctrl K). */
 function useShortcutLabel() {
   return useSyncExternalStore(
@@ -29,6 +38,9 @@ export default function Header({
   name?: string;
 }) {
   const pathname = usePathname();
+  const hydrated = useHydrated();
+  // Pathname used for rendering: null until hydrated so server and client markup match
+  const currentPath = hydrated ? pathname : null;
   const { getNextAnimation, animationClass, timeLeft } = useAnimation();
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -62,13 +74,13 @@ export default function Header({
 
   const items = useMemo<MenuItem[]>(() => {
     // Internal links are only shown on pages that use the full global menu
-    const visibleLinks = FULL_MENU_PATHS.includes(pathname)
+    const visibleLinks = currentPath !== null && FULL_MENU_PATHS.includes(currentPath)
       ? links
       : links.filter((l) => l.category !== "internal");
 
     const result: MenuItem[] = [];
     if (!links.some((l) => l.url === "/")) {
-      result.push({ id: "home", label: "Home", group: "Pages", icon: "home", href: "/", current: pathname === "/" });
+      result.push({ id: "home", label: "Home", group: "Pages", icon: "home", href: "/", current: currentPath === "/" });
     }
 
     for (const link of visibleLinks) {
@@ -92,8 +104,8 @@ export default function Header({
         icon: iconForUrl(link.url),
         href: link.url,
         external,
-        current: !external && pathname === link.url,
-        hint: external ? undefined : pathname === link.url ? "Current page" : undefined,
+        current: !external && currentPath === link.url,
+        hint: external ? undefined : currentPath === link.url ? "Current page" : undefined,
         keywords: link.url,
       });
 
@@ -118,7 +130,7 @@ export default function Header({
       }
     }
     return result;
-  }, [links, pathname, animationsRunning, timeLeft, getNextAnimation, copied]);
+  }, [links, currentPath, animationsRunning, timeLeft, getNextAnimation, copied]);
 
   const onOpenChange = useCallback((o: boolean) => {
     setOpen(o);
