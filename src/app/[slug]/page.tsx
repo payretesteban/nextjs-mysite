@@ -3,6 +3,7 @@ import { client } from "@/sanity/client";
 import { urlFor } from "@/lib/image";
 import Link from "next/link";
 import Image from "next/image";
+import { Animated } from "@/lib/animations";
 
 const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]`;
 
@@ -33,7 +34,9 @@ export default async function PostPage({
         <Link href="/" className="hover:underline">
           ← Back
         </Link>
-        <h1 className="mt-8 text-4xl font-bold">Post not found</h1>
+        <h1 className="mt-8 text-4xl font-bold">
+          <Animated>Post not found</Animated>
+        </h1>
       </main>
     );
   }
@@ -61,7 +64,9 @@ export default async function PostPage({
         </div>
       )}
 
-      <h1 className="mb-8 text-4xl font-bold">{post.title}</h1>
+      <h1 className="mb-8 text-4xl font-bold">
+        <Animated>{post.title}</Animated>
+      </h1>
 
       <div className="prose dark:prose-invert">
         {Array.isArray(post.body) && (

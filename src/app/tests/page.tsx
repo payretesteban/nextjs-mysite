@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import TestRunner from "./TestRunner";
+import { Animated } from "@/lib/animations";
 
 export const metadata: Metadata = {
   title: "Tests",
@@ -14,7 +15,9 @@ export default function TestsPage() {
   return (
     <div className="container mx-auto min-h-screen max-w-3xl p-8">
       <section className="mb-10">
-        <h1 className="text-4xl font-bold">Test Suite</h1>
+        <h1 className="text-4xl font-bold">
+          <Animated>Test Suite</Animated>
+        </h1>
         <p className="mt-3 max-w-xl text-slate-600 dark:text-slate-400">
           This site is covered by unit and component tests written with Vitest and
           Testing Library. Run them and see every result below.

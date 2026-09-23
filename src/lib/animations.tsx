@@ -18,3 +18,26 @@ export default function AnimatedHeadline({
     </p>
   );
 }
+
+/**
+ * Wrap any text (e.g. a page title) so it joins in when fun mode is on.
+ * Rendered as an inline-block so transforms like spin/wiggle pivot around the text itself.
+ */
+export function Animated({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const { animationClass } = useAnimation();
+
+  return (
+    <span
+      key={animationClass}
+      className={`inline-block ${className} ${animationClass}`.replace(/\s+/g, " ").trim()}
+    >
+      {children}
+    </span>
+  );
+}
