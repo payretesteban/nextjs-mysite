@@ -62,6 +62,19 @@ describe("Header Component", () => {
     expect(screen.getByText("GitHub")).toBeInTheDocument();
   });
 
+  it("shows the full homepage menu on the tests page", () => {
+    mockUsePathname.mockReturnValue("/tests");
+
+    render(
+      <AnimationProvider>
+        <Header links={mockLinks} />
+      </AnimationProvider>
+    );
+
+    expect(screen.getByText("Home")).toBeInTheDocument();
+    expect(screen.getByText("Blog")).toBeInTheDocument();
+  });
+
   it("sets correct attributes for external links", () => {
     mockUsePathname.mockReturnValue("/");
 

@@ -111,7 +111,13 @@ export async function runVitest({ cwd = process.cwd(), source = "snapshot", time
       const child = spawn(
         process.execPath,
         [vitestBin, "run", "--reporter=json", `--outputFile=${reportPath}`],
-        { cwd, env: { ...process.env, CI: "1", FORCE_COLOR: "0" }, stdio: ["ignore", "ignore", "pipe"] }
+        {
+          cwd,
+          // Force NODE_ENV=test: builds (e.g. Vercel) run with NODE_ENV=production, which loads
+          // React's production bundle — it has no `act`, so every Testing Library test would fail.
+          env: { ...process.env, NODE_ENV: "test", CI: "1", FORCE_COLOR: "0" },
+          stdio: ["ignore", "ignore", "pipe"],
+        }
       );
       let err = "";
       child.stderr.on("data", (d) => (err += d));

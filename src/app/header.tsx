@@ -4,15 +4,19 @@ import { usePathname } from "next/navigation";
 import { SanityLink } from "@/lib/types";
 import { useAnimation } from "./context/AnimationContext";
 
+// Pages that show the same full menu as the homepage
+const FULL_MENU_PATHS = ["/", "/tests"];
+
 export default function Header({ links }: { links: SanityLink[] }) {
   const pathname = usePathname();
   const { getNextAnimation, animationClass, timeLeft } = useAnimation();
 
   const animationsRunning = animationClass !== "";
 
-  // Only show internal links on the home page
-  const visibleLinks =
-    pathname === "/" ? links : links.filter((l) => l.category !== "internal");
+  // Internal links are only shown on pages that use the full global menu
+  const visibleLinks = FULL_MENU_PATHS.includes(pathname)
+    ? links
+    : links.filter((l) => l.category !== "internal");
 
   return (
     <header className="container mx-auto max-w-3xl p-8 pb-0">
