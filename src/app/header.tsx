@@ -9,7 +9,7 @@ import { useContact } from "./contact/ContactProvider";
 import CommandMenu, { Icon, Kbd, iconForUrl, isExternalUrl, type MenuItem } from "./command-menu";
 
 // Pages that show the same full menu as the homepage
-const FULL_MENU_PATHS = ["/", "/tests", "/performance"];
+const FULL_MENU_PATHS = ["/", "/tests", "/performance", "/adventure"];
 
 const noopSubscribe = () => () => {};
 
