@@ -18,7 +18,7 @@ export default function PerformancePage() {
           <Animated>Performance</Animated>
         </h1>
         <p className="mt-3 max-w-xl text-slate-600 dark:text-slate-400">
-          Run a live Lighthouse audit of <span className="font-medium text-slate-900 dark:text-slate-100">{host}</span>{" "}
+          Run a live Lighthouse audit of my website 
           and see how fast, accessible and search-friendly it is. The test runs on Google&apos;s
           servers through PageSpeed Insights.
         </p>
