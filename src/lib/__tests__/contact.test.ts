@@ -53,6 +53,12 @@ describe("contact email", () => {
     expect(contactSubject(ft)).toBe("[Full-time] EM at Globex — Sam Bcc: x@y.z"); // no header injection via newlines
   });
 
+  it("names the service in the subject and email when the form was opened from a service", () => {
+    const withTopic = validateContact({ ...consulting, topic: "Web Development" }).data!;
+    expect(contactSubject(withTopic)).toBe("[Consulting] Web Development for Acme — Jane Doe");
+    expect(contactEmailText(withTopic)).toContain("Service: Web Development");
+  });
+
   it("includes only the fields for the chosen type", () => {
     const text = contactEmailText({ ...data, role: "should not appear" });
     expect(text).toContain("Budget: $5k – $15k");

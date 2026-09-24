@@ -5,10 +5,12 @@ import { getIndexPageData } from "@/lib/data";
 import { urlFor } from "@/lib/image";
 import AnimatedHeadline from "@/lib/animations";
 import ContactButton from "./contact/ContactButton";
+import ServicesTicker from "./services/ServicesTicker";
+import { getServicesPageData } from "@/lib/services";
 
 
 export default async function IndexPage() {
-  const { posts, profile } = await getIndexPageData();
+  const [{ posts, profile }, { services }] = await Promise.all([getIndexPageData(), getServicesPageData()]);
     
   return (
     <main className="container mx-auto min-h-screen max-w-3xl p-8">
@@ -27,8 +29,9 @@ export default async function IndexPage() {
             <div className="prose prose-slate">
               <PortableText value={profile.bio} />
             </div>
-            <div className="mt-6">
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
               <ContactButton />
+              <ServicesTicker names={services.map((s) => s.shortTitle || s.title)} />
             </div>
           </div>
         </section>

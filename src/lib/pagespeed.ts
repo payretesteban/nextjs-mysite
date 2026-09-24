@@ -4,10 +4,13 @@
  * Docs: https://developers.google.com/speed/docs/insights/v5/get-started
  */
 
+import { SITE_ORIGIN } from "./site";
+
 export type Strategy = "mobile" | "desktop";
 export type Rating = "good" | "average" | "poor" | "none";
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.estebanpayret.com/";
+/** The page PageSpeed Insights tests: the homepage at the canonical (www) address. */
+export const SITE_URL = `${SITE_ORIGIN}/`;
 
 export interface CategoryScore {
   id: string;

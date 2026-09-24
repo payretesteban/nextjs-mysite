@@ -28,6 +28,7 @@
   --animate-grow: grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-gauge: gauge 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-caret: caret 1.1s step-end infinite;
+  --animate-ticker: ticker 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Test results page */
@@ -55,6 +56,18 @@
   transform-origin: left;
 }
 
+/* Homepage "incl. …" line: the next service name slides up */
+@keyframes ticker {
+  from {
+    opacity: 0;
+    transform: translateY(70%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Header logo: blinking text cursor */
 @keyframes caret {
   50% {
@@ -72,6 +85,7 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up,
   .animate-caret,
+  .animate-ticker,
   .animate-gauge,
   .animate-grow {
     animation: none;

@@ -43,3 +43,6 @@ next-env.d.ts
 
 # others
 package-lock.json
+
+# preview images from Claude sessions
+/Claude outputs/

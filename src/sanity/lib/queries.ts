@@ -34,3 +34,28 @@ export const indexPageQuery = defineQuery(`{
     }
   }
 }`);
+
+export const servicesPageQuery = defineQuery(`{
+  "page": *[_type == "servicesPage"][0] {
+    title,
+    intro,
+    ctaTitle,
+    ctaText
+  },
+  "services": *[_type == "service" && defined(title)] | order(coalesce(order, 999) asc, title asc) {
+    _id,
+    title,
+    shortTitle,
+    summary,
+    icon
+  }
+}`);
+
+export const sitemapQuery = defineQuery(`{
+  "posts": *[_type == "post" && defined(slug.current)] | order(publishedAt desc) {
+    "slug": slug.current,
+    _updatedAt
+  },
+  "homeUpdatedAt": *[_type in ["profile", "post", "link"]] | order(_updatedAt desc)[0]._updatedAt,
+  "servicesUpdatedAt": *[_type in ["service", "servicesPage"]] | order(_updatedAt desc)[0]._updatedAt
+}`);

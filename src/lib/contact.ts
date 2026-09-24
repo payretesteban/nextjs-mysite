@@ -27,6 +27,8 @@ export interface ContactInput {
   email: string;
   company: string;
   message: string;
+  /** Optional: the service the visitor clicked on, e.g. "Web Development". */
+  topic: string;
   // Consulting & Freelance
   projectType: string;
   budget: string;
@@ -47,6 +49,7 @@ export const EMPTY_CONTACT: ContactInput = {
   email: "",
   company: "",
   message: "",
+  topic: "",
   projectType: "",
   budget: "",
   timeline: "",
@@ -63,6 +66,7 @@ const LIMITS: Partial<Record<ContactField, number>> = {
   role: 120,
   location: 120,
   jobUrl: 500,
+  topic: 120,
   message: 5000,
 };
 
@@ -119,7 +123,7 @@ export function contactSubject(d: ContactInput) {
   const tag = d.type === "consulting" ? "[Consulting]" : "[Full-time]";
   const topic =
     d.type === "consulting"
-      ? [d.projectType, d.company].filter(Boolean).join(" for ")
+      ? [d.topic || d.projectType, d.company].filter(Boolean).join(" for ")
       : [d.role, d.company].filter(Boolean).join(" at ");
   return oneLine(`${tag} ${topic ? `${topic} — ` : ""}${d.name}`).slice(0, 200);
 }
@@ -127,6 +131,7 @@ export function contactSubject(d: ContactInput) {
 function contactRows(d: ContactInput): [string, string][] {
   const rows: [string, string][] = [
     ["Type", d.type === "consulting" ? "Consulting & Freelance" : "Full-Time Opportunity"],
+    ["Service", d.topic],
     ["Name", d.name],
     ["Email", d.email],
     ["Company", d.company],

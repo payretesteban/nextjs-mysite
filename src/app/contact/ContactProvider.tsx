@@ -15,7 +15,10 @@ import {
   type InquiryType,
 } from "@/lib/contact";
 
-type ContactContextValue = { open: (type?: InquiryType) => void };
+type ContactContextValue = {
+  /** Open the form. `topic` (e.g. a service name) is shown in the form and added to the email. */
+  open: (type?: InquiryType, topic?: string) => void;
+};
 const ContactContext = createContext<ContactContextValue | null>(null);
 
 /** Opens the "Let's work together" form from anywhere. Null outside the provider. */
@@ -37,13 +40,13 @@ export default function ContactProvider({ children }: { children: React.ReactNod
   const [honeypot, setHoneypot] = useState("");
 
   const open = useCallback(
-    (type?: InquiryType) => {
-      // Start fresh after a successful send; otherwise keep the draft
+    (type?: InquiryType, topic?: string) => {
+      // Start fresh after a successful send; otherwise keep the draft (with the new topic, if any)
       if (status === "sent") {
-        setForm({ ...EMPTY_CONTACT, type: type ?? "consulting" });
+        setForm({ ...EMPTY_CONTACT, type: type ?? "consulting", topic: topic ?? "" });
         setStatus("idle");
-      } else if (type) {
-        setForm((f) => ({ ...f, type }));
+      } else {
+        setForm((f) => ({ ...f, type: type ?? f.type, topic: topic ?? "" }));
       }
       setErrors({});
       setServerError(null);
@@ -184,6 +187,22 @@ export default function ContactProvider({ children }: { children: React.ReactNod
               <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
                 Tell me a bit about what you have in mind and I&apos;ll get back to you within 2 business days.
               </p>
+
+              {form.topic && (
+                <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-sky-50 py-1 pr-1 pl-3 text-sm font-medium text-sky-800 dark:bg-sky-950/60 dark:text-sky-200">
+                  About: {form.topic}
+                  <button
+                    type="button"
+                    onClick={() => update("topic", "")}
+                    aria-label={`Remove topic ${form.topic}`}
+                    className="rounded-full p-0.5 text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-900 dark:text-sky-300 dark:hover:bg-sky-900"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="h-3.5 w-3.5" aria-hidden="true">
+                      <path d="m7 7 10 10M17 7 7 17" />
+                    </svg>
+                  </button>
+                </p>
+              )}
 
               <div role="radiogroup" aria-label="What are you looking for?" className="mt-5 grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1 text-sm dark:bg-slate-800">
                 {INQUIRY_TYPES.map((t) => (

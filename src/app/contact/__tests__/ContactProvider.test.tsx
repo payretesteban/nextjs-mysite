@@ -2,6 +2,12 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ContactProvider from "../ContactProvider";
 import ContactButton from "../ContactButton";
+import { useContact } from "../ContactProvider";
+
+function TopicButton() {
+  const contact = useContact();
+  return <button onClick={() => contact?.open("consulting", "AI workflows")}>Ask about AI</button>;
+}
 
 function setup() {
   render(
@@ -62,6 +68,36 @@ describe("Let's work together form", () => {
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
     expect(body).toMatchObject({ type: "consulting", name: "Jane Doe", budget: "Not sure yet", website: "" });
     expect(typeof body.startedAt).toBe("number");
+  });
+
+  it("sends the service topic and lets the visitor remove it", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ ok: true }) });
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <ContactProvider>
+        <TopicButton />
+      </ContactProvider>
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Ask about AI" }));
+    expect(screen.getByText("About: AI workflows")).toBeInTheDocument();
+
+    type(/^name/i, "Jane Doe");
+    type(/^email/i, "jane@acme.com");
+    type(/message/i, "We need help reviewing our platform architecture.");
+    fireEvent.click(screen.getByRole("button", { name: /send message/i }));
+    await screen.findByText("Thanks, Jane!");
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).topic).toBe("AI workflows");
+  });
+
+  it("can remove the topic", () => {
+    render(
+      <ContactProvider>
+        <TopicButton />
+      </ContactProvider>
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Ask about AI" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove topic AI workflows" }));
+    expect(screen.queryByText(/^About:/)).not.toBeInTheDocument();
   });
 
   it("keeps what was typed when sending fails", async () => {
