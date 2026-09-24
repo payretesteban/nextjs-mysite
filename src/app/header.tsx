@@ -153,16 +153,24 @@ export default function Header({
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-md dark:border-slate-800/70 dark:bg-[#0a0a0a]/80">
       <nav aria-label="Main" className="container mx-auto flex max-w-3xl items-center gap-3 px-8 py-4">
-        <Link href="/" className="group flex min-w-0 items-center gap-2.5 font-semibold tracking-tight">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-xs font-bold text-white transition-transform group-hover:-rotate-6 dark:bg-white dark:text-slate-900">
-            {name
-              .split(/\s+/)
-              .map((w) => w[0])
-              .slice(0, 2)
-              .join("")
-              .toUpperCase()}
+        <Link href="/" aria-label={`${name} — home`} title={name} className="group flex items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+          {/* Code-tag logo: <EP/> with a blinking cursor */}
+          <span
+            aria-hidden="true"
+            className="flex h-8 shrink-0 items-center rounded-lg bg-slate-900 px-2 font-mono text-xs font-bold text-white shadow-sm transition-shadow group-hover:shadow-md dark:bg-white dark:text-slate-900"
+          >
+            <span className="text-sky-400 transition-transform duration-200 group-hover:-translate-x-0.5 dark:text-sky-600">&lt;</span>
+            <span>
+              {name
+                .split(/\s+/)
+                .map((w) => w[0])
+                .slice(0, 2)
+                .join("")
+                .toUpperCase()}
+            </span>
+            <span className="text-sky-400 transition-transform duration-200 group-hover:translate-x-0.5 dark:text-sky-600">/&gt;</span>
+            <span className="animate-caret ml-0.5 h-3.5 w-[2px] rounded-full bg-emerald-400 dark:bg-emerald-500" />
           </span>
-          <span className="truncate whitespace-nowrap">{name}</span>
         </Link>
 
         <span className="flex-1" />

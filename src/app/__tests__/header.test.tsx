@@ -116,10 +116,11 @@ describe("Header Component", () => {
     expect(screen.getByText(/More Fun \(10s\)/)).toBeInTheDocument();
   });
 
-  it("shows initials and the site name linking home", () => {
+  it("shows only the logo, linking home with an accessible name", () => {
     renderHeader();
     expect(screen.getByText("EP")).toBeInTheDocument();
-    expect(screen.getByText("Esteban Payret").closest("a")).toHaveAttribute("href", "/");
+    expect(screen.queryByText("Esteban Payret")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Esteban Payret — home" })).toHaveAttribute("href", "/");
   });
 
   it("opens the menu from the button and closes it with Esc", () => {
