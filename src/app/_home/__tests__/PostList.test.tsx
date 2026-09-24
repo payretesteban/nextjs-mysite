@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import PostList from "../PostList";
+import HomePosts from "../HomePosts";
 
 const post = (i: number, extra = {}) => ({
   _id: `p${i}`,
@@ -13,32 +14,38 @@ const post = (i: number, extra = {}) => ({
 const posts = Array.from({ length: 8 }, (_, i) => post(i + 1));
 
 describe("PostList", () => {
-  it("shows only `limit` posts and a link to all of them", () => {
-    render(<PostList posts={posts} limit={5} total={12} />);
-    expect(screen.getAllByRole("listitem")).toHaveLength(5);
-    expect(screen.getByRole("link", { name: /see all 12 posts/i })).toHaveAttribute("href", "/posts");
+  it("shows featured posts first in their own highlighted list, then the rest", () => {
+    render(<PostList posts={[post(1), post(2, { featured: true }), post(3)]} />);
+    const featured = screen.getByRole("list", { name: /featured posts/i });
+    expect(within(featured).getByRole("link", { name: /post 2/i })).toHaveAttribute("href", "/post-2");
+    expect(within(featured).getByText("Featured")).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(3);
+    expect(screen.getAllByText("Featured")).toHaveLength(1);
   });
 
-  it("hides the 'See all' link when everything already fits", () => {
-    render(<PostList posts={posts.slice(0, 3)} limit={5} total={3} />);
-    expect(screen.queryByRole("link", { name: /see all/i })).not.toBeInTheDocument();
-  });
-
-  it("shows every post without a limit", () => {
+  it("has no featured list when nothing is featured, and shows no dates", () => {
     render(<PostList posts={posts} />);
+    expect(screen.queryByRole("list", { name: /featured posts/i })).not.toBeInTheDocument();
     expect(screen.getAllByRole("listitem")).toHaveLength(8);
-    expect(screen.queryByRole("link", { name: /see all/i })).not.toBeInTheDocument();
-  });
-
-  it("links each post to its page with the featured badge, and shows no dates", () => {
-    render(<PostList posts={[post(1, { featured: true }), post(2)]} />);
-    expect(screen.getByRole("link", { name: /post 1/i })).toHaveAttribute("href", "/post-1");
-    expect(screen.getByText("Featured")).toBeInTheDocument();
     expect(screen.queryByText(/2026/)).not.toBeInTheDocument();
   });
 
   it("says so when there are no posts", () => {
     render(<PostList posts={[]} />);
     expect(screen.getByText(/no posts yet/i)).toBeInTheDocument();
+  });
+});
+
+describe("HomePosts", () => {
+  it("shows only `limit` posts and a link to all of them", () => {
+    render(<HomePosts posts={posts} limit={5} total={12} />);
+    expect(screen.getByRole("heading", { name: "Posts" })).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(5);
+    expect(screen.getByRole("link", { name: /see all 12 posts/i })).toHaveAttribute("href", "/posts");
+  });
+
+  it("hides the 'See all' link when everything already fits", () => {
+    render(<HomePosts posts={posts.slice(0, 3)} limit={5} total={3} />);
+    expect(screen.queryByRole("link", { name: /see all/i })).not.toBeInTheDocument();
   });
 });

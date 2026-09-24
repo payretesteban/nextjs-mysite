@@ -6,7 +6,7 @@ import ContactButton from "./contact/ContactButton";
 import ServicesTicker from "./services/ServicesTicker";
 import { getServicesPageData } from "@/lib/services";
 import { getSiteLog } from "@/lib/siteLog";
-import PostList from "./_home/PostList";
+import HomePosts from "./_home/HomePosts";
 import SiteLogNotes from "./_home/SiteLogNotes";
 
 /** How many posts the homepage shows before "See all posts". */
@@ -45,12 +45,7 @@ export default async function IndexPage() {
         </section>
       )}
 
-      <hr className="mb-12 border-slate-200" />
-
-      <section aria-labelledby="posts-heading">
-        <h2 id="posts-heading" className="mb-6 text-2xl font-bold tracking-tight">Posts</h2>
-        <PostList posts={posts} limit={HOME_POST_LIMIT} total={postCount} />
-      </section>
+      <HomePosts posts={posts} limit={HOME_POST_LIMIT} total={postCount} />
 
       {/* overflow-x-clip keeps tossed notes from causing sideways scrolling on phones */}
       <section aria-labelledby="sitelog-heading" className="-mx-4 mt-16 overflow-x-clip px-4 pb-2">
