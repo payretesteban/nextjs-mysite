@@ -32,6 +32,8 @@ export interface SanityProfile {
 
 export interface IndexPageData {
   posts: SanityPost[];
+  /** Total number of posts (the list above is capped). */
+  postCount?: number;
   links: SanityLink[];
   profile: SanityProfile;
 }

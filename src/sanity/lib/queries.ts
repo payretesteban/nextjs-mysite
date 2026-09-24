@@ -15,6 +15,7 @@ export const indexPageQuery = defineQuery(`{
     publishedAt,
     featured
   },
+  "postCount": count(*[_type == "post" && defined(slug.current)]),
   "links": *[_type == "link"] | order(sort asc) {
     _id, 
     title, 
@@ -57,5 +58,24 @@ export const sitemapQuery = defineQuery(`{
     _updatedAt
   },
   "homeUpdatedAt": *[_type in ["profile", "post", "link"]] | order(_updatedAt desc)[0]._updatedAt,
-  "servicesUpdatedAt": *[_type in ["service", "servicesPage"]] | order(_updatedAt desc)[0]._updatedAt
+  "servicesUpdatedAt": *[_type in ["service", "servicesPage"]] | order(_updatedAt desc)[0]._updatedAt,
+  "siteLogUpdatedAt": *[_type == "siteLogEntry"] | order(_updatedAt desc)[0]._updatedAt
 }`);
+
+export const allPostsQuery = defineQuery(`
+  *[_type == "post" && defined(slug.current)] | order(coalesce(featured, false) desc, publishedAt desc) {
+    _id,
+    title,
+    slug,
+    publishedAt,
+    featured
+  }
+`);
+
+export const siteLogQuery = defineQuery(`
+  *[_type == "siteLogEntry" && defined(title)] | order(order asc, _createdAt asc) {
+    _id,
+    title,
+    text
+  }
+`);

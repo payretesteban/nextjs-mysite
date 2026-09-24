@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { PortableText } from "@portabletext/react";
 import { getIndexPageData } from "@/lib/data";
 import { urlFor } from "@/lib/image";
@@ -7,13 +5,23 @@ import AnimatedHeadline from "@/lib/animations";
 import ContactButton from "./contact/ContactButton";
 import ServicesTicker from "./services/ServicesTicker";
 import { getServicesPageData } from "@/lib/services";
+import { getSiteLog } from "@/lib/siteLog";
+import PostList from "./_home/PostList";
+import SiteLogNotes from "./_home/SiteLogNotes";
+
+/** How many posts the homepage shows before "See all posts". */
+const HOME_POST_LIMIT = 5;
 
 
 export default async function IndexPage() {
-  const [{ posts, profile }, { services }] = await Promise.all([getIndexPageData(), getServicesPageData()]);
+  const [{ posts, postCount, profile }, { services }, siteLog] = await Promise.all([
+    getIndexPageData(),
+    getServicesPageData(),
+    getSiteLog(),
+  ]);
     
   return (
-    <main className="container mx-auto min-h-screen max-w-3xl p-8">
+    <div className="container mx-auto min-h-screen max-w-3xl p-8">
       {profile && (
         <section className="mb-12 flex flex-col md:flex-row gap-8 items-start">
           {profile.profileImage && (
@@ -39,23 +47,19 @@ export default async function IndexPage() {
 
       <hr className="mb-12 border-slate-200" />
 
-      <h1 className={`text-4xl font-bold mb-8`}>Posts</h1>
-      <ul className="flex flex-col gap-y-4">
-        {posts.map((post) => (
-          <li className="hover:underline" key={post._id}>
-          <Link href={`/${post.slug.current}`}>
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              {post.title}
-              {post.featured && (
-                <span className="text-xs bg-yellow-400 text-black px-2 py-1 rounded-full uppercase tracking-wide">
-                  Featured
-                </span>
-              )}
-            </h2>
-          </Link>
-          </li>
-        ))}
-      </ul>
-    </main>
+      <section aria-labelledby="posts-heading">
+        <h2 id="posts-heading" className="mb-6 text-2xl font-bold tracking-tight">Posts</h2>
+        <PostList posts={posts} limit={HOME_POST_LIMIT} total={postCount} />
+      </section>
+
+      {/* overflow-x-clip keeps tossed notes from causing sideways scrolling on phones */}
+      <section aria-labelledby="sitelog-heading" className="-mx-4 mt-16 overflow-x-clip px-4 pb-2">
+        <h2 id="sitelog-heading" className="text-2xl font-bold tracking-tight">Site log</h2>
+        <p className="mt-1 mb-8 text-sm text-slate-500 dark:text-slate-400">
+          Notes from building this site, mostly the funny parts. Tap a note for the next one.
+        </p>
+        <SiteLogNotes entries={siteLog} moreHref="/site-log" />
+      </section>
+    </div>
   );
 }
