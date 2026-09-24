@@ -114,7 +114,7 @@ export default function Header({
         id: link._id,
         label: link.title,
         group: external ? "Elsewhere" : "Pages",
-        icon: iconForUrl(link.url),
+        icon: iconForUrl(link.url, link.title),
         href: link.url,
         external,
         current: !external && currentPath === link.url,

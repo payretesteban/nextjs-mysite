@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.0.1 — 2026-09-24
+
+- Each page in the ⌘K menu has its own icon (tests, services, performance, game, posts, site log), picked from the page's address and title.
+
 ## 1.0.0 — 2026-09-24
 
 - Site version shown in the footer, this changelog, and git tags for every past release.
