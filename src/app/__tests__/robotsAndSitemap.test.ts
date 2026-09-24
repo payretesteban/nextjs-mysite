@@ -11,7 +11,7 @@ vi.mock("@/sanity/client", () => ({
 }));
 const fetchMock = vi.mocked(client.fetch) as unknown as ReturnType<typeof vi.fn>;
 
-describe("robots route handler", () => {
+describe("robots.txt", () => {
   it("allows the site, blocks the studio and API routes, and points to the www sitemap", () => {
     expect(robots()).toEqual({
       rules: {
@@ -24,7 +24,7 @@ describe("robots route handler", () => {
   });
 });
 
-describe("sitemap route handler", () => {
+describe("Sitemap", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

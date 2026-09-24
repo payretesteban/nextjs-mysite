@@ -40,12 +40,12 @@ function renderHeader(pathname = "/") {
   return document.querySelector("dialog") as HTMLDialogElement;
 }
 
-describe("Header Component", () => {
+describe("Header and ⌘K menu", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("renders internal links when on the home page '/'", () => {
+  it("shows the site's pages in the menu on the homepage", () => {
     mockUsePathname.mockReturnValue("/");
 
     render(
@@ -60,7 +60,7 @@ describe("Header Component", () => {
     expect(screen.getByText("GitHub")).toBeInTheDocument();
   });
 
-  it("filters out internal links when not on the home page", () => {
+  it("hides the site's pages in the menu on other pages", () => {
     mockUsePathname.mockReturnValue("/blog/post-1");
 
     render(
@@ -87,7 +87,7 @@ describe("Header Component", () => {
     expect(screen.getByText("Blog")).toBeInTheDocument();
   });
 
-  it("sets correct attributes for external links", () => {
+  it("sets the right attributes on external links", () => {
     mockUsePathname.mockReturnValue("/");
 
     render(
@@ -101,7 +101,7 @@ describe("Header Component", () => {
     expect(externalLink).toHaveAttribute("rel", "noopener noreferrer");
   });
 
-  it("triggers animation countdown on clicking funky link", () => {
+  it("starts fun mode from the funky link", () => {
     mockUsePathname.mockReturnValue("/");
 
     render(

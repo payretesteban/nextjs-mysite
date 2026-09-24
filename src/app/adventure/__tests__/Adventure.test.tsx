@@ -20,7 +20,7 @@ function setup() {
   return { input, send };
 }
 
-describe("The Deep Drop page", () => {
+describe("Game screen", () => {
   it("starts aboard the plane with metric and imperial units", () => {
     setup();
     expect(screen.getAllByText("Aboard the jump plane").length).toBeGreaterThan(0);

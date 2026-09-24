@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { alt, bar, depth, kg, kmh, rate, statusDive } from "../units";
 
-describe("metric + imperial units", () => {
+describe("Metric and imperial units", () => {
   it("formats depths, altitudes, pressure, weight and speed in both systems", () => {
     expect(depth(18)).toBe("18 m (60 ft)");
     expect(depth(5)).toBe("5 m (15 ft)");

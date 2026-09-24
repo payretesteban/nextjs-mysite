@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { normalizePageSpeed, ratingFromScore, splitMarkdown } from "../pagespeed";
 import { pageSpeedSample } from "./fixtures/pagespeed-sample";
 
-describe("normalizePageSpeed", () => {
+describe("Reading PageSpeed results", () => {
   const result = normalizePageSpeed(pageSpeedSample, "mobile");
 
   it("converts category scores to 0–100 in a fixed order", () => {
@@ -34,7 +34,7 @@ describe("normalizePageSpeed", () => {
     ]);
   });
 
-  it("returns null field data when there isn't any", () => {
+  it("handles sites without real-visitor data", () => {
     const noField = { ...pageSpeedSample, loadingExperience: undefined };
     expect(normalizePageSpeed(noField, "desktop").field).toBeNull();
   });
@@ -58,12 +58,12 @@ describe("normalizePageSpeed", () => {
     expect(result.reportUrl).toBe("https://pagespeed.web.dev/report?url=https%3A%2F%2Festebanpayret.com%2F&form_factor=mobile");
   });
 
-  it("throws a clear error when there is no Lighthouse result", () => {
+  it("gives a clear error when there is no Lighthouse result", () => {
     expect(() => normalizePageSpeed({ error: {} }, "mobile")).toThrow(/no Lighthouse result/);
   });
 });
 
-describe("helpers", () => {
+describe("Scores and tips", () => {
   it("rates scores using Lighthouse's bands", () => {
     expect([ratingFromScore(0.95), ratingFromScore(0.5), ratingFromScore(0.49), ratingFromScore(null)]).toEqual([
       "good",

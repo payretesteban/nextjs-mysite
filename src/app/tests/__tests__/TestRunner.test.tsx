@@ -45,16 +45,16 @@ function mockFetch(body: unknown, ok = true) {
   return fn;
 }
 
-describe("TestRunner", () => {
+describe("Run tests button", () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it("shows only the button before running", () => {
     render(<TestRunner mode="live" />);
     expect(screen.getByRole("button", { name: /run tests/i })).toBeInTheDocument();
-    expect(screen.queryByText(/results by file/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/what.s tested/i)).not.toBeInTheDocument();
   });
 
-  it("runs tests live via the API and shows a passing summary", async () => {
+  it("runs tests live and shows a passing summary", async () => {
     const fetchMock = mockFetch(passingRun);
     render(<TestRunner mode="live" />);
 
@@ -64,6 +64,10 @@ describe("TestRunner", () => {
     expect(fetchMock).toHaveBeenCalledWith("/api/tests", { method: "POST" });
     expect(screen.getByText("renders the year")).toBeInTheDocument();
     expect(screen.getByText("Live run")).toBeInTheDocument();
+    // Grouped by part of the site, not by file path
+    expect(screen.getByText("Header, menu & footer")).toBeInTheDocument();
+    expect(screen.getByText("2/2")).toBeInTheDocument();
+    expect(screen.queryByText(/footer\.test\.tsx/)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /run tests again/i })).toBeInTheDocument();
   });
 
@@ -81,7 +85,7 @@ describe("TestRunner", () => {
     expect(screen.getByText("renders the name")).toBeInTheDocument();
   });
 
-  it("reads the build snapshot in snapshot mode", async () => {
+  it("shows the results saved at build time on the live site", async () => {
     const fetchMock = mockFetch({ ...passingRun, source: "snapshot" });
     render(<TestRunner mode="snapshot" />);
 
@@ -91,7 +95,7 @@ describe("TestRunner", () => {
     expect(fetchMock).toHaveBeenCalledWith("/test-results.json", { cache: "no-store" });
   });
 
-  it("shows an error when no snapshot exists", async () => {
+  it("explains when no saved results exist", async () => {
     mockFetch({}, false);
     render(<TestRunner mode="snapshot" />);
 

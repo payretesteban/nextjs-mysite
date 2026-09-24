@@ -21,7 +21,7 @@ const ui = (
   </AnimationProvider>
 );
 
-describe("Header hydration", () => {
+describe("Loading the header", () => {
   it("hydrates without a mismatch even when the server doesn't know the pathname", async () => {
     // Server render: the prerendered layout may not have a pathname
     mockUsePathname.mockReturnValue(null);

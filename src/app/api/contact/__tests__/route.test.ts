@@ -23,7 +23,7 @@ function post(body: unknown, ip = `10.0.0.${++ipCounter}`) {
 
 const human = (extra: object = {}) => ({ ...valid, startedAt: Date.now() - 10_000, website: "", ...extra });
 
-describe("POST /api/contact", () => {
+describe("Sending the email", () => {
   beforeEach(() => {
     vi.stubEnv("RESEND_API_KEY", "re_test");
     vi.spyOn(console, "error").mockImplementation(() => {});

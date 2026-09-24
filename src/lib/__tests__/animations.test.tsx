@@ -3,8 +3,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import AnimatedHeadline, { Animated } from "../animations";
 import { AnimationProvider, useAnimation } from "@/app/context/AnimationContext";
 
-describe("AnimatedHeadline Component", () => {
-  it("renders headline text with animation context styling", () => {
+describe("Animated headline", () => {
+  it("shows the headline and joins in with fun mode", () => {
     const text = "Tech Lead & Software Engineer";
 
     render(
@@ -24,8 +24,8 @@ function FunButton() {
   return <button onClick={getNextAnimation}>Fun</button>;
 }
 
-describe("Animated", () => {
-  it("renders its children as an inline-block with no animation by default", () => {
+describe("Animated page titles", () => {
+  it("shows the title with no animation by default", () => {
     render(
       <AnimationProvider>
         <h1>

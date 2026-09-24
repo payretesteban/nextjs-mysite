@@ -16,7 +16,7 @@ const response = (strategy: "mobile" | "desktop", cached = false) => ({
   freshAfter: "2026-09-23T22:10:00.000Z",
 });
 
-describe("PerformanceRunner", () => {
+describe("Performance page", () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it("starts with mobile selected and no report", () => {

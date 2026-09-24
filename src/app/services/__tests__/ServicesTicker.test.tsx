@@ -10,7 +10,7 @@ function mockReducedMotion(reduce: boolean) {
   vi.stubGlobal("matchMedia", (q: string) => ({ matches: reduce && q.includes("reduce"), media: q, addEventListener() {}, removeEventListener() {} }));
 }
 
-describe("ServicesTicker", () => {
+describe("Rotating services link", () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();

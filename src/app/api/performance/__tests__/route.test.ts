@@ -18,7 +18,7 @@ const { POST } = await import("../route");
 const post = (body: unknown) =>
   POST(new Request("http://localhost/api/performance", { method: "POST", body: JSON.stringify(body) }));
 
-describe("POST /api/performance", () => {
+describe("Running a PageSpeed test", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     store.clear();

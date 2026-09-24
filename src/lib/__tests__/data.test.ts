@@ -9,12 +9,12 @@ vi.mock("@/sanity/client", () => ({
   },
 }));
 
-describe("getIndexPageData", () => {
+describe("Loading homepage content", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("calls client.fetch with indexPageQuery and correct revalidation settings", async () => {
+  it("asks Sanity for the homepage content, refreshed every 30 seconds", async () => {
     const mockData = {
       posts: [],
       links: [],

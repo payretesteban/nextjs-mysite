@@ -36,7 +36,7 @@ const report = {
   ],
 };
 
-describe("normalizeReport", () => {
+describe("Turning raw results into this report", () => {
   const result = normalizeReport(report, { cwd, source: "live", ranAt: "2026-01-01T00:00:00.000Z" });
 
   it("summarises counts and overall status", () => {
@@ -50,13 +50,13 @@ describe("normalizeReport", () => {
     expect(result.files.map((f) => f.file)).toEqual(["src/a.test.ts", "src/b.test.ts"]);
   });
 
-  it("strips colour codes, absolute paths and node_modules frames from failure messages", () => {
+  it("cleans colour codes, local paths and library noise out of failure messages", () => {
     const failed = result.files[1].tests.find((t) => t.status === "failed")!;
     expect(failed.failureMessages[0]).toBe("AssertionError\n    at src/b.test.ts:10:5");
     expect(failed.failureMessages[0]).not.toContain(cwd);
   });
 
-  it("maps pending tests to skipped and rounds durations", () => {
+  it("counts pending tests as skipped and rounds durations", () => {
     const tests = result.files[1].tests;
     expect(tests[0].durationMs).toBe(5);
     expect(tests[2]).toMatchObject({ status: "skipped", durationMs: null });

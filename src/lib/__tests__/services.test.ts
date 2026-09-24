@@ -6,7 +6,7 @@ import { servicesPageQuery } from "@/sanity/lib/queries";
 vi.mock("@/sanity/client", () => ({ client: { fetch: vi.fn() } }));
 const fetchMock = vi.mocked(client.fetch) as unknown as ReturnType<typeof vi.fn>;
 
-describe("getServicesPageData", () => {
+describe("Loading services from Sanity", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("returns the services and page text from Sanity, refreshed every minute", async () => {

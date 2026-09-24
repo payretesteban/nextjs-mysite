@@ -21,7 +21,7 @@ function setup() {
 
 const type = (label: RegExp | string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } });
 
-describe("Let's work together form", () => {
+describe("Let's Work Together form", () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it("opens from the button with Consulting selected", () => {

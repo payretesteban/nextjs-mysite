@@ -4,11 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   isTestRunError,
   type TestCaseResult,
-  type TestFileResult,
   type TestRunResponse,
   type TestRunResult,
   type TestStatus,
 } from "@/lib/testResults";
+import { groupByArea, type AreaGroup } from "@/lib/testGroups";
 
 type Mode = "live" | "snapshot";
 type Filter = "all" | "failed" | "skipped";
@@ -134,14 +134,16 @@ function Results({ result }: { result: TestRunResult }) {
   const [filter, setFilter] = useState<Filter>("all");
   const { summary } = result;
 
-  const files = useMemo(() => {
-    if (filter === "all") return result.files;
+  // Filter the tests first, then group what's left by part of the site
+  const areas = useMemo(() => {
     const want = (t: TestCaseResult) =>
-      filter === "failed" ? t.status === "failed" : t.status === "skipped" || t.status === "todo";
-    return result.files
+      filter === "all" || (filter === "failed" ? t.status === "failed" : t.status === "skipped" || t.status === "todo");
+    const files = result.files
       .map((f) => ({ ...f, tests: f.tests.filter(want) }))
-      .filter((f) => f.tests.length > 0 || (filter === "failed" && f.error));
+      .filter((f) => f.tests.length > 0 || (filter !== "skipped" && f.error));
+    return groupByArea(files);
   }, [filter, result.files]);
+  const areaCount = useMemo(() => groupByArea(result.files).length, [result.files]);
 
   const pct = (n: number) => (summary.total ? (n / summary.total) * 100 : 0);
 
@@ -181,7 +183,8 @@ function Results({ result }: { result: TestRunResult }) {
               {result.source === "live" ? "Live run" : "Build snapshot"}
             </span>
             <span>
-              {summary.files} files · {formatDuration(result.durationMs)} · {formatDate(result.ranAt)}
+              {areaCount} areas of the site · {summary.files} files · {formatDuration(result.durationMs)} ·{" "}
+              {formatDate(result.ranAt)}
             </span>
           </p>
         </div>
@@ -190,8 +193,8 @@ function Results({ result }: { result: TestRunResult }) {
       {/* Stats */}
       <dl className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Passed" value={summary.passed} tone="text-emerald-600" delay={60} />
-        <Stat label="Failed" value={summary.failed} tone={summary.failed ? "text-rose-600" : "text-slate-400"} delay={120} />
-        <Stat label="Skipped" value={summary.skipped} tone={summary.skipped ? "text-amber-500" : "text-slate-400"} delay={180} />
+        <Stat label="Failed" value={summary.failed} tone={summary.failed ? "text-rose-600" : "text-slate-500"} delay={120} />
+        <Stat label="Skipped" value={summary.skipped} tone={summary.skipped ? "text-amber-600" : "text-slate-500"} delay={180} />
         <Stat label="Duration" value={formatDuration(result.durationMs)} tone="text-slate-900 dark:text-slate-100" delay={240} />
       </dl>
 
@@ -208,7 +211,7 @@ function Results({ result }: { result: TestRunResult }) {
 
       {/* Filters */}
       <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold">Results by file</h2>
+        <h2 className="text-xl font-semibold">What&apos;s tested</h2>
         <div className="flex gap-1 rounded-full bg-slate-100 p-1 text-sm dark:bg-slate-800" role="tablist">
           <FilterTab active={filter === "all"} onClick={() => setFilter("all")} label="All" count={summary.total} />
           <FilterTab active={filter === "failed"} onClick={() => setFilter("failed")} label="Failed" count={summary.failed} />
@@ -216,14 +219,15 @@ function Results({ result }: { result: TestRunResult }) {
         </div>
       </div>
 
-      <ul className="mt-4 flex flex-col gap-3">
-        {files.map((file, i) => (
-          <FileCard key={file.file} file={file} index={i} />
+      <ul
+        key={filter}
+        className="mt-4 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 dark:divide-slate-800 dark:border-slate-800"
+      >
+        {areas.map((area, i) => (
+          <AreaRow key={area.key} area={area} index={i} openByDefault={filter !== "all" || area.status === "failed"} />
         ))}
-        {files.length === 0 && (
-          <li className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500 dark:border-slate-700">
-            Nothing to show for this filter.
-          </li>
+        {areas.length === 0 && (
+          <li className="p-8 text-center text-sm text-slate-500">Nothing to show for this filter.</li>
         )}
       </ul>
     </>
@@ -252,52 +256,66 @@ function FilterTab({ active, onClick, label, count }: { active: boolean; onClick
       className={`rounded-full px-3 py-1 font-medium transition-colors ${
         active
           ? "bg-white text-slate-900 shadow-sm dark:bg-slate-950 dark:text-white"
-          : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+          : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
       }`}
     >
-      {label} <span className="tabular-nums text-slate-400">{count}</span>
+      {label} <span className="tabular-nums text-slate-600 dark:text-slate-400">{count}</span>
     </button>
   );
 }
 
-function FileCard({ file, index }: { file: TestFileResult; index: number }) {
-  const failed = file.status === "failed";
-  const passed = file.tests.filter((t) => t.status === "passed").length;
-  const dir = file.file.includes("/") ? file.file.slice(0, file.file.lastIndexOf("/") + 1) : "";
-  const base = file.file.slice(dir.length);
+const DOT: Record<AreaGroup["status"], string> = {
+  passed: "bg-emerald-500",
+  failed: "bg-rose-500",
+  skipped: "bg-amber-400",
+};
+
+/** One part of the site: a summary row that opens to show its checks, grouped by test group. */
+function AreaRow({ area, index, openByDefault }: { area: AreaGroup; index: number; openByDefault: boolean }) {
+  const failed = area.status === "failed";
 
   return (
-    <li className="animate-fade-up" style={{ animationDelay: `${300 + index * 50}ms` }}>
-      <details
-        open={failed}
-        className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition-shadow open:shadow-sm hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
-      >
-        <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3 select-none [&::-webkit-details-marker]:hidden">
-          <span
-            className={`h-2.5 w-2.5 shrink-0 rounded-full ${failed ? "bg-rose-500" : "bg-emerald-500"}`}
-            aria-label={failed ? "failed" : "passed"}
-          />
-          <span className="min-w-0 flex-1 truncate font-mono text-sm">
-            <span className="hidden text-slate-400 sm:inline">{dir}</span>
-            <span className="font-medium text-slate-900 dark:text-slate-100">{base}</span>
+    <li className="animate-fade-up" style={{ animationDelay: `${300 + index * 40}ms` }}>
+      <details open={openByDefault} className="group">
+        <summary className="flex cursor-pointer list-none items-center gap-3 px-5 py-3.5 select-none hover:bg-slate-50 dark:hover:bg-slate-900 [&::-webkit-details-marker]:hidden">
+          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${DOT[area.status]}`} aria-hidden="true" />
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold text-slate-900 dark:text-slate-100">{area.label}</span>
+            <span className="block text-sm text-slate-500 dark:text-slate-400">{area.description}</span>
           </span>
-          <span className="shrink-0 text-xs tabular-nums text-slate-500">
-            {passed}/{file.tests.length} · {formatDuration(file.durationMs)}
+          <span
+            className={`shrink-0 font-mono text-sm tabular-nums ${failed ? "text-rose-700 dark:text-rose-400" : "text-emerald-700 dark:text-emerald-400"}`}
+          >
+            <span className="sr-only">{failed ? `${area.failed} failed, ` : ""}</span>
+            {area.passed}/{area.total}
+            <span className="sr-only"> passed</span>
           </span>
           <ChevronIcon className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-90" />
         </summary>
 
-        <div className="border-t border-slate-100 dark:border-slate-800">
-          {file.error && (
-            <pre className="m-4 overflow-x-auto rounded-lg bg-rose-50 p-3 font-mono text-xs break-words whitespace-pre-wrap text-rose-800 dark:bg-rose-950/40 dark:text-rose-300">
-              {file.error}
-            </pre>
-          )}
-          <ul className="divide-y divide-slate-100 dark:divide-slate-800">
-            {file.tests.map((test, i) => (
-              <TestRow key={`${test.fullName}-${i}`} test={test} />
-            ))}
-          </ul>
+        <div className="border-t border-slate-100 bg-slate-50/60 px-5 py-4 dark:border-slate-800 dark:bg-slate-900/40">
+          {area.fileErrors.map(({ file, error }) => (
+            <div key={file} className="mb-4">
+              <p className="text-sm font-semibold text-rose-800 dark:text-rose-300">
+                Couldn&apos;t run <span className="font-mono">{file}</span>
+              </p>
+              <pre className="mt-1.5 overflow-x-auto rounded-lg bg-rose-50 p-3 font-mono text-xs break-words whitespace-pre-wrap text-rose-800 dark:bg-rose-950/40 dark:text-rose-300">
+                {error}
+              </pre>
+            </div>
+          ))}
+          {area.sections.map((section) => (
+            <div key={section.title} className="mb-4 last:mb-0">
+              <h3 className="mb-1 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                {section.title}
+              </h3>
+              <ul>
+                {section.tests.map((test, i) => (
+                  <TestRow key={`${test.fullName}-${i}`} test={test} />
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </details>
     </li>
@@ -312,35 +330,33 @@ const STATUS_STYLES: Record<TestStatus, string> = {
 };
 
 function TestRow({ test }: { test: TestCaseResult }) {
+  // The first group title is already the section heading; show any deeper ones as a prefix
+  const deeper = test.ancestors.slice(1);
   return (
-    <li className="px-4 py-2.5">
-      <div className="flex items-start gap-3">
+    <li className="py-1.5">
+      <div className="flex items-start gap-2.5">
         <span
-          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${STATUS_STYLES[test.status]}`}
+          className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${STATUS_STYLES[test.status]}`}
           aria-label={test.status}
         >
           {test.status === "passed" ? (
-            <CheckIcon className="h-3 w-3" />
+            <CheckIcon className="h-2.5 w-2.5" />
           ) : test.status === "failed" ? (
-            <CrossIcon className="h-3 w-3" />
+            <CrossIcon className="h-2.5 w-2.5" />
           ) : (
-            <span className="h-0.5 w-2 rounded bg-current" />
+            <span className="h-0.5 w-1.5 rounded bg-current" />
           )}
         </span>
         <p className="min-w-0 flex-1 text-sm text-slate-700 dark:text-slate-300">
-          {test.ancestors.length > 0 && (
-            <span className="text-slate-400">{test.ancestors.join(" › ")} › </span>
-          )}
-          {test.name}
+          {deeper.length > 0 && <span className="text-slate-500">{deeper.join(" › ")} › </span>}
+          <span className="inline-block first-letter:uppercase">{test.name}</span>
         </p>
-        <span className="shrink-0 font-mono text-xs tabular-nums text-slate-400">
-          {formatDuration(test.durationMs)}
-        </span>
+        <span className="shrink-0 font-mono text-xs text-slate-500 tabular-nums">{formatDuration(test.durationMs)}</span>
       </div>
       {test.failureMessages.map((msg, i) => (
         <pre
           key={i}
-          className="mt-2 overflow-x-auto rounded-lg bg-rose-50 p-3 font-mono text-xs break-words whitespace-pre-wrap text-rose-800 sm:ml-8 dark:bg-rose-950/40 dark:text-rose-300"
+          className="mt-2 overflow-x-auto rounded-lg bg-rose-50 p-3 font-mono text-xs break-words whitespace-pre-wrap text-rose-800 sm:ml-6 dark:bg-rose-950/40 dark:text-rose-300"
         >
           {msg}
         </pre>

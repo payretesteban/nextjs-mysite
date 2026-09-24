@@ -13,7 +13,7 @@ vi.mock("@/lib/siteLog", () => ({
   ]),
 }));
 
-describe("/site-log page", () => {
+describe("Site log page", () => {
   it("shows every site log entry as a numbered note", async () => {
     render(await SiteLogPage());
     expect(screen.getByRole("heading", { level: 1, name: /site log/i })).toBeInTheDocument();

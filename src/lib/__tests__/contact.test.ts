@@ -12,7 +12,7 @@ const consulting = {
   message: "We need help reviewing our platform architecture.",
 };
 
-describe("validateContact", () => {
+describe("Checking the form fields", () => {
   it("accepts a valid consulting inquiry and trims values", () => {
     const { data, errors } = validateContact(consulting);
     expect(errors).toEqual({});
@@ -44,7 +44,7 @@ describe("validateContact", () => {
   });
 });
 
-describe("contact email", () => {
+describe("Writing the email", () => {
   const data = validateContact(consulting).data!;
 
   it("builds a filterable subject line", () => {

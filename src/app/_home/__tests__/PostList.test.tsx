@@ -13,7 +13,7 @@ const post = (i: number, extra = {}) => ({
 });
 const posts = Array.from({ length: 8 }, (_, i) => post(i + 1));
 
-describe("PostList", () => {
+describe("Posts list", () => {
   it("shows featured posts first in their own highlighted list, then the rest", () => {
     render(<PostList posts={[post(1), post(2, { featured: true }), post(3)]} />);
     const featured = screen.getByRole("list", { name: /featured posts/i });
@@ -36,7 +36,7 @@ describe("PostList", () => {
   });
 });
 
-describe("HomePosts", () => {
+describe("Homepage posts panel", () => {
   it("shows only `limit` posts and a link to all of them", () => {
     render(<HomePosts posts={posts} limit={5} total={12} />);
     expect(screen.getByRole("heading", { name: "Posts" })).toBeInTheDocument();

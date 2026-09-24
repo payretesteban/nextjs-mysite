@@ -7,7 +7,7 @@ const wrapper = ({ children }: { children: ReactNode }) => (
   <AnimationProvider>{children}</AnimationProvider>
 );
 
-describe("AnimationContext", () => {
+describe("Fun mode timer", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -16,7 +16,7 @@ describe("AnimationContext", () => {
     vi.useRealTimers();
   });
 
-  it("throws error when useAnimation is used outside AnimationProvider", () => {
+  it("complains clearly when used outside its provider", () => {
     // Prevent console.error from spamming test output during expected error
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() => renderHook(() => useAnimation())).toThrow(
@@ -25,14 +25,14 @@ describe("AnimationContext", () => {
     spy.mockRestore();
   });
 
-  it("provides initial animation state", () => {
+  it("starts with no animation running", () => {
     const { result } = renderHook(() => useAnimation(), { wrapper });
 
     expect(result.current.animationClass).toBe("");
     expect(result.current.timeLeft).toBe(0);
   });
 
-  it("activates animation and starts timer when getNextAnimation is called", () => {
+  it("starts an animation and its countdown", () => {
     const { result } = renderHook(() => useAnimation(), { wrapper });
 
     act(() => {
@@ -43,7 +43,7 @@ describe("AnimationContext", () => {
     expect(result.current.timeLeft).toBe(10);
   });
 
-  it("counts down timeLeft each second and clears animation when duration expires", () => {
+  it("counts down each second and stops when time is up", () => {
     const { result } = renderHook(() => useAnimation(), { wrapper });
 
     act(() => {

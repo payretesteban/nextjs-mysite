@@ -18,14 +18,14 @@ const upTo = (cmd: string, occurrence = 1) => {
   return WALKTHROUGH.slice(0, idx);
 };
 
-describe("normalize", () => {
-  it("lowercases and strips punctuation and filler words", () => {
+describe("Understanding typed commands", () => {
+  it("ignores case, punctuation and filler words", () => {
     expect(normalize("  Follow the SEAM to the edge! ")).toBe("follow seam to edge");
     expect(normalize("Put my regulator in")).toBe("put regulator in");
   });
 });
 
-describe("The Deep Drop", () => {
+describe("Story, choices and scoring", () => {
   it("can be won by following best practice, for the maximum score", () => {
     const result = play(WALKTHROUGH);
     expect(result.state.status).toBe("won");

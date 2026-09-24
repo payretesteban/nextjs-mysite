@@ -8,12 +8,12 @@ vi.mock("@/sanity/client", () => ({
   },
 }));
 
-describe("getSiteMetadata", () => {
+describe("Page titles and descriptions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("returns metadata using Sanity settings when available", async () => {
+  it("uses the title and description from Sanity", async () => {
     vi.mocked(client.fetch).mockResolvedValueOnce({
       title: "Custom Title",
       description: "Custom Description",
@@ -28,7 +28,7 @@ describe("getSiteMetadata", () => {
     expect(metadata.description).toBe("Custom Description");
   });
 
-  it("uses fallbacks when Sanity settings return null or empty", async () => {
+  it("falls back to defaults when Sanity has none", async () => {
     vi.mocked(client.fetch).mockResolvedValueOnce(null);
 
     const metadata = await getSiteMetadata();

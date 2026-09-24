@@ -11,7 +11,7 @@ const entries = [
 
 const topTitle = () => screen.getByRole("heading", { level: 3 }).textContent;
 
-describe("SiteLogNotes", () => {
+describe("Site log sticky notes", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });

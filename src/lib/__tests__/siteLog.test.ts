@@ -6,7 +6,7 @@ import { siteLogQuery } from "@/sanity/lib/queries";
 vi.mock("@/sanity/client", () => ({ client: { fetch: vi.fn() } }));
 const fetchMock = vi.mocked(client.fetch) as unknown as ReturnType<typeof vi.fn>;
 
-describe("getSiteLog", () => {
+describe("Loading site log notes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
