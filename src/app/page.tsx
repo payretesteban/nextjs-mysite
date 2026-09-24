@@ -23,24 +23,29 @@ export default async function IndexPage() {
   return (
     <div className="container mx-auto min-h-screen max-w-3xl p-8">
       {profile && (
-        <section className="mb-12 flex flex-col md:flex-row gap-8 items-start">
-          {profile.profileImage && (
-            <img 
-              src={urlFor(profile.profileImage).width(200).height(200).url()} 
-              alt={profile.profileImage.alt || profile.name}
-              className="rounded-full w-32 h-32 object-cover border-4 border-slate-100"
-            />
-          )}
-          <div>
-            <h1 className="text-4xl font-bold">{profile.name}</h1>
-            <AnimatedHeadline headline={profile.headline} />
-            <div className="prose prose-slate">
-              <PortableText value={profile.bio} />
+        <section className="mb-12">
+          {/* Small avatar beside the name, so the bio and buttons start on the same left edge as the rest of the page */}
+          <div className="flex items-center gap-4">
+            {profile.profileImage && (
+              <img
+                src={urlFor(profile.profileImage).width(144).height(144).url()}
+                alt={profile.profileImage.alt || profile.name}
+                width={72}
+                height={72}
+                className="h-16 w-16 shrink-0 rounded-full object-cover shadow-md ring-2 ring-white sm:h-[72px] sm:w-[72px] dark:ring-slate-800"
+              />
+            )}
+            <div className="min-w-0">
+              <h1 className="text-3xl font-bold sm:text-4xl">{profile.name}</h1>
+              <AnimatedHeadline headline={profile.headline} className="mt-0.5 text-lg sm:text-xl" />
             </div>
-            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-              <ContactButton />
-              <ServicesTicker names={services.map((s) => s.shortTitle || s.title)} />
-            </div>
+          </div>
+          <div className="prose prose-slate mt-5 max-w-2xl">
+            <PortableText value={profile.bio} />
+          </div>
+          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+            <ContactButton />
+            <ServicesTicker names={services.map((s) => s.shortTitle || s.title)} />
           </div>
         </section>
       )}

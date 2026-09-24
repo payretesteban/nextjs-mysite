@@ -4,15 +4,18 @@ import { useAnimation } from "@/app/context/AnimationContext";
 
 export default function AnimatedHeadline({
   headline,
+  className = "mb-4 text-xl",
 }: {
   headline: string;
+  /** Size and spacing classes; defaults to text-xl with a bottom margin. */
+  className?: string;
 }) {
   const { animationClass } = useAnimation();
 
   return (
     <p
       key={animationClass}
-      className={`text-xl text-slate-600 mb-4 ${animationClass}`}
+      className={`text-slate-600 ${className} ${animationClass}`}
     >
       {headline}
     </p>
