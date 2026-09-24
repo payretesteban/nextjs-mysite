@@ -22,12 +22,19 @@ export default function PostList({ posts, limit, total }: { posts: SanityPost[];
               href={`/${post.slug.current}`}
               className="group flex items-baseline gap-3 py-3.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 sm:gap-4"
             >
-              <span
+              {/* Decorative ">" drawn as an icon, so its faded color doesn't count as low-contrast text */}
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 aria-hidden="true"
-                className="shrink-0 font-mono text-sm font-semibold text-sky-600/50 transition-all group-hover:translate-x-0.5 group-hover:text-sky-600 dark:text-sky-400/50 dark:group-hover:text-sky-400"
+                className="h-3 w-3 shrink-0 self-center text-sky-600/50 transition-all group-hover:translate-x-0.5 group-hover:text-sky-600 dark:text-sky-400/50 dark:group-hover:text-sky-400"
               >
-                &gt;
-              </span>
+                <path d="M5 3l6 5-6 5" />
+              </svg>
               <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2.5 gap-y-1">
                 <span className="text-lg leading-snug font-medium tracking-tight text-slate-800 transition-colors group-hover:text-sky-700 dark:text-slate-200 dark:group-hover:text-sky-400">
                   {post.title}
