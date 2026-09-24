@@ -4,6 +4,7 @@ import { PortableText } from "@portabletext/react";
 import { getIndexPageData } from "@/lib/data";
 import { urlFor } from "@/lib/image";
 import AnimatedHeadline from "@/lib/animations";
+import ContactButton from "./contact/ContactButton";
 
 
 export default async function IndexPage() {
@@ -25,6 +26,9 @@ export default async function IndexPage() {
             <AnimatedHeadline headline={profile.headline} />
             <div className="prose prose-slate">
               <PortableText value={profile.bio} />
+            </div>
+            <div className="mt-6">
+              <ContactButton />
             </div>
           </div>
         </section>

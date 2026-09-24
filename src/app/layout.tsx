@@ -3,6 +3,7 @@ import { getIndexPageData } from "@/lib/data";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AnimationProvider } from "./context/AnimationContext";
+import ContactProvider from "./contact/ContactProvider";
 import Header from "./header";
 import Footer from "./footer";
 import "./globals.css";
@@ -37,9 +38,11 @@ export default async function RootLayout({
     >
       <body className={`${geistSans.className} min-h-full flex flex-col bg-white text-slate-900`}>
         <AnimationProvider>          
-          <Header links={links} name={profile?.name} />
-          <main className="flex-grow">{children}</main>
-          <Footer />
+          <ContactProvider>
+            <Header links={links} name={profile?.name} />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+          </ContactProvider>
         </AnimationProvider>
       </body>
     </html>

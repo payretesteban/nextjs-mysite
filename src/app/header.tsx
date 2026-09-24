@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { SanityLink } from "@/lib/types";
 import { useAnimation } from "./context/AnimationContext";
+import { useContact } from "./contact/ContactProvider";
 import CommandMenu, { Icon, Kbd, iconForUrl, isExternalUrl, type MenuItem } from "./command-menu";
 
 // Pages that show the same full menu as the homepage
@@ -42,6 +43,7 @@ export default function Header({
   // Pathname used for rendering: null until hydrated so server and client markup match
   const currentPath = hydrated ? pathname : null;
   const { getNextAnimation, animationClass, timeLeft } = useAnimation();
+  const contact = useContact();
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const shortcut = useShortcutLabel();
@@ -79,6 +81,17 @@ export default function Header({
       : links.filter((l) => l.category !== "internal");
 
     const result: MenuItem[] = [];
+    if (contact) {
+      result.push({
+        id: "contact",
+        label: "Let’s work together",
+        group: "Actions",
+        icon: "send",
+        hint: "Consulting or full-time",
+        keywords: "contact hire email consulting freelance job full-time work",
+        run: () => contact.open(),
+      });
+    }
     if (!links.some((l) => l.url === "/")) {
       result.push({ id: "home", label: "Home", group: "Pages", icon: "home", href: "/", current: currentPath === "/" });
     }
@@ -130,7 +143,7 @@ export default function Header({
       }
     }
     return result;
-  }, [links, currentPath, animationsRunning, timeLeft, getNextAnimation, copied]);
+  }, [links, currentPath, animationsRunning, timeLeft, getNextAnimation, copied, contact]);
 
   const onOpenChange = useCallback((o: boolean) => {
     setOpen(o);

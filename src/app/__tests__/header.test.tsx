@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Header from "../header";
 import { AnimationProvider } from "../context/AnimationContext";
+import ContactProvider from "../contact/ContactProvider";
 import { SanityLink } from "@/lib/types";
 
 // Mock next/navigation
@@ -180,5 +181,19 @@ describe("Header Component", () => {
 
     await waitFor(() => expect(screen.getByText("Copied to clipboard")).toBeInTheDocument());
     expect(writeText).toHaveBeenCalledWith("me@example.com");
+  });
+
+  it("offers the contact form in the menu when available", () => {
+    mockUsePathname.mockReturnValue("/tests");
+    render(
+      <AnimationProvider>
+        <ContactProvider>
+          <Header links={mockLinks} name="Esteban Payret" />
+        </ContactProvider>
+      </AnimationProvider>
+    );
+    fireEvent.click(screen.getByText("Let’s work together"));
+    const dialogs = document.querySelectorAll("dialog");
+    expect([...dialogs].some((d) => d.getAttribute("aria-labelledby") === "contact-title" && d.hasAttribute("open"))).toBe(true);
   });
 });

@@ -7,6 +7,21 @@
 @source inline("animate-ping");
 @source inline("animate-wiggle");
 
+/* Show the hand cursor on everything clickable (Tailwind v4 defaults buttons to the arrow) */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="option"],
+  [role="radio"],
+  [role="tab"],
+  select:not(:disabled),
+  summary,
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 @theme {
   --animate-wiggle: wiggle 1s ease-in-out infinite;
   --animate-fade-up: fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
