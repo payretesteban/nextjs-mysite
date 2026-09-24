@@ -113,7 +113,8 @@ export default function SiteLogNotes({ entries, moreHref }: { entries: SiteLogEn
         Note {top + 1} of {n}: {entries[top].title}
       </p>
 
-      <div className="mx-auto mt-6 flex max-w-md items-center justify-between text-sm sm:mx-0">
+      {/* The notes behind the top one are shifted down and tilted (transforms don't take up space), so leave room below the pile */}
+      <div className="mx-auto mt-12 flex max-w-md items-center justify-between text-sm sm:mx-0">
         <span className="font-mono text-slate-400 tabular-nums" aria-hidden="true">
           {pad(top + 1)} / {pad(n)}
         </span>
