@@ -12,6 +12,7 @@ const PATHS: Record<string, React.ReactNode> = {
   rocket: <><path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2" /><path d="M9 15 5 11l3-4c3-4 8-5 12-5 0 4-1 9-5 12l-4 3-2-2Z" /><circle cx="14.5" cy="9.5" r="1.5" /></>,
 };
 
+/** Icon for a service, by name from Sanity. Falls back to the code icon for unknown names. */
 export function ServiceIcon({ name, className = "h-5 w-5" }: { name?: string | null; className?: string }) {
   const path = (name && PATHS[name]) || PATHS.code;
   return (
@@ -21,4 +22,5 @@ export function ServiceIcon({ name, className = "h-5 w-5" }: { name?: string | n
   );
 }
 
+/** All available icon names. */
 export const SERVICE_ICON_NAMES = Object.keys(PATHS);

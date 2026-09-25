@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+/** Time each name is shown before the next one slides in. */
 const INTERVAL_MS = 2500;
 
 /**

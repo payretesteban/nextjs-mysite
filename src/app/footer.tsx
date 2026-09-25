@@ -7,10 +7,16 @@ import FooterContactButton from "./contact/FooterContactButton";
 const DEFAULT_LINKEDIN = "https://www.linkedin.com/in/esteban-payret/";
 const DEFAULT_GITHUB = "https://github.com/payretesteban";
 
+/** Shared classes for the round social and contact buttons. */
 const iconButton =
   "inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white";
 
+/**
+ * Site footer with LinkedIn, GitHub and contact buttons, plus copyright and site version.
+ * @param props.links - Sanity links; the LinkedIn and GitHub URLs are taken from here when present.
+ */
 export default function Footer({ links = [] }: { links?: SanityLink[] }) {
+  // First link URL that matches the pattern, if any
   const find = (pattern: RegExp) => links.find((link) => pattern.test(link.url))?.url;
   const socials = [
     { name: "LinkedIn", icon: "linkedin" as const, url: find(/linkedin\.com/i) ?? DEFAULT_LINKEDIN },

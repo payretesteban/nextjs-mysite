@@ -6,6 +6,7 @@ import { SITE_ORIGIN } from "@/lib/site";
 // Rebuild the sitemap at most once an hour, so new posts appear without a redeploy
 export const revalidate = 3600;
 
+/** Shape of `sitemapQuery` results; the dates are ISO strings, or null when nothing exists yet. */
 interface SitemapData {
   posts: { slug: string; _updatedAt: string }[] | null;
   homeUpdatedAt: string | null;
@@ -13,8 +14,13 @@ interface SitemapData {
   siteLogUpdatedAt?: string | null;
 }
 
+/** Turns an optional ISO date into a Date, or undefined so the sitemap leaves `lastModified` out. */
 const toDate = (iso?: string | null) => (iso ? new Date(iso) : undefined);
 
+/**
+ * Generates /sitemap.xml: the fixed pages plus every post, with last-modified dates from Sanity.
+ * Revalidated hourly; if Sanity fails, only the fixed pages are listed.
+ */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let data: SitemapData = { posts: [], homeUpdatedAt: null, servicesUpdatedAt: null };
   try {

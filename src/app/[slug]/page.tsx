@@ -6,12 +6,16 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Animated } from "@/lib/animations";
 
+/** The full post (including body and image) for one slug. */
 const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]`;
 
+/** Every post slug, for prebuilding the post pages. */
 const SLUGS_QUERY = `*[_type == "post"]{"slug": slug.current }`;
 
+// Rebuild each post page at most once an hour, so edits in Sanity show up without a redeploy
 export const revalidate = 3600;
 
+/** Prebuilds a page for every post at build time; new slugs are rendered on first visit. */
 export async function generateStaticParams() {
   const posts = await client.fetch<{ slug: string }[]>(SLUGS_QUERY);
   return posts.map((post) => ({
@@ -19,6 +23,10 @@ export async function generateStaticParams() {
   }));
 }
 
+/**
+ * A single post page at /{slug}: optional cover image, title and body.
+ * Revalidated hourly; an unknown slug shows the site's 404 page.
+ */
 export default async function PostPage({
   params,
 }: {
@@ -26,7 +34,7 @@ export default async function PostPage({
 }) {
   const { slug } = await params;
   
-  // Fetching with the configured client (ensure useCdn: true is set in @/sanity/client)
+  // The shared client reads from Sanity's CDN in production (see @/sanity/client)
   const post = await client.fetch<SanityDocument>(POST_QUERY, { slug });
 
   // Unknown slug: show the site's 404 page and send a real 404 status (plus noindex) to search engines

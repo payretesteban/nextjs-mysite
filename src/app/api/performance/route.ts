@@ -10,6 +10,8 @@ const CACHE_SECONDS = 600; // 10 minutes
 /**
  * Runs PageSpeed Insights against the live homepage. Results are cached for up to 10 minutes per
  * device (shared across visitors) so repeat clicks are instant and don't use up the API quota.
+ * Returns 429 when Google's quota is used up and 502 for other failures; in development the
+ * error message includes the underlying reason.
  */
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));

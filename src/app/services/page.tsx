@@ -7,11 +7,13 @@ import ServicesCta from "./ServicesCta";
 // Content edits in Sanity show up within a minute
 export const revalidate = 60;
 
+/** Page title and description from the services page content in Sanity. */
 export async function generateMetadata(): Promise<Metadata> {
   const { page } = await getServicesPageData();
   return { title: page.title, description: page.intro ?? undefined };
 }
 
+/** /services page: title, intro, the list of services and a call to action. */
 export default async function ServicesPage() {
   const { page, services } = await getServicesPageData();
 

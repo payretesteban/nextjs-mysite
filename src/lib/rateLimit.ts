@@ -14,6 +14,7 @@ export function createRateLimiter(limit: number, windowMs: number) {
       if (hits.size > 5000) hits.clear(); // keep memory bounded
       return limited;
     },
+    /** Clears all counts (useful in tests). */
     reset() {
       hits.clear();
     },

@@ -11,6 +11,10 @@ export const metadata: Metadata = {
 // Pick up new notes from Sanity within a minute, without a redeploy
 export const revalidate = 60;
 
+/**
+ * The /site-log page: every site log note as a grid of tilted sticky notes.
+ * Revalidated every minute; shows the built-in default notes if Sanity has none.
+ */
 export default async function SiteLogPage() {
   const entries = await getSiteLog();
 

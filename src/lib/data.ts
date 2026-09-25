@@ -2,6 +2,10 @@ import { client } from "@/sanity/client";
 import { allPostsQuery, indexPageQuery } from "@/sanity/lib/queries";
 import { IndexPageData, SanityPost } from "./types";
 
+/**
+ * Loads the homepage data (posts, links and profile) from Sanity.
+ * Cached for 30 seconds, so edits in Sanity show up without a redeploy.
+ */
 export async function getIndexPageData(): Promise<IndexPageData> {
   return await client.fetch<IndexPageData>(
     indexPageQuery, 
@@ -10,7 +14,10 @@ export async function getIndexPageData(): Promise<IndexPageData> {
   );
 }
 
-/** Every post, featured first and then newest first (for the /posts page). */
+/**
+ * Every post, featured first and then newest first, for the /posts page.
+ * Cached for 30 seconds; returns an empty list when there are no posts.
+ */
 export async function getAllPosts(): Promise<SanityPost[]> {
   return (await client.fetch<SanityPost[] | null>(allPostsQuery, {}, { next: { revalidate: 30 } })) ?? [];
 }

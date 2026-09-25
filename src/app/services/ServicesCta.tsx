@@ -2,6 +2,11 @@
 
 import { useContact } from "../contact/ContactProvider";
 
+/**
+ * Dark call-to-action box at the end of the services page; the button opens the contact form (consulting).
+ * @param props.title - Heading; hidden when empty.
+ * @param props.text - Line under the heading; hidden when empty.
+ */
 export default function ServicesCta({ title, text }: { title?: string | null; text?: string | null }) {
   const contact = useContact();
   return (

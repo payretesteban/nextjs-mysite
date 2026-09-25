@@ -3,13 +3,16 @@
  * and the email that gets sent.
  */
 
+/** The two kinds of inquiry the form supports. */
 export type InquiryType = "consulting" | "fulltime";
 
+/** Options for the inquiry type switch; `short` is a compact label. */
 export const INQUIRY_TYPES: { id: InquiryType; label: string; short: string }[] = [
   { id: "consulting", label: "Consulting & Freelance", short: "Consulting" },
   { id: "fulltime", label: "Full-Time Opportunities", short: "Full-time" },
 ];
 
+/** Dropdown options for consulting inquiries. */
 export const PROJECT_TYPES = [
   "Technical leadership",
   "Architecture review",
@@ -19,8 +22,10 @@ export const PROJECT_TYPES = [
 ];
 export const BUDGETS = ["Under $5k", "$5k – $15k", "$15k – $50k", "$50k+", "Not sure yet"];
 export const TIMELINES = ["As soon as possible", "Within a month", "1 – 3 months", "Flexible"];
+/** Dropdown options for full-time inquiries. */
 export const WORK_SETUPS = ["Remote", "Hybrid", "On-site"];
 
+/** All form fields. Fields that don't apply to the chosen `type` are left empty. */
 export interface ContactInput {
   type: InquiryType;
   name: string;
@@ -40,9 +45,12 @@ export interface ContactInput {
   jobUrl: string;
 }
 
+/** Name of one form field. */
 export type ContactField = keyof ContactInput;
+/** Error message per field; only fields with a problem are present. */
 export type ContactErrors = Partial<Record<ContactField, string>>;
 
+/** A blank form, set to consulting. */
 export const EMPTY_CONTACT: ContactInput = {
   type: "consulting",
   name: "",
@@ -59,6 +67,7 @@ export const EMPTY_CONTACT: ContactInput = {
   jobUrl: "",
 };
 
+/** Maximum length per field, to keep emails reasonable and stop abuse. */
 const LIMITS: Partial<Record<ContactField, number>> = {
   name: 100,
   email: 200,
@@ -70,6 +79,7 @@ const LIMITS: Partial<Record<ContactField, number>> = {
   message: 5000,
 };
 
+/** Simple email check: something@domain.tld. Deliberately loose. */
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /** Validate and clean up the form. Returns the cleaned data or per-field errors. */
@@ -110,6 +120,7 @@ export function validateContact(raw: unknown): { data: ContactInput | null; erro
 /* Email                                                             */
 /* ---------------------------------------------------------------- */
 
+/** Escapes text for safe use in HTML, including attribute values. */
 function escapeHtml(s: string) {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 }
@@ -119,6 +130,7 @@ function oneLine(s: string) {
   return s.replace(/[\r\n]+/g, " ").trim();
 }
 
+/** Email subject, e.g. "[Consulting] Web Development for Acme — Jane Doe". Max 200 characters. */
 export function contactSubject(d: ContactInput) {
   const tag = d.type === "consulting" ? "[Consulting]" : "[Full-time]";
   const topic =
@@ -128,6 +140,7 @@ export function contactSubject(d: ContactInput) {
   return oneLine(`${tag} ${topic ? `${topic} — ` : ""}${d.name}`).slice(0, 200);
 }
 
+/** Label/value pairs for the email summary, skipping empty fields and ones that don't apply to the type. */
 function contactRows(d: ContactInput): [string, string][] {
   const rows: [string, string][] = [
     ["Type", d.type === "consulting" ? "Consulting & Freelance" : "Full-Time Opportunity"],
@@ -144,10 +157,12 @@ function contactRows(d: ContactInput): [string, string][] {
   return rows.filter(([, v]) => v);
 }
 
+/** Plain-text email body: the summary rows, then the message. */
 export function contactEmailText(d: ContactInput) {
   return [...contactRows(d).map(([k, v]) => `${k}: ${v}`), "", d.message, "", "— Sent from the contact form on estebanpayret.com"].join("\n");
 }
 
+/** HTML email body with inline styles (email clients ignore stylesheets). All user input is escaped. */
 export function contactEmailHtml(d: ContactInput) {
   const rows = contactRows(d)
     .map(

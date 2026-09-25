@@ -1,6 +1,7 @@
 import { client } from "@/sanity/client";
 import { siteLogQuery } from "@/sanity/lib/queries";
 
+/** One note in the site log (a short, mostly funny story from building the site). */
 export interface SiteLogEntry {
   _id: string;
   title: string;
@@ -20,6 +21,10 @@ export const DEFAULT_SITE_LOG: SiteLogEntry[] = [
   { _id: "sitelog-speed-checks", title: "Speed Checks & Sanity Checks", text: "Built a live Performance dashboard pulling metrics directly from Google's API. Implemented a 10-minute caching layer because while I love real-time data, I love not burning through API rate limits even more." },
 ];
 
+/**
+ * Loads the site log entries from Sanity, in their set order (cached for 60 seconds).
+ * Falls back to `DEFAULT_SITE_LOG` when there are no entries or Sanity can't be reached.
+ */
 export async function getSiteLog(): Promise<SiteLogEntry[]> {
   try {
     const entries = await client.fetch<SiteLogEntry[] | null>(siteLogQuery, {}, { next: { revalidate: 60 } });

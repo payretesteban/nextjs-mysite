@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   description: "Run this site's automated test suite and see the results.",
 };
 
+/**
+ * The /tests page. Runs the suite live in development; everywhere else it shows the snapshot
+ * captured at build time.
+ */
 export default function TestsPage() {
   // Live runs only work where the source and dev dependencies exist (npm run dev).
   // The deployed site shows the snapshot captured during `npm run build`.

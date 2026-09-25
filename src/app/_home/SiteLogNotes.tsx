@@ -8,23 +8,33 @@ import { PAPER, TILT, pad } from "./notePaper";
 
 /** How many notes are visible in the pile. */
 const DEPTH = 3;
+/** Length of the toss animation; matches the 300ms CSS transition plus a little slack. */
 const TOSS_MS = 320;
+/** Minimum horizontal drag that counts as a swipe rather than a tap. */
 const SWIPE_PX = 40;
 
 /**
  * A pile of sticky notes. Click, tap, swipe or press "Next note" to toss the top note
  * to the back of the pile. Every note sits in the same grid cell, so the pile is always
  * as tall as the longest note and nothing below it jumps around.
+ *
+ * @param entries - Site log notes, in order; the first one starts on top.
+ * @param moreHref - Optional link to the full log, shown under the pile.
  */
 export default function SiteLogNotes({ entries, moreHref }: { entries: SiteLogEntry[]; moreHref?: string }) {
   const [top, setTop] = useState(0);
   const [tossing, setTossing] = useState<0 | 1 | -1>(0);
   const startX = useRef<number | null>(null);
+  // A swipe also fires a click; this flag lets onClick skip it so one swipe tosses only one note
   const swiped = useRef(false);
   const n = entries.length;
 
   if (!n) return null;
 
+  /**
+   * Tosses the top note left (-1) or right (1), then moves it to the back once the animation ends.
+   * With reduced motion it skips the animation and moves the note straight away.
+   */
   const next = (direction: 1 | -1 = 1) => {
     if (tossing || n < 2) return;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {

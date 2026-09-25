@@ -7,8 +7,9 @@ export const dynamic = "force-dynamic";
 let inFlight: Promise<TestRunResult> | null = null;
 
 /**
- * Runs the Vitest suite live. Development only: on the deployed site the
+ * Runs the Vitest suite live. Development only (404 elsewhere): on the deployed site the
  * /tests page reads the snapshot captured at build time (public/test-results.json).
+ * Returns 500 if the run itself fails.
  */
 export async function POST() {
   if (process.env.NODE_ENV !== "development") {

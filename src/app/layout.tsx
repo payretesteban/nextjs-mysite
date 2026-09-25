@@ -20,10 +20,15 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+/** Next.js metadata for every page (title, description, social cards), loaded from Sanity. */
 export async function generateMetadata() {
   return await getSiteMetadata();
 }
 
+/**
+ * Root layout: fonts, animation and contact providers, header, footer and speed insights.
+ * Loads the Sanity links and profile once for the header and footer.
+ */
 export default async function RootLayout({
   children,
 }: {

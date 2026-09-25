@@ -2,6 +2,10 @@
 
 import { useContact } from "./ContactProvider";
 
+/**
+ * Pill button that opens the contact form. Does nothing outside ContactProvider.
+ * @param props.label - Button text; defaults to "Let's Work Together".
+ */
 export default function ContactButton({ label = "Let’s Work Together" }: { label?: string }) {
   const contact = useContact();
   return (

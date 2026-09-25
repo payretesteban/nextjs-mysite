@@ -1,5 +1,6 @@
 import type { TestCaseResult, TestFileResult } from "./testResults";
 
+/** A part of the site that tests are grouped under on the /tests page. */
 export interface TestArea {
   key: string;
   label: string;
@@ -22,18 +23,21 @@ export const TEST_AREAS: TestArea[] = [
   { key: "tests", label: "This tests page", description: "Running the tests and building this report", match: /\/tests\/|capture-test-results|testGroups/ },
 ];
 
+/** Fallback area for tests that don't match any in `TEST_AREAS`. */
 export const OTHER_AREA: Omit<TestArea, "match"> = {
   key: "other",
   label: "Everything else",
   description: "Tests that don't belong to one part of the site",
 };
 
+/** Tests that share the same top-level test group inside an area. */
 export interface TestSection {
   /** The test group ("describe") title, e.g. "Sending the email". */
   title: string;
   tests: TestCaseResult[];
 }
 
+/** One area with its tests, pass/fail counts and overall status. */
 export interface AreaGroup {
   key: string;
   label: string;
@@ -46,9 +50,11 @@ export interface AreaGroup {
   passed: number;
   failed: number;
   skipped: number;
+  /** Failed if anything failed or crashed; skipped only when nothing passed. */
   status: "passed" | "failed" | "skipped";
 }
 
+/** Finds which part of the site a test file belongs to, falling back to `OTHER_AREA`. */
 export function areaForFile(file: string): Omit<TestArea, "match"> {
   return TEST_AREAS.find((area) => area.match.test(file)) ?? OTHER_AREA;
 }

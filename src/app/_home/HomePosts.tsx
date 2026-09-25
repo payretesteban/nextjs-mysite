@@ -3,7 +3,13 @@ import type { SanityPost } from "@/lib/types";
 import Arrow from "./Arrow";
 import PostList from "./PostList";
 
-/** The homepage Posts section: a soft tinted panel with the first few posts and "See all". */
+/**
+ * The homepage Posts section: a soft tinted panel with the first few posts and "See all".
+ *
+ * @param posts - Posts to pick from, featured first.
+ * @param limit - How many posts to show.
+ * @param total - Total number of posts in Sanity, shown in the "See all" link when some are hidden.
+ */
 export default function HomePosts({ posts, limit, total }: { posts: SanityPost[]; limit: number; total?: number }) {
   const shown = posts.slice(0, limit);
   const count = Math.max(total ?? 0, posts.length);

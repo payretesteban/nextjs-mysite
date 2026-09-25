@@ -11,6 +11,7 @@ import CommandMenu, { Icon, Kbd, iconForUrl, isExternalUrl, type MenuItem } from
 // Pages that show the same full menu as the homepage
 const FULL_MENU_PATHS = ["/", "/tests", "/performance", "/adventure", "/services", "/posts", "/site-log"];
 
+/** Subscribe function for useSyncExternalStore when the value never changes after load. */
 const noopSubscribe = () => () => {};
 
 /**
@@ -31,6 +32,12 @@ function useShortcutLabel() {
   );
 }
 
+/**
+ * Sticky site header: the <EP/> logo, the fun mode timer and the button that opens the command menu.
+ * Builds the menu items from the Sanity links and handles the ⌘K, Ctrl+K and "/" shortcuts.
+ * @param props.links - Sanity links shown in the menu (internal ones only on FULL_MENU_PATHS pages).
+ * @param props.name - Owner's name; used for the logo initials and the home link label.
+ */
 export default function Header({
   links,
   name = "Esteban Payret",
@@ -74,6 +81,7 @@ export default function Header({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  // Menu entries: contact action, home, one per link, plus a "copy email" action for mailto: links
   const items = useMemo<MenuItem[]>(() => {
     // Internal links are only shown on pages that use the full global menu
     const visibleLinks = currentPath !== null && FULL_MENU_PATHS.includes(currentPath)
@@ -145,6 +153,7 @@ export default function Header({
     return result;
   }, [links, currentPath, animationsRunning, timeLeft, getNextAnimation, copied, contact]);
 
+  // Reset the "Copied" label whenever the menu closes
   const onOpenChange = useCallback((o: boolean) => {
     setOpen(o);
     if (!o) setCopied(false);

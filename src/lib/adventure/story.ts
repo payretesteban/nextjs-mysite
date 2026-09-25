@@ -8,19 +8,27 @@ import { alt, bar, depth, kg, kmh, rate, statusAlt, statusDive, statusSurface } 
 /** Build a matcher from alternatives (regex fragments) tested against the normalized command. */
 const rx = (...alternatives: string[]) => new RegExp(`\\b(?:${alternatives.join("|")})\\b`);
 
+/** Inventory text for the skydiving stages. */
 const SKY_KIT = "A skydiving rig (main and reserve parachutes), an altimeter on your wrist, and a waterproof gear bag with your scuba kit.";
+/** Inventory text once the scuba kit is on; mentions the treasure after it's sent up. */
 const diveKit = (ctx: Ctx) =>
   `BCD with tank, mask, regulator and pressure gauge, fins, a primary light and two backups, a cave line reel, a lift bag and a GPS rescue beacon.${
     ctx.has("treasure_sent") && !ctx.has("no_treasure") ? " Somewhere above you, a lift bag with a treasure chest." : ""
   }`;
 
+/** Lesson shown when the player dies by gearing up in the wrong order. */
 const BUOYANCY_LESSON = "Get buoyant first: open the valve, put on the BCD and inflate it. Everything else comes after.";
+/**
+ * Death outcome for putting on a piece of gear before being buoyant.
+ * @param item - The gear the player tried to put on, e.g. "mask".
+ */
 const tooEarly = (item: string): Outcome => ({
   die: true,
   text: `You try to wrestle the ${item} on while treading water. A wave breaks over you, you swallow a mouthful of sea, and your legs give out.`,
   lesson: BUOYANCY_LESSON,
 });
 
+/** Every stage, in play order. The engine looks them up by `id`. */
 export const STAGES: Stage[] = [
   /* 1 ─────────────────────────────────────────────────────────────── */
   {
@@ -677,12 +685,14 @@ export const STAGES: Stage[] = [
   },
 ];
 
+/** Outcome for leaving the treasure behind: a safe way out, but it caps the rank at "Survivor". */
 const leaveTreasure: Outcome = {
   text: "You leave the chest where it lies and follow the line out, reeling it in as you go. Daylight. The treasure will wait; you get to dive another day.",
   set: ["no_treasure"],
   goto: "ascent",
 };
 
+/** The ending text; changes depending on whether the treasure was sent up and secured. */
 function winText(ctx: Ctx) {
   const base =
     "You pull up the antenna, flip the cover and press the button. The beacon sends your GPS position to every boat nearby. Forty minutes later, a dive boat pulls alongside";

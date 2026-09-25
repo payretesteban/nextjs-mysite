@@ -6,27 +6,34 @@
 
 import { SITE_ORIGIN } from "./site";
 
+/** Which device PageSpeed Insights simulates. */
 export type Strategy = "mobile" | "desktop";
+/** Lighthouse colour band; "none" when there is no score. */
 export type Rating = "good" | "average" | "poor" | "none";
 
 /** The page PageSpeed Insights tests: the homepage at the canonical (www) address. */
 export const SITE_URL = `${SITE_ORIGIN}/`;
 
+/** Score for one Lighthouse category, such as Performance or SEO. */
 export interface CategoryScore {
   id: string;
   title: string;
   score: number | null; // 0–100
 }
 
+/** One lab metric from the simulated visit, such as Largest Contentful Paint. */
 export interface MetricResult {
   id: string;
   title: string;
   displayValue: string;
+  /** Raw value from Lighthouse (usually ms; unitless for layout shift). */
   numericValue: number | null;
   rating: Rating;
+  /** Plain-text explanation of the metric, without the "Learn more" link. */
   description: string;
 }
 
+/** One real-visitor metric from the Chrome UX Report (75th percentile). */
 export interface FieldMetric {
   id: string;
   title: string;
@@ -34,32 +41,43 @@ export interface FieldMetric {
   rating: Rating;
 }
 
+/** A failing performance audit, shown under "What to improve". */
 export interface Opportunity {
   id: string;
   title: string;
   description: string;
   learnMoreUrl: string | null;
+  /** Lighthouse's own summary, e.g. "3 resources found". */
   displayValue: string | null;
+  /** Estimated time and/or size saved, e.g. "1.2 s · 40 KiB". */
   savings: string | null;
   rating: Rating;
 }
 
+/** The compact report the /performance page renders. */
 export interface PerformanceResult {
+  /** The URL Lighthouse ended up testing, after redirects. */
   url: string;
   strategy: Strategy;
+  /** When the test ran (ISO). */
   fetchTime: string;
   lighthouseVersion: string | null;
   categories: CategoryScore[];
   metrics: MetricResult[];
+  /** Real-visitor data, or null when Chrome doesn't have enough for the site. */
   field: { overall: Rating; metrics: FieldMetric[] } | null;
   opportunities: Opportunity[];
+  /** Final screenshot as a data: URI. */
   screenshot: string | null;
+  /** Warnings Lighthouse raised during the run. */
   warnings: string[];
   reportUrl: string;
 }
 
+/** What `/api/performance` returns. */
 export interface PerformanceResponse {
   result: PerformanceResult;
+  /** True when the result came from the 10-minute cache instead of a new run. */
   cached: boolean;
   /** When a fresh run becomes possible again (ISO). */
   freshAfter: string;
@@ -67,6 +85,7 @@ export interface PerformanceResponse {
 
 /* ---------------------------------------------------------------- */
 
+// Lighthouse category ids and titles, in display order
 export const CATEGORY_ORDER = [
   ["performance", "Performance"],
   ["accessibility", "Accessibility"],
@@ -74,6 +93,7 @@ export const CATEGORY_ORDER = [
   ["seo", "SEO"],
 ] as const;
 
+// Lab metrics to show: Lighthouse audit id and title
 const LAB_METRICS: [string, string][] = [
   ["first-contentful-paint", "First Contentful Paint"],
   ["largest-contentful-paint", "Largest Contentful Paint"],
@@ -82,6 +102,7 @@ const LAB_METRICS: [string, string][] = [
   ["speed-index", "Speed Index"],
 ];
 
+// Chrome UX Report metrics: API key, title and formatter for the percentile value
 const FIELD_METRICS: [string, string, (p: number) => string][] = [
   ["LARGEST_CONTENTFUL_PAINT_MS", "Largest Contentful Paint", (p) => `${(p / 1000).toFixed(1)} s`],
   ["INTERACTION_TO_NEXT_PAINT", "Interaction to Next Paint", (p) => `${Math.round(p)} ms`],
@@ -93,12 +114,14 @@ const FIELD_METRICS: [string, string, (p: number) => string][] = [
 /** Lighthouse colour bands: 90–100 good, 50–89 average, 0–49 poor. */
 export function ratingFromScore(score: number | null | undefined): Rating {
   if (score == null) return "none";
+  // Accept both 0–1 (raw Lighthouse) and 0–100 scores
   const s = score <= 1 ? score * 100 : score;
   if (s >= 90) return "good";
   if (s >= 50) return "average";
   return "poor";
 }
 
+/** Maps a Chrome UX Report category (FAST / AVERAGE / SLOW) to a rating. */
 function ratingFromField(category?: string): Rating {
   if (category === "FAST") return "good";
   if (category === "AVERAGE") return "average";
@@ -121,6 +144,10 @@ export function splitMarkdown(md = ""): { text: string; link: string | null } {
   return { text, link: learn ? learn[2] : null };
 }
 
+/**
+ * Summarises an audit's estimated savings in time and bytes, ignoring tiny amounts.
+ * @returns Text like "1.2 s · 40 KiB", or null when there is nothing worth showing.
+ */
 function formatSavings(audit: any): string | null {
   const ms = audit?.details?.overallSavingsMs ?? audit?.metricSavings?.LCP ?? audit?.metricSavings?.FCP;
   const bytes = audit?.details?.overallSavingsBytes;
@@ -130,15 +157,18 @@ function formatSavings(audit: any): string | null {
   return parts.length ? parts.join(" · ") : null;
 }
 
+/** Rough size of an audit's potential savings, used to list the biggest wins first. */
 function savingsWeight(audit: any): number {
   const s = audit?.metricSavings ?? {};
   return (
     (audit?.details?.overallSavingsMs ?? 0) +
+    // CLS is a small unitless number, so scale it up to compete with milliseconds
     (s.LCP ?? 0) + (s.FCP ?? 0) + (s.TBT ?? 0) + (s.INP ?? 0) + (s.CLS ?? 0) * 10_000 +
     (audit?.details?.overallSavingsBytes ?? 0) / 100
   );
 }
 
+/** Link to the full report for this URL and device on pagespeed.web.dev. */
 export function reportUrl(url: string, strategy: Strategy) {
   return `https://pagespeed.web.dev/report?url=${encodeURIComponent(url)}&form_factor=${strategy}`;
 }
@@ -160,6 +190,7 @@ export function normalizePageSpeed(json: any, strategy: Strategy): PerformanceRe
     return {
       id,
       title,
+      // Lighthouse uses non-breaking spaces in values like "1.2 s"; swap them for normal spaces
       displayValue: (a.displayValue ?? "—").replace(/ /g, " "),
       numericValue: typeof a.numericValue === "number" ? a.numericValue : null,
       rating: ratingFromScore(a.score),

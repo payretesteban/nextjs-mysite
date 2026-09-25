@@ -13,6 +13,10 @@ import SiteLogNotes from "./_home/SiteLogNotes";
 const HOME_POST_LIMIT = 5;
 
 
+/**
+ * The homepage: profile, bio, contact button and services ticker, the latest posts and the site log notes.
+ * Data loads in parallel; each loader caches for 30-60 seconds, so Sanity edits appear without a redeploy.
+ */
 export default async function IndexPage() {
   const [{ posts, postCount, profile }, { services }, siteLog] = await Promise.all([
     getIndexPageData(),

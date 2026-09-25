@@ -5,6 +5,8 @@ export const PAPER = [
   { bg: "bg-pink-200", ink: "text-pink-800" },
   { bg: "bg-lime-200", ink: "text-lime-800" },
 ];
+/** Rotation in degrees for each note, cycled like PAPER so neighbours lean different ways. */
 export const TILT = [-2, 2.5, -3.5, 1.5];
 
+/** Pads a note number to two digits, e.g. 3 → "03". */
 export const pad = (n: number) => String(n).padStart(2, "0");

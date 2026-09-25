@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   description: "Everything I've written, newest first.",
 };
 
+/** The /posts page: every post, featured first (the list is cached for 30 seconds by `getAllPosts`). */
 export default async function PostsPage() {
   const posts = await getAllPosts();
 

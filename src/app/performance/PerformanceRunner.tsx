@@ -11,6 +11,7 @@ import type {
   Strategy,
 } from "@/lib/pagespeed";
 
+// Progress messages shown while a test runs; {device} is swapped for "phone" or "desktop"
 const STAGES = [
   "Loading the page on a simulated {device}…",
   "Measuring how quickly content appears…",
@@ -19,6 +20,7 @@ const STAGES = [
   "Putting the report together…",
 ];
 
+// Tailwind classes and labels for each rating, shared by every score, metric and dot
 const RATING = {
   good: { text: "text-emerald-600 dark:text-emerald-400", stroke: "stroke-emerald-500", fill: "bg-emerald-500", soft: "bg-emerald-50 dark:bg-emerald-950/40", label: "Good" },
   average: { text: "text-amber-600 dark:text-amber-400", stroke: "stroke-amber-500", fill: "bg-amber-500", soft: "bg-amber-50 dark:bg-amber-950/40", label: "Needs improvement" },
@@ -26,20 +28,28 @@ const RATING = {
   none: { text: "text-slate-400", stroke: "stroke-slate-300", fill: "bg-slate-300", soft: "bg-slate-50 dark:bg-slate-800", label: "No data" },
 } satisfies Record<Rating, Record<string, string>>;
 
+/** Maps a 0–100 category score to a Lighthouse rating band (90+ good, 50+ average). */
 function ratingOf(score: number | null): Rating {
   if (score == null) return "none";
   return score >= 90 ? "good" : score >= 50 ? "average" : "poor";
 }
 
+/** Formats an ISO date as a short, locale-aware date and time. */
 function formatDate(iso: string) {
   return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
 }
 
+/** Describes how long ago an ISO time was, e.g. "3 min ago" or "just now". */
 function minutesAgo(iso: string) {
   const mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60_000));
   return mins < 1 ? "just now" : `${mins} min ago`;
 }
 
+/**
+ * Device picker, run button and live report for the /performance page. Calls `/api/performance`
+ * and shows progress while Lighthouse runs, then the full report or an error.
+ * @param props.url - The address being tested, shown before the first run.
+ */
 export default function PerformanceRunner({ url }: { url: string }) {
   const [strategy, setStrategy] = useState<Strategy>("desktop");
   const [status, setStatus] = useState<"idle" | "running" | "done" | "error">("idle");
@@ -81,6 +91,7 @@ export default function PerformanceRunner({ url }: { url: string }) {
 
   const running = status === "running";
   const secs = elapsed / 1000;
+  // Move to the next progress message every 6 seconds, staying on the last one
   const stage = STAGES[Math.min(STAGES.length - 1, Math.floor(secs / 6))].replace("{device}", strategy === "mobile" ? "phone" : "desktop");
 
   return (
@@ -154,6 +165,7 @@ export default function PerformanceRunner({ url }: { url: string }) {
 
 /* ---------------------------------------------------------------- */
 
+/** The full test report: category scores, core metrics, real-visitor data and suggestions. */
 function Report({ data }: { data: PerformanceResponse }) {
   const { result, cached } = data;
   return (
@@ -273,10 +285,15 @@ function Report({ data }: { data: PerformanceResponse }) {
   );
 }
 
+/**
+ * Animated ring showing one category score, coloured by its rating.
+ * @param props.delay - Animation delay in ms, so the gauges appear one after another.
+ */
 function Gauge({ category, delay }: { category: CategoryScore; delay: number }) {
   const r = 36;
   const circ = 2 * Math.PI * r;
   const rating = ratingOf(category.score);
+  // Hide the part of the ring's stroke that the score doesn't fill
   const offset = circ * (1 - (category.score ?? 0) / 100);
   return (
     <div
@@ -308,6 +325,7 @@ function Gauge({ category, delay }: { category: CategoryScore; delay: number }) 
   );
 }
 
+/** Coloured dot plus score range explaining one rating colour. */
 function Legend({ rating, range }: { rating: Rating; range: string }) {
   return (
     <span className="inline-flex items-center gap-1.5">
@@ -317,6 +335,7 @@ function Legend({ rating, range }: { rating: Rating; range: string }) {
   );
 }
 
+/** Tile for one lab metric; hovering shows what the metric means. */
 function Metric({ metric, delay }: { metric: MetricResult; delay: number }) {
   return (
     <div
@@ -333,6 +352,7 @@ function Metric({ metric, delay }: { metric: MetricResult; delay: number }) {
   );
 }
 
+/** Tile for one real-visitor (Chrome UX Report) metric and its rating. */
 function FieldCard({ metric }: { metric: FieldMetric }) {
   return (
     <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
@@ -343,6 +363,7 @@ function FieldCard({ metric }: { metric: FieldMetric }) {
   );
 }
 
+/** One suggested improvement, with estimated savings and a "Learn more" link when available. */
 function OpportunityRow({ item, delay }: { item: Opportunity; delay: number }) {
   return (
     <li className="animate-fade-up rounded-xl border border-slate-200 p-4 dark:border-slate-800" style={{ animationDelay: `${delay}ms` }}>
@@ -371,6 +392,7 @@ function OpportunityRow({ item, delay }: { item: Opportunity; delay: number }) {
 
 /* ---------------------------------------------------------------- */
 
+/** Spinning circle shown on the button while a test runs. */
 function Spinner() {
   return (
     <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 animate-spin" aria-hidden="true">
@@ -380,6 +402,7 @@ function Spinner() {
   );
 }
 
+/** Lightning bolt icon for the run button. */
 function BoltIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 transition-transform group-hover:scale-110" aria-hidden="true">
@@ -388,6 +411,7 @@ function BoltIcon() {
   );
 }
 
+/** Phone or monitor icon for the device picker. */
 function DeviceIcon({ device }: { device: Strategy }) {
   return device === "mobile" ? (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4" aria-hidden="true">

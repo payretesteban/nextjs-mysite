@@ -10,12 +10,18 @@ import {
 } from "@/lib/testResults";
 import { groupByArea, type AreaGroup } from "@/lib/testGroups";
 
+/** "live" runs the suite through the API (dev only); "snapshot" reads the build-time JSON. */
 type Mode = "live" | "snapshot";
+/** Which tests the results list shows. */
 type Filter = "all" | "failed" | "skipped";
 
 const SNAPSHOT_URL = "/test-results.json";
 const LIVE_URL = "/api/tests";
 
+/**
+ * Gets test results for the given mode: runs the suite live via the API, or loads the build snapshot.
+ * @returns The results, or an error object when there is no snapshot.
+ */
 async function fetchResults(mode: Mode): Promise<TestRunResponse> {
   if (mode === "live") {
     const res = await fetch(LIVE_URL, { method: "POST" });
@@ -34,23 +40,30 @@ async function fetchResults(mode: Mode): Promise<TestRunResponse> {
   return res.json();
 }
 
+/** Formats milliseconds as "850ms" or "1.25s"; shows a dash when unknown. */
 function formatDuration(ms: number | null | undefined) {
   if (ms == null) return "—";
   if (ms < 1000) return `${ms}ms`;
   return `${(ms / 1000).toFixed(ms < 10_000 ? 2 : 1)}s`;
 }
 
+/** Formats an ISO date as a short, locale-aware date and time. */
 function formatDate(iso: string) {
   return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(
     new Date(iso)
   );
 }
 
+/**
+ * Run button and results for the /tests page, with a live timer while tests run.
+ * @param props.mode - Whether to run the suite live or show the build snapshot.
+ */
 export default function TestRunner({ mode }: { mode: Mode }) {
   const [status, setStatus] = useState<"idle" | "running" | "done" | "error">("idle");
   const [result, setResult] = useState<TestRunResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  // Bumped on each run so the results remount and their animations replay
   const [runId, setRunId] = useState(0);
   const startRef = useRef(0);
 
@@ -130,6 +143,7 @@ export default function TestRunner({ mode }: { mode: Mode }) {
   );
 }
 
+/** Summary banner, stats, coverage and the filterable list of tests grouped by part of the site. */
 function Results({ result }: { result: TestRunResult }) {
   const [filter, setFilter] = useState<Filter>("all");
   const { summary } = result;
@@ -143,6 +157,7 @@ function Results({ result }: { result: TestRunResult }) {
       .filter((f) => f.tests.length > 0 || (filter !== "skipped" && f.error));
     return groupByArea(files);
   }, [filter, result.files]);
+  // Count areas from all files, so the number in the banner doesn't change with the filter
   const areaCount = useMemo(() => groupByArea(result.files).length, [result.files]);
 
   const pct = (n: number) => (summary.total ? (n / summary.total) * 100 : 0);
@@ -266,6 +281,7 @@ function CoverageStat({ pct, delay }: { pct: number; delay: number }) {
   );
 }
 
+/** Tile showing one summary number, such as how many tests passed. */
 function Stat({ label, value, tone, delay }: { label: string; value: number | string; tone: string; delay: number }) {
   return (
     <div
@@ -278,6 +294,7 @@ function Stat({ label, value, tone, delay }: { label: string; value: number | st
   );
 }
 
+/** Tab button that switches the results filter and shows how many tests it matches. */
 function FilterTab({ active, onClick, label, count }: { active: boolean; onClick: () => void; label: string; count: number }) {
   return (
     <button
@@ -296,6 +313,7 @@ function FilterTab({ active, onClick, label, count }: { active: boolean; onClick
   );
 }
 
+// Dot colour for each area's overall status
 const DOT: Record<AreaGroup["status"], string> = {
   passed: "bg-emerald-500",
   failed: "bg-rose-500",
@@ -354,6 +372,7 @@ function AreaRow({ area, index, openByDefault }: { area: AreaGroup; index: numbe
   );
 }
 
+// Badge colours for each test status; todo looks the same as skipped
 const STATUS_STYLES: Record<TestStatus, string> = {
   passed: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
   failed: "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400",
@@ -361,6 +380,7 @@ const STATUS_STYLES: Record<TestStatus, string> = {
   todo: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
 };
 
+/** One test: its status, name, duration and any failure messages. */
 function TestRow({ test }: { test: TestCaseResult }) {
   // The first group title is already the section heading; show any deeper ones as a prefix
   const deeper = test.ancestors.slice(1);
@@ -399,6 +419,7 @@ function TestRow({ test }: { test: TestCaseResult }) {
 
 /* ---------- icons ---------- */
 
+/** Play triangle icon for the run button. */
 function PlayIcon() {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 transition-transform group-hover:scale-110" aria-hidden="true">
@@ -407,6 +428,7 @@ function PlayIcon() {
   );
 }
 
+/** Spinning circle shown on the button while tests run. */
 function Spinner() {
   return (
     <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 animate-spin" aria-hidden="true">
@@ -416,6 +438,7 @@ function Spinner() {
   );
 }
 
+/** Check mark icon for passed tests. */
 function CheckIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="3" className={className} aria-hidden="true">
@@ -424,6 +447,7 @@ function CheckIcon({ className }: { className?: string }) {
   );
 }
 
+/** Cross icon for failed tests. */
 function CrossIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="3" className={className} aria-hidden="true">
@@ -432,6 +456,7 @@ function CrossIcon({ className }: { className?: string }) {
   );
 }
 
+/** Chevron that rotates when an area row is opened. */
 function ChevronIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" className={className} aria-hidden="true">

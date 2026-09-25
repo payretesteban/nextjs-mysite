@@ -6,6 +6,7 @@ import type { Line, LineKind } from "@/lib/adventure/types";
 import { useContact } from "../contact/ContactProvider";
 import { useAnimation } from "../context/AnimationContext";
 
+/** Oldest output lines are dropped past this, so a long game doesn't slow the page down. */
 const MAX_LINES = 400;
 
 /* Green phosphor palette */
@@ -25,6 +26,11 @@ const LINE_STYLES: Record<LineKind, { className: string; prefix?: string }> = {
   system: { className: "text-[#2fbf5c] [text-shadow:0_0_6px_rgba(57,255,110,0.25)]" },
 };
 
+/**
+ * The text adventure in a retro 80s CRT monitor. Keeps the game state and output, runs commands
+ * from the prompt or the suggestion buttons, and supports ↑/↓ command history.
+ * Typing HIRE opens the site's contact form; winning plays one of the site's celebration animations.
+ */
 export default function Adventure() {
   const [game, setGame] = useState<{ state: GameState; lines: Line[] }>(() => start());
   const [input, setInput] = useState("");
@@ -41,6 +47,7 @@ export default function Adventure() {
     if (el) el.scrollTop = el.scrollHeight;
   }, [game.lines]);
 
+  /** Runs a command through the engine, appends its output and handles UI events. */
   function run(command: string) {
     const trimmed = command.trim();
     if (!trimmed) return;
@@ -52,6 +59,7 @@ export default function Adventure() {
     if (result.event === "win") getNextAnimation();
   }
 
+  /** Runs the typed command and clears the prompt. */
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     run(input);

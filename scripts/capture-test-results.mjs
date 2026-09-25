@@ -20,6 +20,13 @@ import { pathToFileURL } from "node:url";
 const MAX_MESSAGE_LENGTH = 2000;
 const ANSI_PATTERN = /\u001b\[[0-9;]*m/g;
 
+/**
+ * Makes an error message readable in the browser: strips colour codes, shortens absolute paths,
+ * drops noisy stack frames and caps the length.
+ * @param {unknown} message
+ * @param {string} [cwd] - Project root, removed from paths so they don't leak the machine's layout.
+ * @returns {string}
+ */
 function cleanMessage(message, cwd) {
   let text = String(message).replace(ANSI_PATTERN, "");
   if (cwd) text = text.split(cwd + path.sep).join("").split(cwd).join(".");
@@ -33,6 +40,11 @@ function cleanMessage(message, cwd) {
   return text;
 }
 
+/**
+ * Maps a Vitest test status to one the /tests page understands.
+ * @param {string} status
+ * @returns {import("../src/lib/testResults").TestStatus}
+ */
 function normalizeStatus(status) {
   if (status === "passed" || status === "failed") return status;
   if (status === "todo") return "todo";
@@ -174,6 +186,11 @@ export async function runVitest({ cwd = process.cwd(), source = "snapshot", time
   }
 }
 
+/**
+ * CLI entry point: runs the suite and writes the JSON file. Records errors in the file instead of
+ * throwing, so the build never fails because of it.
+ * @returns {Promise<void>}
+ */
 async function main() {
   const args = process.argv.slice(2);
   const arg = (name, fallback) => {

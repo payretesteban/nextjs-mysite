@@ -9,6 +9,7 @@ import {
   useEffect,
 } from "react";
 
+/** Tailwind animation classes that fun mode cycles through. */
 const HARDCODED_ANIMATIONS = [
   { class: "animate-bounce" },
   { class: "animate-spin" },
@@ -21,20 +22,30 @@ type Animation = {
   class: string;
 };
 
+/** Fun mode state shared through `useAnimation()`. */
 type AnimationContextType = {
+  /** Current animation class, or "" when fun mode is off. */
   animationClass: string;
+  /** Seconds until the current animation stops. */
   timeLeft: number;
+  /** Starts the next animation and restarts the countdown. */
   getNextAnimation: () => void;
 };
 
 const AnimationContext = createContext<AnimationContextType | undefined>(undefined);
 
+/** Returns a shuffled copy of the array. Not perfectly random, but fine for picking animations. */
 function shuffleArray<T>(array: T[]) {
   return [...array].sort(() => Math.random() - 0.5);
 }
 
+/** How long each animation runs, in seconds. */
 const ANIMATION_DURATION = 10;
 
+/**
+ * Holds fun mode state: the current animation class and a countdown. Each call to
+ * `getNextAnimation` plays the next class from a shuffled queue for ANIMATION_DURATION seconds.
+ */
 export function AnimationProvider({ children }: { children: ReactNode }) {
   const [animationClass, setAnimationClass] = useState("");
   const [queue, setQueue] = useState<string[]>([]);
@@ -54,6 +65,10 @@ export function AnimationProvider({ children }: { children: ReactNode }) {
     if (intervalRef.current) clearInterval(intervalRef.current);
   }
 
+  /**
+   * Plays the next animation from the queue (reshuffled when empty) and restarts the timers.
+   * Ignored before mount so nothing runs during server rendering.
+   */
   function getNextAnimation() {
     if (!isMounted) return;
 
@@ -88,6 +103,10 @@ export function AnimationProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Returns the fun mode state: `animationClass`, `timeLeft` and `getNextAnimation`.
+ * Must be used inside AnimationProvider, otherwise it throws.
+ */
 export function useAnimation() {
   const context = useContext(AnimationContext);
   if (!context) {

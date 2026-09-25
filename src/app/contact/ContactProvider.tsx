@@ -15,19 +15,29 @@ import {
   type InquiryType,
 } from "@/lib/contact";
 
+/** What `useContact()` exposes to the rest of the app. */
 type ContactContextValue = {
   /** Open the form. `topic` (e.g. a service name) is shown in the form and added to the email. */
   open: (type?: InquiryType, topic?: string) => void;
 };
 const ContactContext = createContext<ContactContextValue | null>(null);
 
-/** Opens the "Let's work together" form from anywhere. Null outside the provider. */
+/**
+ * Returns `{ open }` for opening the "Let's work together" form from anywhere.
+ * Returns null outside ContactProvider, so callers use `contact?.open()`.
+ */
 export function useContact() {
   return useContext(ContactContext);
 }
 
+/** Where the form is in its send cycle. */
 type Status = "idle" | "sending" | "sent" | "error";
 
+/**
+ * Provides `useContact()` to its children and renders the "Let's work together" form
+ * in a native <dialog>. It handles validation, sending to /api/contact and the thank-you screen.
+ * @param props.children - The page content that can open the form.
+ */
 export default function ContactProvider({ children }: { children: React.ReactNode }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -39,6 +49,7 @@ export default function ContactProvider({ children }: { children: React.ReactNod
   const [serverError, setServerError] = useState<string | null>(null);
   const [honeypot, setHoneypot] = useState("");
 
+  // Opens the dialog, optionally preset to an inquiry type and topic
   const open = useCallback(
     (type?: InquiryType, topic?: string) => {
       // Start fresh after a successful send; otherwise keep the draft (with the new topic, if any)
@@ -78,6 +89,7 @@ export default function ContactProvider({ children }: { children: React.ReactNod
     if (!isOpen) document.documentElement.style.overflow = "";
   }, [isOpen]);
 
+  // Keep state in sync when the browser closes the dialog itself (Esc key)
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
@@ -86,6 +98,7 @@ export default function ContactProvider({ children }: { children: React.ReactNod
     return () => dialog.removeEventListener("close", onClose);
   }, []);
 
+  /** Sets one field and clears its error, so the message goes away as soon as the user fixes it. */
   function update(field: ContactField, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
     if (errors[field])
@@ -96,11 +109,16 @@ export default function ContactProvider({ children }: { children: React.ReactNod
       });
   }
 
+  /** Moves focus to the first invalid field (after render) so keyboard and screen reader users land on it. */
   function focusFirstError(errs: ContactErrors) {
     const first = Object.keys(errs)[0];
     if (first) requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>(`[name="${first}"]`)?.focus());
   }
 
+  /**
+   * Validates in the browser first, then posts to /api/contact. Server-side field errors are shown
+   * the same way as local ones. The honeypot and start time are sent for spam checks.
+   */
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setServerError(null);
@@ -324,6 +342,7 @@ export default function ContactProvider({ children }: { children: React.ReactNod
 
 /* ---------------------------------------------------------------- */
 
+/** Tailwind classes for a text input or select; red border and ring when `error` is set. */
 function inputClass(error?: string) {
   return `w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 shadow-xs transition-colors placeholder:text-slate-400 focus:outline-none focus:ring-2 dark:bg-slate-950 dark:text-slate-100 ${
     error
@@ -332,6 +351,7 @@ function inputClass(error?: string) {
   }`;
 }
 
+/** Id and ARIA attributes that link a field to its label and error message. */
 function a11y(name: ContactField, errors: ContactErrors) {
   return {
     id: `contact-${name}`,
@@ -340,6 +360,11 @@ function a11y(name: ContactField, errors: ContactErrors) {
   };
 }
 
+/**
+ * Label, input slot and error message for one form field.
+ * @param props.name - Field name; builds the ids that connect the label and error to the input.
+ * @param props.optional - Shows an "Optional" tag next to the label.
+ */
 function Field({
   label,
   name,
@@ -369,6 +394,11 @@ function Field({
   );
 }
 
+/**
+ * Dropdown with an empty "Choose…" option, styled like the text inputs.
+ * @param props.error - This field's error (for styling).
+ * @param props.errors - All form errors (for the ARIA attributes).
+ */
 function Select({
   name,
   value,

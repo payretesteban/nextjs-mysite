@@ -2,6 +2,10 @@
 
 import { useAnimation } from "@/app/context/AnimationContext";
 
+/**
+ * Grey headline paragraph that plays the current fun mode animation.
+ * The `key` changes with the animation class so the animation restarts each time.
+ */
 export default function AnimatedHeadline({
   headline,
   className = "mb-4 text-xl",

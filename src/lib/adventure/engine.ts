@@ -5,18 +5,22 @@
 import { STAGES } from "./story";
 import type { Ctx, Line, Stage, StageId } from "./types";
 
+/** Everything about a game in progress. Plain data, so each step returns a new copy. */
 export interface GameState {
   stage: StageId;
+  /** Things done so far; "#" counters can appear more than once. */
   flags: string[];
   score: number;
   moves: number;
   retries: number;
+  /** How many hints were asked for (not scored). */
   hints: number;
   status: "playing" | "dead" | "won";
   /** Snapshot taken when entering a stage, restored by RETRY. */
   checkpoint: { flags: string[]; score: number };
 }
 
+/** What `step` returns: the next state, the lines to print and an optional UI event. */
 export interface StepResult {
   state: GameState;
   lines: Line[];
@@ -24,9 +28,11 @@ export interface StepResult {
   event?: "contact" | "win";
 }
 
+/** Shown in the terminal header. */
 export const GAME_TITLE = "The Deep Drop";
 
 const STAGE_BY_ID = Object.fromEntries(STAGES.map((s) => [s.id, s])) as Record<StageId, Stage>;
+/** Points taken off the final score for each retry after dying. */
 const RETRY_PENALTY = 5;
 
 /** Lowercase, strip punctuation and filler words, collapse spaces. */
@@ -40,6 +46,7 @@ export function normalize(input: string): string {
     .trim();
 }
 
+/** Wraps a flag list in the `Ctx` helpers that stage texts and actions use. */
 function ctxOf(flags: string[]): Ctx {
   return {
     has: (f) => flags.includes(f),
@@ -47,6 +54,7 @@ function ctxOf(flags: string[]): Ctx {
   };
 }
 
+/** The stage title and intro, printed on entering a stage and by LOOK. */
 function describe(state: GameState): Line[] {
   const stage = STAGE_BY_ID[state.stage];
   return [
@@ -55,10 +63,12 @@ function describe(state: GameState): Line[] {
   ];
 }
 
+/** A fresh game at the first stage, with no flags and no score. */
 export function initialState(): GameState {
   return { stage: "plane", flags: [], score: 0, moves: 0, retries: 0, hints: 0, status: "playing", checkpoint: { flags: [], score: 0 } };
 }
 
+/** Starts a new game: the initial state plus the welcome line and the first stage's description. */
 export function start(): { state: GameState; lines: Line[] } {
   const state = initialState();
   return {
@@ -70,14 +80,17 @@ export function start(): { state: GameState; lines: Line[] } {
   };
 }
 
+/** The status bar readout for the current stage (altitude, or depth and air). */
 export function statusFor(state: GameState): string {
   return STAGE_BY_ID[state.stage].status(ctxOf(state.flags));
 }
 
+/** The current stage's title. */
 export function stageTitle(state: GameState): string {
   return STAGE_BY_ID[state.stage].title;
 }
 
+/** Commands to offer as buttons; after dying or winning, only RETRY/RESTART make sense. */
 export function suggestionsFor(state: GameState): string[] {
   if (state.status === "dead") return ["retry", "restart"];
   if (state.status === "won") return ["restart"];
@@ -98,9 +111,14 @@ export const WALKTHROUGH = [
   "ascend slowly", "safety stop", "surface", "inflate BCD", "grab the lift bag", "activate GPS",
 ];
 
+// getMaxScore plays the walkthrough through `step`; computingMax stops that run from printing the win summary
 let maxScoreCache: number | null = null;
 let computingMax = false;
 
+/**
+ * The highest possible score, found by playing the walkthrough once and caching the result.
+ * Used to show "score of max" and to pick the rank.
+ */
 export function getMaxScore(): number {
   if (maxScoreCache !== null) return maxScoreCache;
   computingMax = true;
@@ -111,10 +129,12 @@ export function getMaxScore(): number {
   return maxScoreCache;
 }
 
+/** The score minus the retry penalty, never below zero. */
 export function finalScore(state: GameState) {
   return Math.max(0, state.score - state.retries * RETRY_PENALTY);
 }
 
+/** A fun rank title based on the final score as a share of the best possible score. */
 export function rankFor(state: GameState): string {
   const pct = finalScore(state) / getMaxScore();
   if (state.flags.includes("no_treasure")) return pct >= 0.5 ? "Survivor" : "Lucky Survivor";
@@ -128,9 +148,11 @@ export function rankFor(state: GameState): string {
 /* Commands                                                             */
 /* ------------------------------------------------------------------ */
 
+/** Text printed by HELP. */
 const HELP =
   "Type short commands like JUMP, CUT AWAY, PUT ON MASK or CHECK GAUGE. Each stage has a right way through; one wrong move ends the game, but RETRY takes you back to the start of that stage. Other commands: LOOK (describe again), HINT, INVENTORY, SCORE, RESTART.";
 
+/** Commands that work in every stage, checked before the current stage's own actions. */
 const GLOBAL = {
   restart: /^(?:restart|start over|new game|play again|reset)$/,
   retry: /^(?:retry|try again|retry stage)$/,
@@ -144,6 +166,13 @@ const GLOBAL = {
   instruments: /^(?:check|look at|read) (?:altimeter|alti|altitude|depth|computer|dive computer|gauge|air|pressure)$/,
 };
 
+/**
+ * Runs one player command and returns the new state and output. Never changes `prev`.
+ * Order matters: always-on commands (restart, help, contact, score) come first, then retry and
+ * the dead/won checks, then LOOK/INVENTORY/HINT, and finally the current stage's actions.
+ * Flags that are already set aren't added again (except # counters), so repeating an action scores nothing.
+ * @param raw - The command exactly as typed; it is echoed back and then normalized.
+ */
 export function step(prev: GameState, raw: string): StepResult {
   const input = normalize(raw);
   const echo: Line = { kind: "input", text: raw.trim() };
@@ -152,6 +181,7 @@ export function step(prev: GameState, raw: string): StepResult {
   const state: GameState = { ...prev, flags: [...prev.flags] };
   const ctx = ctxOf(state.flags);
   const stage = STAGE_BY_ID[state.stage];
+  // Every result starts with the echoed command
   const out = (lines: Line[], s: GameState = state, event?: StepResult["event"]): StepResult => ({ state: s, lines: [echo, ...lines], event });
 
   // Commands that work at any time

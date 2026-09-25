@@ -1,8 +1,10 @@
 import Link from "next/link";
 import type { SanityPost } from "@/lib/types";
 
+/** Keyboard focus outline shared by every post link. */
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600";
 
+/** Amber star icon that marks a featured post (decorative). */
 function Star() {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" className="h-4 w-4 shrink-0 text-amber-500">

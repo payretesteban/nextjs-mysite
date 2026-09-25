@@ -14,6 +14,11 @@ const RATE_WINDOW_MS = 60 * 60 * 1000; // …per hour, per visitor
 // 5 messages per visitor per hour (see src/lib/rateLimit.ts)
 const contactRateLimiter = createRateLimiter(RATE_LIMIT, RATE_WINDOW_MS);
 
+/**
+ * Sends a contact form message by email through Resend. Returns 400 for invalid input,
+ * 429 when rate limited, 502 when sending fails, and 503 if no API key is set (in development
+ * it logs a preview instead). Suspected bots get a fake success.
+ */
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   if (!body || typeof body !== "object") {

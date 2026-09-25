@@ -7,9 +7,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 /* Items                                                               */
 /* ------------------------------------------------------------------ */
 
+/** Section headings in the menu, shown in GROUP_ORDER. */
 type Group = "Pages" | "Elsewhere" | "Actions";
 const GROUP_ORDER: Group[] = ["Pages", "Elsewhere", "Actions"];
 
+/** Names of the inline icons that menu items can use. */
 export type IconName =
   | "home"
   | "page"
@@ -30,6 +32,7 @@ export type IconName =
   | "user"
   | "code";
 
+/** One entry in the command menu: a page link, an external link or an action. */
 export interface MenuItem {
   id: string;
   label: string;
@@ -37,13 +40,19 @@ export interface MenuItem {
   icon: IconName;
   /** Links render as <a>; items with `run` render as <button>. */
   href?: string;
+  /** Opens in a new tab (except mailto: links). */
   external?: boolean;
+  /** Action to run when picked; the menu closes afterwards (except for copy actions). */
   run?: () => void | Promise<void>;
+  /** Small grey text on the right, e.g. "Current page". */
   hint?: string;
+  /** True for the page being viewed (sets aria-current). */
   current?: boolean;
+  /** Extra words that match in search but aren't shown. */
   keywords?: string;
 }
 
+/** True for absolute http(s), mailto: and tel: links, i.e. anything that isn't a page on this site. */
 export function isExternalUrl(url: string) {
   return /^(https?:|mailto:|tel:)/i.test(url);
 }
@@ -60,6 +69,11 @@ const PAGE_ICON_RULES: [RegExp, IconName][] = [
   [/project|portfolio|code/i, "code"],
 ];
 
+/**
+ * Picks an icon for a link: special cases for home, email, LinkedIn and GitHub,
+ * a globe for other external sites, then PAGE_ICON_RULES for the site's own pages.
+ * @param title - Link title, also checked against the page rules.
+ */
 export function iconForUrl(url: string, title = ""): IconName {
   if (url === "/") return "home";
   if (url.startsWith("mailto:")) return "mail";
@@ -74,6 +88,13 @@ export function iconForUrl(url: string, title = ""): IconName {
 /* Component                                                           */
 /* ------------------------------------------------------------------ */
 
+/**
+ * ⌘K-style menu in a native <dialog>: a search box that filters the items and full keyboard navigation.
+ * Open state is controlled by the parent.
+ * @param props.items - Everything the menu can show; filtered by label, hint, keywords and group.
+ * @param props.open - Whether the dialog is shown.
+ * @param props.onOpenChange - Called with false when the menu closes (Esc, backdrop, item picked).
+ */
 export default function CommandMenu({
   items,
   open,
@@ -128,6 +149,7 @@ export default function CommandMenu({
     return () => dialog.removeEventListener("close", handleClose);
   }, [onOpenChange]);
 
+  // Items matching the search, in group order; `active` indexes into this list
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const matches = q
@@ -139,12 +161,14 @@ export default function CommandMenu({
     return GROUP_ORDER.flatMap((g) => matches.filter((i) => i.group === g));
   }, [items, query]);
 
+  // Keep the highlighted item in view when moving with the arrow keys
   useEffect(() => {
     itemRefs.current[active]?.scrollIntoView?.({ block: "nearest" });
   }, [active]);
 
   const close = useCallback(() => onOpenChange(false), [onOpenChange]);
 
+  /** Arrow keys, Home and End move the highlight (wrapping around); Enter clicks the highlighted item. */
   function onKeyDown(e: React.KeyboardEvent) {
     if (!filtered.length) return;
     if (e.key === "ArrowDown") {
@@ -165,6 +189,7 @@ export default function CommandMenu({
     }
   }
 
+  // Position of each item in the flat list, needed while rendering items group by group
   const indexOf = new Map(filtered.map((item, i) => [item.id, i]));
 
   return (
@@ -310,6 +335,7 @@ export default function CommandMenu({
   );
 }
 
+/** Small keyboard-key badge, e.g. for "⌘K" or "esc". */
 export function Kbd({ children }: { children: React.ReactNode }) {
   return (
     <kbd className="rounded border border-slate-200 bg-slate-50 px-1 font-mono text-[11px] text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
@@ -322,6 +348,7 @@ export function Kbd({ children }: { children: React.ReactNode }) {
 /* Icons (inline so there's no extra dependency)                       */
 /* ------------------------------------------------------------------ */
 
+/** SVG contents for each icon, drawn on a 24×24 grid with a stroke. */
 const PATHS: Record<string, React.ReactNode> = {
   search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>,
   home: <><path d="M4 11 12 4l8 7" /><path d="M6 10v10h12V10" /></>,
@@ -346,6 +373,7 @@ const PATHS: Record<string, React.ReactNode> = {
   github: <path d="M9 19c-4 1.5-4-2-6-2.5m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />,
 };
 
+/** Inline stroke icon that takes the text color. Decorative only (hidden from screen readers). */
 export function Icon({ name, className }: { name: IconName | "search" | "arrow-up-right" | "menu"; className?: string }) {
   return (
     <svg

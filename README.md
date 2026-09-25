@@ -1,36 +1,92 @@
-This is a personal projectg for my website at [estebanpayret.com](https://www.estebanpayret.com) using Sanity CMS and Next.JS
+# estebanpayret.com
 
-## Getting Started
+The source code for my personal website, [estebanpayret.com](https://www.estebanpayret.com). It's built with Next.js and gets its content from Sanity CMS. The Sanity Studio lives in a separate repository (`studio-mysite`).
 
-First, run the development server:
+## What's on the site
+
+| Page | What it does |
+| --- | --- |
+| `/` | Intro, a "Let's Work Together" contact form, the latest posts and the site log as sticky notes |
+| `/services` | Services managed in Sanity; clicking one opens the contact form about that service |
+| `/posts` and `/<slug>` | All posts, and each post's page |
+| `/site-log` | Behind-the-scenes notes from building the site |
+| `/performance` | Runs a live Lighthouse test through Google PageSpeed Insights |
+| `/tests` | Runs this project's test suite and shows the results and code coverage |
+| `/adventure` | *The Deep Drop*, a small skydiving and cave-diving text adventure |
+
+Other features: a ⌘K / Ctrl+K command menu, a site-wide "fun mode", a 404 page, a sitemap and robots.txt, and the site version in the footer.
+
+## Tech stack
+
+- [Next.js 16](https://nextjs.org) (App Router) with React 19 and TypeScript
+- [Tailwind CSS 4](https://tailwindcss.com) with the Typography plugin
+- [Sanity](https://www.sanity.io) for content (posts, profile, links, services, site log)
+- [Resend](https://resend.com) for sending contact form emails
+- [Vitest](https://vitest.dev) and Testing Library for tests
+- Hosted on [Vercel](https://vercel.com)
+
+## Getting started
+
+You need Node.js 20 or newer.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open [http://localhost:3000](http://localhost:3000). Content is read from the Sanity project `w8am8n9g` (dataset `production`), so the site works right away without any setup.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env.local` file in the project root (it's git-ignored). All variables are optional locally, but add them in Vercel for production:
 
-## Learn More
+| Variable | Used for |
+| --- | --- |
+| `PAGESPEED_API_KEY` | Google PageSpeed Insights key for the performance page. Without it, Google's shared quota usually runs out. |
+| `RESEND_API_KEY` | Sends contact form emails. Without it (in development), the email is printed to the console instead. |
+| `CONTACT_TO_EMAIL` | Where contact form messages go (defaults to my address). |
+| `CONTACT_FROM_EMAIL` | The sender address; it must be on a domain verified in Resend. |
+| `NEXT_PUBLIC_SITE_URL` | Overrides the site address used for the sitemap and robots.txt (defaults to `https://www.estebanpayret.com`). |
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Starts the development server |
+| `npm run build` | Runs the tests (saving the results for `/tests`), then builds the site |
+| `npm start` | Serves the production build |
+| `npm run lint` | Checks the code with ESLint |
+| `npm test` | Runs all tests once |
+| `npm run test:watch` | Re-runs tests as files change |
+| `npm run test:coverage` | Runs the tests with a coverage report (summary in the terminal, full report in `coverage/index.html`) |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project structure
 
-## Deploy on Vercel
+```text
+src/
+  app/          Pages, layout, API routes and page-specific components
+    _home/      Homepage sections (posts, site log notes)
+    api/        Route handlers: contact form, performance test, live test runs
+  lib/          Data loading, helpers and shared logic (contact form, PageSpeed, the adventure game)
+  sanity/       Sanity client and GROQ queries
+scripts/        Captures test results (and coverage) for the /tests page
+public/         Static files
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Content
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Posts, the profile, menu links, services and site log notes are edited in Sanity Studio (the `studio-mysite` repository). Pages pick up changes automatically, usually within a minute (individual post pages within an hour), so there's no need to redeploy after editing content.
+
+## Tests
+
+Tests live next to the code they cover, in `__tests__` folders. On the live site, `/tests` shows the results saved when the site was built. In `npm run dev`, the button runs the suite live.
+
+When you add tests for a new part of the site, add it to the areas in `src/lib/testGroups.ts` so the results are grouped properly on the `/tests` page.
+
+## Releases
+
+The site follows [semantic versioning](https://semver.org). The version in `package.json` is shown in the footer, and every release is listed in [CHANGELOG.md](CHANGELOG.md) with a matching `vX.Y.Z` git tag.
+
+## Deployment
+
+Every push to `main` deploys to Vercel automatically.

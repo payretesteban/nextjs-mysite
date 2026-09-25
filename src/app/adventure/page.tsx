@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 // Classic terminal font for the CRT screen (exposed as --font-vt323)
 const vt323 = VT323({ weight: "400", subsets: ["latin"], display: "swap", variable: "--font-vt323" });
 
+/** The /adventure page: intro text, the game in a retro CRT monitor, and a safety note. */
 export default function AdventurePage() {
   return (
     <>
