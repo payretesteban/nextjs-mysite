@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { normalizeReport, runVitest } from "../capture-test-results.mjs";
+import { normalizeCoverage, normalizeReport, runVitest } from "../capture-test-results.mjs";
 
 const cwd = "/Users/me/site";
 
@@ -91,6 +91,25 @@ describe("Running the suite for this report", () => {
     }
   });
 
+  it("adds code coverage when the coverage tool is installed", async () => {
+    const dir = await fakeProject(`
+      import { mkdirSync, writeFileSync } from "node:fs";
+      const arg = (name) => process.argv.find((a) => a.startsWith(name + "="))?.split("=")[1];
+      writeFileSync(arg("--outputFile"), JSON.stringify({ success: true, testResults: [] }));
+      const dir = arg("--coverage.reportsDirectory");
+      mkdirSync(dir, { recursive: true });
+      const t = (pct) => ({ pct });
+      writeFileSync(dir + "/coverage-summary.json", JSON.stringify({ total: { lines: t(90.49), statements: t(88), functions: t(90.04), branches: t(81.15) } }));
+    `);
+    await mkdir(path.join(dir, "node_modules", "@vitest", "coverage-v8"), { recursive: true });
+    try {
+      const result = await runVitest({ cwd: dir });
+      expect(result.coverage).toEqual({ lines: 90.5, statements: 88, functions: 90, branches: 81.2 });
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
   it("explains what went wrong when Vitest produces no report", async () => {
     const dir = await fakeProject(`console.error("Something broke"); process.exit(1);`);
     try {
@@ -102,5 +121,22 @@ describe("Running the suite for this report", () => {
 
   it("says so when Vitest isn't installed", async () => {
     await expect(runVitest({ cwd: os.tmpdir() })).rejects.toThrow(/not installed/);
+  });
+});
+
+describe("Reading the coverage summary", () => {
+  it("keeps the four totals, rounded to one decimal", () => {
+    const t = (pct: number) => ({ pct });
+    expect(normalizeCoverage({ total: { lines: t(83.094), statements: t(81.2), functions: t(79), branches: t(73.62) } })).toEqual({
+      lines: 83.1,
+      statements: 81.2,
+      functions: 79,
+      branches: 73.6,
+    });
+  });
+
+  it("ignores a missing or incomplete summary", () => {
+    expect(normalizeCoverage(null)).toBeNull();
+    expect(normalizeCoverage({ total: { lines: { pct: 90 } } })).toBeNull();
   });
 });

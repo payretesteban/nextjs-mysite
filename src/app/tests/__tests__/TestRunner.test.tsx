@@ -71,6 +71,24 @@ describe("Run tests button", () => {
     expect(screen.getByRole("button", { name: /run tests again/i })).toBeInTheDocument();
   });
 
+  it("shows the code coverage when the run measured it, and the duration when it didn't", async () => {
+    mockFetch({ ...passingRun, coverage: { lines: 89.9, statements: 87.4, functions: 89.5, branches: 80.2 } });
+    const { unmount } = render(<TestRunner mode="live" />);
+    fireEvent.click(screen.getByRole("button", { name: /run tests/i }));
+
+    expect(await screen.findByText("Coverage")).toBeInTheDocument();
+    expect(screen.getByText(/89\.9%/, { selector: "dd" })).toBeInTheDocument();
+    expect(screen.getByText(/80\.2% of branches/)).toBeInTheDocument();
+    expect(screen.queryByText("Duration")).not.toBeInTheDocument();
+    unmount();
+
+    mockFetch(passingRun);
+    render(<TestRunner mode="live" />);
+    fireEvent.click(screen.getByRole("button", { name: /run tests/i }));
+    expect(await screen.findByText("Duration")).toBeInTheDocument();
+    expect(screen.queryByText("Coverage")).not.toBeInTheDocument();
+  });
+
   it("shows failures and their messages", async () => {
     mockFetch(failingRun);
     render(<TestRunner mode="live" />);

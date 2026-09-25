@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.2.0 — 2026-09-24
+
+- The /tests page shows code coverage: a "Coverage" tile with the share of lines covered, plus statements, functions and branches underneath. Measured on every build and live run.
+
 ## 1.1.1 — 2026-09-24
 
 - Proper 404 page for unknown addresses and missing posts (real 404 status, not indexed by search engines).

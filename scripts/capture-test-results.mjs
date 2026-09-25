@@ -42,6 +42,22 @@ function normalizeStatus(status) {
 /** @typedef {import("../src/lib/testResults").TestRunResult} TestRunResult */
 
 /**
+ * Read the totals from Vitest's `coverage-summary.json` (json-summary reporter).
+ * Returns percentages rounded to one decimal, or null if the summary is missing or malformed.
+ * @param {any} summary
+ * @returns {import("../src/lib/testResults").CoverageSummary | null}
+ */
+export function normalizeCoverage(summary) {
+  const total = summary?.total;
+  const pct = (key) => {
+    const value = total?.[key]?.pct;
+    return typeof value === "number" && Number.isFinite(value) ? Math.round(value * 10) / 10 : null;
+  };
+  const result = { lines: pct("lines"), statements: pct("statements"), functions: pct("functions"), branches: pct("branches") };
+  return Object.values(result).every((v) => v !== null) ? result : null;
+}
+
+/**
  * Convert Vitest's JSON reporter output into the shape the /tests page renders.
  * @param {any} report
  * @param {{ cwd?: string, source?: "live" | "snapshot", ranAt?: string }} [options]
@@ -106,11 +122,17 @@ export async function runVitest({ cwd = process.cwd(), source = "snapshot", time
 
   const tmpDir = await mkdtemp(path.join(os.tmpdir(), "vitest-report-"));
   const reportPath = path.join(tmpDir, "report.json");
+  const coverageDir = path.join(tmpDir, "coverage");
+  // Measure coverage too when the coverage tool is installed (it's a devDependency)
+  const withCoverage = existsSync(path.join(cwd, "node_modules", "@vitest", "coverage-v8"));
+  const coverageArgs = withCoverage
+    ? ["--coverage.enabled", "--coverage.reporter=json-summary", `--coverage.reportsDirectory=${coverageDir}`]
+    : [];
   try {
     const stderr = await new Promise((resolve, reject) => {
       const child = spawn(
         process.execPath,
-        [vitestBin, "run", "--reporter=json", `--outputFile=${reportPath}`],
+        [vitestBin, "run", "--reporter=json", `--outputFile=${reportPath}`, ...coverageArgs],
         {
           cwd,
           // Force NODE_ENV=test: builds (e.g. Vercel) run with NODE_ENV=production, which loads
@@ -140,7 +162,13 @@ export async function runVitest({ cwd = process.cwd(), source = "snapshot", time
       throw new Error(cleanMessage(stderr.trim() || "Vitest produced no report.", cwd));
     }
     const report = JSON.parse(await readFile(reportPath, "utf8"));
-    return normalizeReport(report, { cwd, source });
+    const result = normalizeReport(report, { cwd, source });
+    const summaryPath = path.join(coverageDir, "coverage-summary.json");
+    if (withCoverage && existsSync(summaryPath)) {
+      const coverage = normalizeCoverage(JSON.parse(await readFile(summaryPath, "utf8")));
+      if (coverage) result.coverage = coverage;
+    }
+    return result;
   } finally {
     await rm(tmpDir, { recursive: true, force: true });
   }
@@ -167,7 +195,8 @@ async function main() {
   if (result.error) console.warn(`[tests] Could not capture test results: ${result.error}`);
   else {
     const s = result.summary;
-    console.log(`[tests] ${s.passed}/${s.total} passed, ${s.failed} failed → ${path.relative(process.cwd(), out)}`);
+    const cov = result.coverage ? `, ${result.coverage.lines}% of lines covered` : "";
+    console.log(`[tests] ${s.passed}/${s.total} passed, ${s.failed} failed${cov} → ${path.relative(process.cwd(), out)}`);
   }
 }
 

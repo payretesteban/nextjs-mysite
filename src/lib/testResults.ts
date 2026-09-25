@@ -17,6 +17,14 @@ export interface TestFileResult {
   tests: TestCaseResult[];
 }
 
+/** Code coverage totals, as percentages (0–100). */
+export interface CoverageSummary {
+  lines: number;
+  statements: number;
+  functions: number;
+  branches: number;
+}
+
 export interface TestRunResult {
   source: "live" | "snapshot";
   ranAt: string;
@@ -30,6 +38,8 @@ export interface TestRunResult {
     files: number;
   };
   files: TestFileResult[];
+  /** Present when the coverage tool is installed. */
+  coverage?: CoverageSummary;
 }
 
 /** Shape written when tests couldn't run at all. */

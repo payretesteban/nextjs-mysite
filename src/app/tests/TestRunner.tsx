@@ -195,7 +195,11 @@ function Results({ result }: { result: TestRunResult }) {
         <Stat label="Passed" value={summary.passed} tone="text-emerald-600" delay={60} />
         <Stat label="Failed" value={summary.failed} tone={summary.failed ? "text-rose-600" : "text-slate-500"} delay={120} />
         <Stat label="Skipped" value={summary.skipped} tone={summary.skipped ? "text-amber-600" : "text-slate-500"} delay={180} />
-        <Stat label="Duration" value={formatDuration(result.durationMs)} tone="text-slate-900 dark:text-slate-100" delay={240} />
+        {result.coverage ? (
+          <CoverageStat pct={result.coverage.lines} delay={240} />
+        ) : (
+          <Stat label="Duration" value={formatDuration(result.durationMs)} tone="text-slate-900 dark:text-slate-100" delay={240} />
+        )}
       </dl>
 
       {/* Proportion bar */}
@@ -208,6 +212,14 @@ function Results({ result }: { result: TestRunResult }) {
         <div className="animate-grow bg-rose-500" style={{ width: `${pct(summary.failed)}%` }} />
         <div className="animate-grow bg-amber-400" style={{ width: `${pct(summary.skipped)}%` }} />
       </div>
+
+      {result.coverage && (
+        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+          <span className="font-medium text-slate-700 dark:text-slate-300">Code coverage</span>{" "}(how much of the site&apos;s
+          code runs during these tests): {result.coverage.lines}% of lines · {result.coverage.statements}% of statements ·{" "}
+          {result.coverage.functions}% of functions · {result.coverage.branches}% of branches
+        </p>
+      )}
 
       {/* Filters */}
       <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
@@ -231,6 +243,26 @@ function Results({ result }: { result: TestRunResult }) {
         )}
       </ul>
     </>
+  );
+}
+
+/** "Coverage 89.9%" tile with a small bar; green from 80%, amber from 60%, red below. */
+function CoverageStat({ pct, delay }: { pct: number; delay: number }) {
+  const tone = pct >= 80 ? "text-emerald-600" : pct >= 60 ? "text-amber-600" : "text-rose-600";
+  const bar = pct >= 80 ? "bg-emerald-500" : pct >= 60 ? "bg-amber-400" : "bg-rose-500";
+  return (
+    <div
+      className="animate-fade-up rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Coverage</dt>
+      <dd className={`mt-1 font-mono text-2xl font-semibold tabular-nums ${tone}`}>
+        {pct}%<span className="sr-only"> of lines covered by tests</span>
+      </dd>
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800" aria-hidden="true">
+        <div className={`animate-grow h-full ${bar}`} style={{ width: `${Math.min(100, Math.max(0, pct))}%` }} />
+      </div>
+    </div>
   );
 }
 
