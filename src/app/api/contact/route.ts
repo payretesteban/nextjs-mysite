@@ -3,7 +3,6 @@ import { createRateLimiter } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
 
-const TO = process.env.CONTACT_TO_EMAIL ?? "me@estebanpayret.com";
 // Until your domain is verified in Resend, onboarding@resend.dev only delivers to your Resend account's email
 const FROM = process.env.CONTACT_FROM_EMAIL ?? "Website contact form <onboarding@resend.dev>";
 
@@ -16,8 +15,8 @@ const contactRateLimiter = createRateLimiter(RATE_LIMIT, RATE_WINDOW_MS);
 
 /**
  * Sends a contact form message by email through Resend. Returns 400 for invalid input,
- * 429 when rate limited, 502 when sending fails, and 503 if no API key is set (in development
- * it logs a preview instead). Suspected bots get a fake success.
+ * 429 when rate limited, 502 when sending fails, and 503 if RESEND_API_KEY or CONTACT_TO_EMAIL isn't set
+ * (in development it logs a preview instead). Suspected bots get a fake success.
  */
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -43,9 +42,11 @@ export async function POST(request: Request) {
   const { data, errors } = validateContact(body);
   if (!data) return Response.json({ error: "Please check the highlighted fields.", errors }, { status: 400 });
 
+  // The recipient only lives in the CONTACT_TO_EMAIL setting (no fallback), so it never appears in the public repo
+  const to = process.env.CONTACT_TO_EMAIL?.trim();
   const email = {
     from: FROM,
-    to: [TO],
+    to: to ? [to] : [],
     reply_to: data.email,
     subject: contactSubject(data),
     html: contactEmailHtml(data),
@@ -54,13 +55,14 @@ export async function POST(request: Request) {
   };
 
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
+  if (!apiKey || !to) {
+    const missing = [!apiKey && "RESEND_API_KEY", !to && "CONTACT_TO_EMAIL"].filter(Boolean).join(" and ");
     if (process.env.NODE_ENV === "development") {
-      // Local testing without a key: print the email instead of sending it
-      console.log("[contact] RESEND_API_KEY not set — email not sent. Preview:\n", { ...email, html: undefined });
+      // Local testing without the settings: print the email instead of sending it
+      console.log(`[contact] ${missing} not set — email not sent. Preview:\n`, { ...email, html: undefined });
       return Response.json({ ok: true, preview: true });
     }
-    console.error("[contact] RESEND_API_KEY is not set");
+    console.error(`[contact] ${missing} not set`);
     return Response.json({ error: "The contact form isn't set up yet. Please email me directly." }, { status: 503 });
   }
 

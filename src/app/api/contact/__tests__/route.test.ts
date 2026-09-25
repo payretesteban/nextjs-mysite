@@ -26,6 +26,7 @@ const human = (extra: object = {}) => ({ ...valid, startedAt: Date.now() - 10_00
 describe("Sending the email", () => {
   beforeEach(() => {
     vi.stubEnv("RESEND_API_KEY", "re_test");
+    vi.stubEnv("CONTACT_TO_EMAIL", "inbox@example.com");
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
   afterEach(() => {
@@ -47,6 +48,7 @@ describe("Sending the email", () => {
     expect(init.headers.Authorization).toBe("Bearer re_test");
     const sent = JSON.parse(init.body);
     expect(sent.reply_to).toBe("sam@globex.com");
+    expect(sent.to).toEqual(["inbox@example.com"]);
     expect(sent.subject).toBe("[Full-time] Engineering Manager at Globex — Sam Lee");
     expect(sent.text).toContain("We'd love to talk");
   });
@@ -85,5 +87,15 @@ describe("Sending the email", () => {
     vi.stubEnv("NODE_ENV", "production");
     const res = await post(human());
     expect(res.status).toBe(503);
+  });
+
+  it("refuses to send in production when no recipient is configured, instead of guessing one", async () => {
+    vi.stubEnv("CONTACT_TO_EMAIL", "");
+    vi.stubEnv("NODE_ENV", "production");
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const res = await post(human());
+    expect(res.status).toBe(503);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

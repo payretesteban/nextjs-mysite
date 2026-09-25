@@ -38,13 +38,13 @@ Then open [http://localhost:3000](http://localhost:3000). Content is read from t
 
 ### Environment variables
 
-Create a `.env.local` file in the project root (it's git-ignored). All variables are optional locally, but add them in Vercel for production:
+Create a `.env.local` file in the project root (it's git-ignored). All variables are optional locally (without them, the contact form prints emails to the console instead of sending), but add them in Vercel for production:
 
 | Variable | Used for |
 | --- | --- |
 | `PAGESPEED_API_KEY` | Google PageSpeed Insights key for the performance page. Without it, Google's shared quota usually runs out. |
 | `RESEND_API_KEY` | Sends contact form emails. Without it (in development), the email is printed to the console instead. |
-| `CONTACT_TO_EMAIL` | Where contact form messages go (defaults to my address). |
+| `CONTACT_TO_EMAIL` | Where contact form messages go. Required for the form to send in production; kept out of the code so the address isn't public. |
 | `CONTACT_FROM_EMAIL` | The sender address; it must be on a domain verified in Resend. |
 | `NEXT_PUBLIC_SITE_URL` | Overrides the site address used for the sitemap and robots.txt (defaults to `https://www.estebanpayret.com`). |
 

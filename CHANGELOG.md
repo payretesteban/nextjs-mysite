@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.3.2 — 2026-09-25
+
+- Contact form recipient comes only from the `CONTACT_TO_EMAIL` setting, so the address isn't in the public code. Without it the form refuses to send instead of guessing.
+
 ## 1.3.1 — 2026-09-25
 
 - Consistent code comments: JSDoc on every function, component and shared type (no code changes).
