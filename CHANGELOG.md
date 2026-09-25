@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.3.0 — 2026-09-24
+
+- Footer links to LinkedIn and GitHub, plus an envelope button that opens the contact form (no email address exposed to spam bots).
+
 ## 1.2.1 — 2026-09-24
 
 - Performance page tests Desktop by default (Mobile is one click away); easier-to-read device toggle.

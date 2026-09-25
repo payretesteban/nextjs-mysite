@@ -41,7 +41,7 @@ export default async function RootLayout({
           <ContactProvider>
             <Header links={links} name={profile?.name} />
             <main className="flex-grow">{children}</main>
-            <Footer />
+            <Footer links={links} />
           </ContactProvider>
         </AnimationProvider>
       </body>
