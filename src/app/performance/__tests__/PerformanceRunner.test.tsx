@@ -19,9 +19,10 @@ const response = (strategy: "mobile" | "desktop", cached = false) => ({
 describe("Performance page", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("starts with mobile selected and no report", () => {
+  it("starts with desktop selected and no report", () => {
     render(<PerformanceRunner url="https://estebanpayret.com/" />);
-    expect(screen.getByRole("radio", { name: /mobile/i })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radio", { name: /desktop/i })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radio", { name: /mobile/i })).toHaveAttribute("aria-checked", "false");
     expect(screen.queryByText("Core metrics")).not.toBeInTheDocument();
   });
 
@@ -44,6 +45,15 @@ describe("Performance page", () => {
     expect(screen.getByText("Save ~1.2 s · 88 KiB")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /full report/i })).toHaveAttribute("href", expect.stringContaining("form_factor=desktop"));
     expect(screen.getByRole("button", { name: /run again/i })).toBeInTheDocument();
+  });
+
+  it("tests on mobile when you switch to it", async () => {
+    const fetchMock = mockFetch(response("mobile"));
+    render(<PerformanceRunner url="https://estebanpayret.com/" />);
+    fireEvent.click(screen.getByRole("radio", { name: /mobile/i }));
+    fireEvent.click(screen.getByRole("button", { name: /run performance test/i }));
+    expect(await screen.findByText("Core metrics")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith("/api/performance", expect.objectContaining({ body: JSON.stringify({ strategy: "mobile" }) }));
   });
 
   it("labels cached results", async () => {

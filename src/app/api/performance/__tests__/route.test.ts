@@ -63,4 +63,12 @@ describe("Running a PageSpeed test", () => {
     expect(res.status).toBe(429);
     expect((await res.json()).error).toMatch(/quota is used up/i);
   });
+
+  it("tests desktop when no device is given", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve(pageSpeedSample) });
+    vi.stubGlobal("fetch", fetchMock);
+    await post({});
+    const url = new URL(fetchMock.mock.calls[0][0]);
+    expect(url.searchParams.get("strategy")).toBe("desktop");
+  });
 });

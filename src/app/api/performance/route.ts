@@ -13,7 +13,8 @@ const CACHE_SECONDS = 600; // 10 minutes
  */
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
-  const strategy: Strategy = body?.strategy === "desktop" ? "desktop" : "mobile";
+  // Desktop unless mobile is asked for (matches the page's default)
+  const strategy: Strategy = body?.strategy === "mobile" ? "mobile" : "desktop";
 
   // Fixed 10-minute windows: a result is never older than the window it was produced in
   const bucket = Math.floor(Date.now() / (CACHE_SECONDS * 1000));

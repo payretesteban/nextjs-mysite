@@ -41,7 +41,7 @@ function minutesAgo(iso: string) {
 }
 
 export default function PerformanceRunner({ url }: { url: string }) {
-  const [strategy, setStrategy] = useState<Strategy>("mobile");
+  const [strategy, setStrategy] = useState<Strategy>("desktop");
   const [status, setStatus] = useState<"idle" | "running" | "done" | "error">("idle");
   const [data, setData] = useState<PerformanceResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +87,7 @@ export default function PerformanceRunner({ url }: { url: string }) {
     <div>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="inline-flex w-fit rounded-full bg-slate-100 p-1 text-sm dark:bg-slate-800" role="radiogroup" aria-label="Device">
-          {(["mobile", "desktop"] as const).map((s) => (
+          {(["desktop", "mobile"] as const).map((s) => (
             <button
               key={s}
               type="button"
@@ -98,7 +98,7 @@ export default function PerformanceRunner({ url }: { url: string }) {
               className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 font-medium capitalize transition-colors disabled:cursor-not-allowed ${
                 strategy === s
                   ? "bg-white text-slate-900 shadow-sm dark:bg-slate-950 dark:text-white"
-                  : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
               }`}
             >
               <DeviceIcon device={s} />
