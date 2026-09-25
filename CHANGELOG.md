@@ -17,6 +17,16 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.1.1 — 2026-09-24
+
+- Proper 404 page for unknown addresses and missing posts (real 404 status, not indexed by search engines).
+- Test coverage report: `npm run test:coverage`. Coverage raised from 83% to 90% of lines with tests for the homepage, post pages, /posts, the game story and live test runs.
+- Post page no longer nests a second `<main>` inside the layout's.
+
+## 1.1.0 — 2026-09-24 · `2473cb8`
+
+- Added the test coverage tool (`@vitest/coverage-v8`). The rest of this release landed in 1.1.1.
+
 ## 1.0.1 — 2026-09-24
 
 - Each page in the ⌘K menu has its own icon (tests, services, performance, game, posts, site log), picked from the page's address and title.

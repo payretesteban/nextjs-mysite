@@ -11,6 +11,7 @@ export interface TestArea {
 /** Parts of the site, in the order the /tests page lists them. */
 export const TEST_AREAS: TestArea[] = [
   { key: "home", label: "Homepage", description: "Posts, site log notes and the services link", match: /_home\/|ServicesTicker|site-log|siteLog|lib\/__tests__\/data\.test/ },
+  { key: "posts", label: "Posts", description: "Each post's page and the list of all posts", match: /\[slug\]|app\/posts\// },
   { key: "contact", label: "Contact form", description: "The Let's Work Together form and sending the email", match: /contact/i },
   { key: "services", label: "Services", description: "The Services page and its content from Sanity", match: /\/services\/|services\.test/ },
   { key: "adventure", label: "The Deep Drop game", description: "The story, the choices and the game screen", match: /adventure/ },

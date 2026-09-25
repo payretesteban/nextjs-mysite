@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { normalizeReport } from "../capture-test-results.mjs";
+import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { normalizeReport, runVitest } from "../capture-test-results.mjs";
 
 const cwd = "/Users/me/site";
 
@@ -60,5 +63,44 @@ describe("Turning raw results into this report", () => {
     const tests = result.files[1].tests;
     expect(tests[0].durationMs).toBe(5);
     expect(tests[2]).toMatchObject({ status: "skipped", durationMs: null });
+  });
+});
+
+describe("Running the suite for this report", () => {
+  // A stand-in for Vitest: writes (or doesn't write) a JSON report to --outputFile
+  async function fakeProject(script: string) {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "fake-vitest-"));
+    await mkdir(path.join(dir, "node_modules", "vitest"), { recursive: true });
+    await writeFile(path.join(dir, "node_modules", "vitest", "vitest.mjs"), script);
+    return dir;
+  }
+
+  it("runs Vitest and turns its report into this page's format", async () => {
+    const dir = await fakeProject(`
+      import { writeFileSync } from "node:fs";
+      const out = process.argv.find((a) => a.startsWith("--outputFile=")).split("=")[1];
+      writeFileSync(out, JSON.stringify({ success: process.env.NODE_ENV === "test", testResults: [
+        { name: process.cwd() + "/src/a.test.ts", status: "passed", assertionResults: [{ ancestorTitles: [], title: "ok", status: "passed", duration: 1, failureMessages: [] }] },
+      ] }));
+    `);
+    try {
+      const result = await runVitest({ cwd: dir, source: "live" });
+      expect(result).toMatchObject({ source: "live", success: true, summary: { total: 1, passed: 1 } });
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("explains what went wrong when Vitest produces no report", async () => {
+    const dir = await fakeProject(`console.error("Something broke"); process.exit(1);`);
+    try {
+      await expect(runVitest({ cwd: dir })).rejects.toThrow("Something broke");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("says so when Vitest isn't installed", async () => {
+    await expect(runVitest({ cwd: os.tmpdir() })).rejects.toThrow(/not installed/);
   });
 });
