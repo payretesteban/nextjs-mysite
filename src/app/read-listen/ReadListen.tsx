@@ -23,7 +23,16 @@ interface Speaking {
   index: number;
 }
 
-const RATES = [0.75, 1] as const;
+/**
+ * Reading speeds, slowest first, with a pause between sentences so learners can follow (longer at
+ * slower speeds; none at normal speed).
+ */
+const SPEEDS = [
+  { rate: 0.5, label: "Very slow", pauseMs: 2000 },
+  { rate: 0.75, label: "Slow", pauseMs: 1000 },
+  { rate: 1, label: "Normal", pauseMs: 0 },
+] as const;
+type Speed = (typeof SPEEDS)[number];
 const NO_VOICES: SpeechSynthesisVoice[] = [];
 let voiceCache: SpeechSynthesisVoice[] = NO_VOICES;
 
@@ -62,7 +71,7 @@ export default function ReadListen({ initial }: { initial: ReadListenText }) {
   const [error, setError] = useState<string | null>(null);
   const [hovered, setHovered] = useState<number | null>(null);
   const [speaking, setSpeaking] = useState<Speaking | null>(null);
-  const [rate, setRate] = useState<(typeof RATES)[number]>(1);
+  const [speed, setSpeed] = useState<Speed>(SPEEDS[2]);
   const requestId = useRef(0);
   // Current reading: a run number (so late events from a stopped reading are ignored) and the
   // utterances themselves (kept referenced, or Chrome may garbage-collect them and never finish)
@@ -120,7 +129,7 @@ export default function ReadListen({ initial }: { initial: ReadListenText }) {
       const utterance = new SpeechSynthesisUtterance(sentences[index]);
       utterance.voice = lineVoice;
       utterance.lang = lineVoice.lang;
-      utterance.rate = rate;
+      utterance.rate = speed.rate;
       if (text.speakers) utterance.pitch = secondSpeaker && !otherVoice ? 0.8 : secondSpeaker ? 1 : 1.1;
       return utterance;
     });
@@ -131,8 +140,9 @@ export default function ReadListen({ initial }: { initial: ReadListenText }) {
       if (run !== playRun.current || !utterance) return;
       const next = () => {
         if (run !== playRun.current) return;
-        if (n + 1 < queue.current.length) play(n + 1);
-        else setSpeaking(null);
+        if (n + 1 >= queue.current.length) setSpeaking(null);
+        else if (speed.pauseMs) setTimeout(() => play(n + 1), speed.pauseMs);
+        else play(n + 1);
       };
       utterance.onstart = () => run === playRun.current && setSpeaking({ lang, index: indexes[n] });
       utterance.onend = next;
@@ -418,20 +428,20 @@ export default function ReadListen({ initial }: { initial: ReadListenText }) {
           <span className="font-medium text-slate-800 dark:text-slate-200">{topicLabel}</span> · {text.level} ·{" "}
           {text.source === "ai" ? "written by AI" : "from the built-in library"}
         </p>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <div role="radiogroup" aria-label="Reading speed" className="flex rounded-full bg-slate-100 p-0.5 text-xs dark:bg-slate-800">
-            {RATES.map((r) => (
+            {SPEEDS.map((option) => (
               <button
-                key={r}
+                key={option.rate}
                 type="button"
                 role="radio"
-                aria-checked={rate === r}
-                onClick={() => setRate(r)}
-                className={`rounded-full px-2.5 py-1 font-medium ${
-                  rate === r ? "bg-white text-slate-900 shadow-sm dark:bg-slate-950 dark:text-white" : "text-slate-600 dark:text-slate-400"
+                aria-checked={speed.rate === option.rate}
+                onClick={() => setSpeed(option)}
+                className={`rounded-full px-2.5 py-1 font-medium whitespace-nowrap ${
+                  speed.rate === option.rate ? "bg-white text-slate-900 shadow-sm dark:bg-slate-950 dark:text-white" : "text-slate-600 dark:text-slate-400"
                 }`}
               >
-                {r === 1 ? "Normal" : "Slower"}
+                {option.label}
               </button>
             ))}
           </div>

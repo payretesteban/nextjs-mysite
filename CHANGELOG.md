@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.4.4 — 2026-09-27
+
+- Read & Listen: new "Very slow" reading speed. Speeds are now Very slow (half speed, 2-second pause between sentences), Slow (¾ speed, 1-second pause) and Normal.
+
 ## 1.4.3 — 2026-09-27
 
 - Read & Listen: the beta note now applies to the whole page (every topic, not only Conversation) and explains that voices can take a few seconds to start on some systems and languages.

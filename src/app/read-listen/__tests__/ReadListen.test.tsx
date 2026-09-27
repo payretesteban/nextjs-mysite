@@ -175,6 +175,22 @@ describe("Read & Listen page", () => {
     }
   });
 
+  it("reads very slowly, with a pause between sentences, when asked", async () => {
+    render(<ReadListen initial={initial} />);
+    const speeds = within(screen.getByRole("radiogroup", { name: "Reading speed" })).getAllByRole("radio");
+    expect(speeds.map((b) => b.textContent)).toEqual(["Very slow", "Slow", "Normal"]);
+    expect(screen.getByRole("radio", { name: "Normal" })).toHaveAttribute("aria-checked", "true");
+
+    fireEvent.click(screen.getByRole("radio", { name: "Very slow" }));
+    fireEvent.click(screen.getByRole("button", { name: /listen to the español text/i }));
+    await waitFor(() => expect(speak).toHaveBeenCalledTimes(1));
+    expect(speak.mock.calls[0][0].rate).toBe(0.5);
+    // The next sentence waits for the pause after the first one ends
+    await new Promise((r) => setTimeout(r, 300));
+    expect(speak).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(speak).toHaveBeenCalledTimes(2), { timeout: 3000 });
+  });
+
   it("shows the beta note for every topic, mentioning that voices can be slow to start", () => {
     const { rerender } = render(<ReadListen initial={initial} />);
     expect(screen.getByText(/is a test version/)).toHaveTextContent(/voice can take a few seconds to start/);
