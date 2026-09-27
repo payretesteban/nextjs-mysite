@@ -16,12 +16,15 @@ const speak = vi.fn((u: FakeUtterance) => {
   }, 0);
 });
 const cancel = vi.fn();
+// Silent " " utterances the page uses to load a voice ahead of time are recorded separately
+const warmUp = vi.fn();
 class FakeUtterance {
   text: string;
   voice!: { name: string; lang: string }; // set by the page before speaking
   lang = "";
   rate = 1;
   pitch = 1;
+  volume = 1;
   onstart: (() => void) | null = null;
   onend: (() => void) | null = null;
   onerror: ((event: { error: string }) => void) | null = null;
@@ -44,7 +47,8 @@ describe("Read & Listen page", () => {
   beforeEach(() => {
     vi.stubGlobal("speechSynthesis", {
       getVoices: () => voices,
-      speak,
+      speak: (u: FakeUtterance) => (u.text.trim() ? speak(u) : warmUp(u)),
+      speaking: false,
       cancel,
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
@@ -55,6 +59,7 @@ describe("Read & Listen page", () => {
     vi.unstubAllGlobals();
     speak.mockClear();
     cancel.mockClear();
+    warmUp.mockClear();
     failing.clear();
   });
 
@@ -129,6 +134,7 @@ describe("Read & Listen page", () => {
     fireEvent.click(screen.getByRole("button", { name: /listen to the español text/i }));
     await waitFor(() => expect(speak).toHaveBeenCalledTimes(initial.sentences.es!.length));
 
+    await waitFor(() => expect(screen.getByRole("button", { name: /listen to the español text/i })).toBeInTheDocument());
     speak.mockClear();
     fireEvent.click(screen.getByRole("button", { name: /listen to the español text/i }));
     fireEvent.click(screen.getByRole("button", { name: /listen to the english text/i }));
@@ -149,6 +155,24 @@ describe("Read & Listen page", () => {
     await waitFor(() => expect(speak).toHaveBeenCalledTimes(4));
     const [first, second] = speak.mock.calls.map((c) => c[0]);
     expect(first.pitch).not.toBe(second.pitch);
+  });
+
+  it("loads the voice of the language being learned ahead of time, silently", () => {
+    render(<ReadListen initial={initial} />);
+    expect(warmUp).toHaveBeenCalledTimes(1);
+    expect(warmUp.mock.calls[0][0].voice.name).toBe("Monica");
+    expect(warmUp.mock.calls[0][0].volume).toBe(0);
+  });
+
+  it("shows a stop button with a spinner while the voice is starting", () => {
+    vi.useFakeTimers();
+    try {
+      render(<ReadListen initial={initial} />);
+      fireEvent.click(screen.getByRole("button", { name: /listen to the español text/i }));
+      expect(screen.getByRole("button", { name: /stop reading español/i })).toHaveAttribute("title", "Starting the voice…");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("marks the conversation topic as a beta with an asterisk and a note", () => {

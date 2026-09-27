@@ -9,9 +9,28 @@ const NOVELTY_VOICES =
 export const isNoveltyVoice = (voice: SpeechSynthesisVoice) => NOVELTY_VOICES.test(voice.name);
 
 /**
+ * Character voices that newer macOS versions add in every language ("Eddy (French (France))",
+ * "Grandma (German (Germany))"…). They're listed as installed but often load slowly the first time,
+ * so they're only used when nothing better exists.
+ */
+const CHARACTER_VOICES = /^(eddy|flo|grandma|grandpa|reed|rocko|sandy|shelley)\b|\(.+\(.+\)\)$/i;
+
+/** Well-known standard voices per platform (macOS, Windows, Android), which start quickly. */
+const STANDARD_VOICES =
+  /^(samantha|alex|allison|ava|tom|daniel|karen|moira|m[oó]nica|paulina|jorge|thomas|am[eé]lie|marie|anna|helena|martin|yannick|alice|luca|federica|luciana|joana|microsoft |google )/i;
+
+/**
+ * How suitable a voice is: installed on the device first (starts faster, works offline), then a
+ * standard voice, then anything but a character voice.
+ */
+function voiceScore(v: SpeechSynthesisVoice): number {
+  return (v.localService ? 4 : 0) + (STANDARD_VOICES.test(v.name) && !CHARACTER_VOICES.test(v.name) ? 2 : 0) + (CHARACTER_VOICES.test(v.name) ? 0 : 1);
+}
+
+/**
  * Picks the best built-in browser voice for a language: an exact match for the tag (e.g. "es-ES")
- * first, then any voice for the same language (e.g. "es-MX"). Among equals, voices installed on the
- * device come first because they start faster and work offline. Returns null if there's none.
+ * first, then any voice for the same language (e.g. "es-MX"). Among those, installed standard voices
+ * come first and slow-to-load character voices last (see `voiceScore`). Returns null if there's none.
  */
 export function pickVoice(voices: SpeechSynthesisVoice[], tag: string): SpeechSynthesisVoice | null {
   const norm = (lang: string) => lang.replace("_", "-").toLowerCase();
@@ -22,7 +41,7 @@ export function pickVoice(voices: SpeechSynthesisVoice[], tag: string): SpeechSy
   const sameLanguage = usable.filter((v) => norm(v.lang).split("-")[0] === base);
   const candidates = exact.length ? exact : sameLanguage;
   if (!candidates.length) return null;
-  return [...candidates].sort((a, b) => Number(b.localService) - Number(a.localService))[0];
+  return [...candidates].sort((a, b) => voiceScore(b) - voiceScore(a))[0];
 }
 
 /**

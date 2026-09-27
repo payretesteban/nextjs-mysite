@@ -19,6 +19,7 @@ type TopicChoice = TopicId | "surprise";
 /** Which sentence is being read aloud right now. */
 interface Speaking {
   lang: LangCode;
+  /** Sentence being read, or -1 while the voice is still starting up. */
   index: number;
 }
 
@@ -74,6 +75,18 @@ export default function ReadListen({ initial }: { initial: ReadListenText }) {
   // Stop any speech when leaving the page
   useEffect(() => () => window.speechSynthesis?.cancel(), []);
 
+  // Load the "I'm learning" voice ahead of time with a silent utterance, so the first play is quick:
+  // browsers load a voice the first time it's used, which can take a few seconds for some languages
+  const warmVoice = voices.length ? pickVoice(voices, languageOf(learn).tag) : null;
+  useEffect(() => {
+    if (!warmVoice || !speechSupported() || window.speechSynthesis.speaking) return;
+    const utterance = new SpeechSynthesisUtterance(" ");
+    utterance.voice = warmVoice;
+    utterance.lang = warmVoice.lang;
+    utterance.volume = 0;
+    window.speechSynthesis.speak(utterance);
+  }, [warmVoice]);
+
   /** Stops reading aloud. */
   function stop() {
     playRun.current++; // ignore callbacks from the reading that's being stopped
@@ -94,6 +107,9 @@ export default function ReadListen({ initial }: { initial: ReadListenText }) {
     if (!speechSupported() || !voice || !sentences.length) return;
     stop();
     const run = playRun.current;
+    // Show the stop button straight away: some voices take a moment to start, and a second click on
+    // "play" would restart (and delay) the reading
+    setSpeaking({ lang, index: -1 });
     // In a conversation the second person gets another voice, or the same voice at a lower pitch
     const otherVoice = text.speakers ? pickOtherVoice(voices, languageOf(lang).tag, voice) : null;
     const indexes = only === undefined ? sentences.map((_, i) => i) : [only];
@@ -352,9 +368,13 @@ export default function ReadListen({ initial }: { initial: ReadListenText }) {
                     onClick={() => (isPlaying ? stop() : speak(code))}
                     disabled={!voice}
                     aria-label={isPlaying ? `Stop reading ${lang.name}` : `Listen to the ${lang.name} text`}
+                    title={isPlaying && speaking?.index === -1 ? "Starting the voice…" : undefined}
                     className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-40 dark:bg-white dark:text-slate-900"
                   >
-                    {isPlaying ? (
+                    {isPlaying && speaking?.index === -1 ? (
+                      // Voice still starting: a small spinner (the button still stops it)
+                      <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent motion-reduce:animate-none" aria-hidden="true" />
+                    ) : isPlaying ? (
                       <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true">
                         <rect x="5" y="5" width="10" height="10" rx="1.5" />
                       </svg>

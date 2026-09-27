@@ -17,6 +17,11 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.4.2 — 2026-09-27
+
+- Read & Listen: French, German and other languages start speaking faster. The page prefers each language's standard voice over the slow-loading macOS character voices, loads the voice ahead of time, and shows a spinner while it starts.
+- Read & Listen: AI texts with a sentence in another alphabet (e.g. Korean inside English) are rejected and asked for again, and the AI is told to stay strictly in the two chosen languages. Previously saved AI texts are cleared.
+
 ## 1.4.1 — 2026-09-27
 
 - The Deep Drop's retro terminal font is no longer preloaded, which removes Chrome's "preloaded but not used" console warning.

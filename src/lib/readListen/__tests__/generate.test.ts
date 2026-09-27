@@ -60,6 +60,33 @@ describe("Writing texts with Gemini", () => {
     await expect(generateText(req, { apiKey: "k" })).rejects.toThrow(/matching/);
   });
 
+  it("rejects sentences that slip into another language or alphabet", () => {
+    const answer = (en: string) => ({ learn: ["Hier, Marie est allée au marché.", "Elle a choisi des pommes."], know: ["Yesterday, Marie went to the market.", en] });
+    expect(parseAiSentences(answer("그녀는 빨간 사과를 골랐습니다."), "fr", "en")).toBeNull();
+    expect(parseAiSentences(answer("Она выбрала яблоки."), "fr", "en")).toBeNull();
+    expect(parseAiSentences(answer("她选了苹果。"), "fr", "en")).toBeNull();
+    // Accents and other Latin letters are fine
+    expect(parseAiSentences(answer("She chose crème brûlée, jalapeños and Äpfel — 3 € each!"), "fr", "en")).not.toBeNull();
+  });
+
+  it("asks again once when the answer can't be used, then gives up", async () => {
+    const bad = geminiReply(JSON.stringify({ learn: ["Uno.", "Dos."], know: ["One.", "두 번째."] }));
+    const good = geminiReply(JSON.stringify({ learn: ["Uno.", "Dos."], know: ["One.", "Two."] }));
+    const fetchMock = vi.fn().mockResolvedValueOnce(bad).mockResolvedValueOnce(good);
+    vi.stubGlobal("fetch", fetchMock);
+    expect((await generateText(req, { apiKey: "k" })).sentences.en).toEqual(["One.", "Two."]);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    const alwaysBad = vi.fn().mockResolvedValue(bad);
+    vi.stubGlobal("fetch", alwaysBad);
+    await expect(generateText(req, { apiKey: "k" })).rejects.toThrow(/matching/);
+    expect(alwaysBad).toHaveBeenCalledTimes(2);
+  });
+
+  it("tells the model to stay in the two chosen languages", () => {
+    expect(buildPrompt({ ...req, learn: "fr", know: "en" })).toMatch(/entirely in French.*entirely in English, using the Latin alphabet only/);
+  });
+
   it("asks for a dialogue with alternating speakers for the conversation topic", async () => {
     const convo = { ...req, topic: "conversation", variant: 1 } as const;
     const prompt = buildPrompt(convo);

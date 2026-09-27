@@ -37,4 +37,15 @@ describe("Choosing a voice", () => {
     expect(pickOtherVoice([sam, voice("en-US", "Google US English", false)], "en-US", sam)).toBeNull();
     expect(pickOtherVoice([sam, voice("en-US", "Samantha")], "en-US", sam)?.name).toBe("Samantha");
   });
+
+  it("prefers standard voices over the slow-to-load character voices", () => {
+    const french = [voice("fr-FR", "Daniel (French (France))"), voice("fr-FR", "Eddy (French (France))"), voice("fr-FR", "Jacques"), voice("fr-FR", "Thomas")];
+    expect(pickVoice(french, "fr-FR")?.name).toBe("Thomas");
+    const german = [voice("de-DE", "Grandma (German (Germany))"), voice("de-DE", "Anna")];
+    expect(pickVoice(german, "de-DE")?.name).toBe("Anna");
+    // A character voice is still used when it's the only one
+    expect(pickVoice([voice("it-IT", "Reed (Italian (Italy))")], "it-IT")?.name).toBe("Reed (Italian (Italy))");
+    // Installed beats online, even for a standard name
+    expect(pickVoice([voice("de-DE", "Google Deutsch", false), voice("de-DE", "Eddy (German (Germany))")], "de-DE")?.name).toBe("Eddy (German (Germany))");
+  });
 });

@@ -47,7 +47,8 @@ export async function POST(request: Request) {
         if (aiCooldown.isPaused()) throw new AiPausedError();
         return generateText(req, { apiKey, model: process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL });
       },
-      ["read-listen-v1", pair, req.level, req.topic, String(req.variant)],
+      // v2: texts saved before the language check (some had a sentence in another language) are dropped
+      ["read-listen-v2", pair, req.level, req.topic, String(req.variant)],
       { revalidate: CACHE_SECONDS }
     )();
     return Response.json(text);
