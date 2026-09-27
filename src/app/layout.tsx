@@ -14,10 +14,13 @@ const geistSans = Geist({
   display: "swap",
 });
 
+// Only used in small details further down the page, so it loads when needed instead of being preloaded
+// (preloading it made the browser warn that the file wasn't used right away)
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
+  preload: false,
 });
 
 /** Next.js metadata for every page (title, description, social cards), loaded from Sanity. */

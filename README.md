@@ -13,6 +13,7 @@ The source code for my personal website, [estebanpayret.com](https://www.esteban
 | `/performance` | Runs a live Lighthouse test through Google PageSpeed Insights |
 | `/tests` | Runs this project's test suite and shows the results and code coverage |
 | `/adventure` | *The Deep Drop*, a small skydiving and cave-diving text adventure |
+| `/read-listen` | Read & Listen: short AI-written texts in two languages side by side, from A1 to C2, read aloud by the browser |
 
 Other features: a ⌘K / Ctrl+K command menu, a site-wide "fun mode", a 404 page, a sitemap and robots.txt, and the site version in the footer.
 
@@ -22,6 +23,7 @@ Other features: a ⌘K / Ctrl+K command menu, a site-wide "fun mode", a 404 page
 - [Tailwind CSS 4](https://tailwindcss.com) with the Typography plugin
 - [Sanity](https://www.sanity.io) for content (posts, profile, links, services, site log)
 - [Resend](https://resend.com) for sending contact form emails
+- [Google Gemini](https://ai.google.dev) (free tier) for Read & Listen texts, and the browser's built-in speech for reading them aloud
 - [Vitest](https://vitest.dev) and Testing Library for tests
 - Hosted on [Vercel](https://vercel.com)
 
@@ -46,6 +48,8 @@ Create a `.env.local` file in the project root (it's git-ignored). All variables
 | `RESEND_API_KEY` | Sends contact form emails. Without it (in development), the email is printed to the console instead. |
 | `CONTACT_TO_EMAIL` | Where contact form messages go. Required for the form to send in production; kept out of the code so the address isn't public. |
 | `CONTACT_FROM_EMAIL` | The sender address; it must be on a domain verified in Resend. |
+| `GEMINI_API_KEY` | Google AI Studio key for new texts on `/read-listen` (free tier). Without it, the page uses its built-in texts. |
+| `GEMINI_MODEL` | Optional Gemini model name (defaults to `gemini-3.5-flash-lite`). |
 | `NEXT_PUBLIC_SITE_URL` | Overrides the site address used for the sitemap and robots.txt (defaults to `https://www.estebanpayret.com`). |
 
 ## Scripts

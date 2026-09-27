@@ -20,6 +20,7 @@ export const TEST_AREAS: TestArea[] = [
   { key: "menu", label: "Header, menu & footer", description: "The logo, the ⌘K menu and the footer", match: /header|footer/ },
   { key: "seo", label: "SEO", description: "Sitemap, robots.txt, page titles and descriptions", match: /robots|sitemap|seo\.test/i },
   { key: "fun", label: "Fun mode", description: "The site-wide animations", match: /animation/i },
+  { key: "readListen", label: "Read & Listen", description: "Texts in two languages, the AI route and read-aloud", match: /read-?listen/i },
   { key: "tests", label: "This tests page", description: "Running the tests and building this report", match: /\/tests\/|capture-test-results|testGroups/ },
 ];
 

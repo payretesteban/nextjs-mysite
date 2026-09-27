@@ -17,6 +17,14 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.4.0 — 2026-09-27
+
+- New Read & Listen page (`/read-listen`): short texts in two languages side by side (Spanish, English, French, Portuguese, Italian, German), from beginner (A1) to proficient (C2), with read-aloud using the browser's voices. New texts are written by AI (Google Gemini), with a built-in library as backup.
+- Conversation topic (beta): two-person dialogues with a different voice for each speaker.
+- When the AI's free usage limit is reached, the page pauses the AI and explains why a built-in text is shown.
+- Read-aloud plays one sentence at a time so it doesn't stop partway through a conversation.
+- Headphones icon in the menu, sitemap entry, and a "Read & Listen" area on the tests page.
+
 ## 1.3.2 — 2026-09-25
 
 - Contact form recipient comes only from the `CONTACT_TO_EMAIL` setting, so the address isn't in the public code. Without it the form refuses to send instead of guessing.
