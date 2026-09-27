@@ -8,8 +8,10 @@ export const metadata: Metadata = {
   description: "A tiny text adventure: skydive, scuba, an underwater cave and a sunken treasure.",
 };
 
-// Classic terminal font for the CRT screen (exposed as --font-vt323)
-const vt323 = VT323({ weight: "400", subsets: ["latin"], display: "swap", variable: "--font-vt323" });
+// Classic terminal font for the CRT screen (exposed as --font-vt323). Not preloaded: the file is tiny and
+// loads as soon as the screen needs it, and preloading made browsers warn it wasn't used right away
+// (for example when the page opens in a background tab, or the game is prefetched from the menu)
+const vt323 = VT323({ weight: "400", subsets: ["latin"], display: "swap", variable: "--font-vt323", preload: false });
 
 /** The /adventure page: intro text, the game in a retro CRT monitor, and a safety note. */
 export default function AdventurePage() {

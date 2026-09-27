@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.4.1 — 2026-09-27
+
+- The Deep Drop's retro terminal font is no longer preloaded, which removes Chrome's "preloaded but not used" console warning.
+
 ## 1.4.0 — 2026-09-27
 
 - New Read & Listen page (`/read-listen`): short texts in two languages side by side (Spanish, English, French, Portuguese, Italian, German), from beginner (A1) to proficient (C2), with read-aloud using the browser's voices. New texts are written by AI (Google Gemini), with a built-in library as backup.
