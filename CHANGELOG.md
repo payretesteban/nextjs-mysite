@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.4.3 — 2026-09-27
+
+- Read & Listen: the beta note now applies to the whole page (every topic, not only Conversation) and explains that voices can take a few seconds to start on some systems and languages.
+
 ## 1.4.2 — 2026-09-27
 
 - Read & Listen: French, German and other languages start speaking faster. The page prefers each language's standard voice over the slow-loading macOS character voices, loads the voice ahead of time, and shows a spinner while it starts.

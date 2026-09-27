@@ -175,13 +175,13 @@ describe("Read & Listen page", () => {
     }
   });
 
-  it("marks the conversation topic as a beta with an asterisk and a note", () => {
+  it("shows the beta note for every topic, mentioning that voices can be slow to start", () => {
     const { rerender } = render(<ReadListen initial={initial} />);
-    expect(screen.getByRole("option", { name: "Conversation *" })).toBeInTheDocument();
-    expect(screen.queryByText(/is a test version/)).not.toBeInTheDocument();
-    rerender(<ReadListen key="conv" initial={libraryText("es", "en", "A1", "conversation")} />);
-    expect(screen.getByText(/Conversation is a test version/)).toBeInTheDocument();
+    expect(screen.getByText(/is a test version/)).toHaveTextContent(/voice can take a few seconds to start/);
     expect(screen.getByText("Beta")).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Conversation" })).toBeInTheDocument();
+    rerender(<ReadListen key="conv" initial={libraryText("es", "en", "A1", "conversation")} />);
+    expect(screen.getByText(/is a test version/)).toBeInTheDocument();
   });
 
     it("explains when a built-in text was used because the AI is paused", async () => {

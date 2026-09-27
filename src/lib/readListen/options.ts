@@ -42,18 +42,15 @@ export const LEVELS: { id: Level; label: string; guide: string }[] = [
 /** Topic keys offered as presets (no free text, so the AI can't be asked to write just anything). */
 export type TopicId = "market" | "travel" | "cooking" | "work" | "nature" | "city" | "conversation";
 
-/**
- * Preset topics, with the English description used in the AI prompt. `beta` marks topics that are still
- * being tested; the page shows them with an asterisk and a short note.
- */
-export const TOPICS: { id: TopicId; label: string; prompt: string; beta?: boolean }[] = [
+/** Preset topics, with the English description used in the AI prompt. */
+export const TOPICS: { id: TopicId; label: string; prompt: string }[] = [
   { id: "market", label: "At the market", prompt: "shopping for food at a local market" },
   { id: "travel", label: "Travel", prompt: "a short trip to a new place" },
   { id: "cooking", label: "Cooking", prompt: "cooking a meal at home" },
   { id: "work", label: "Work", prompt: "a day at work in an office or workshop" },
   { id: "nature", label: "Nature", prompt: "a walk in nature" },
   { id: "city", label: "City life", prompt: "everyday life in a big city" },
-  { id: "conversation", label: "Conversation", prompt: "an everyday conversation between two friends", beta: true },
+  { id: "conversation", label: "Conversation", prompt: "an everyday conversation between two friends" },
 ];
 
 /** True for topics shown as a dialogue between two people instead of a paragraph. */
