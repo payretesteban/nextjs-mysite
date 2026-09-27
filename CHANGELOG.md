@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.5.1 — 2026-09-27
+
+- The Lab's cards no longer prefetch their pages, which removes Chrome's "stylesheet preloaded but not used" console warning on the homepage (it was the game's retro font).
+
 ## 1.5.0 — 2026-09-27
 
 - Homepage: new "The Lab" section after the intro, showing the site's experiments (Read & Listen, The Deep Drop, Performance, Tests) as a swipeable row of cards. Each card has a small preview, what it is, the question behind it and the tools used. The Tests card shows the latest real test numbers.

@@ -23,6 +23,9 @@ export default function TheLab({ items, tests }: { items: LabItem[]; tests: LabT
           <Link
             key={item._id}
             href={item.href}
+            // No prefetching: these pages bring their own styles (e.g. the game's retro font), and prefetching
+            // them while the cards are on screen made browsers warn that a stylesheet was preloaded but unused
+            prefetch={false}
             className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 motion-reduce:hover:translate-y-0 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
           >
             <LabPreview kind={item.preview} tests={tests} />
