@@ -8,22 +8,26 @@ import { getServicesPageData } from "@/lib/services";
 import { getSiteLog } from "@/lib/siteLog";
 import HomePosts from "./_home/HomePosts";
 import SiteLogNotes from "./_home/SiteLogNotes";
+import TheLab from "./_home/TheLab";
+import { getLabItems, getLabTestStats } from "@/lib/lab";
 
 /** How many posts the homepage shows before "See all posts". */
 const HOME_POST_LIMIT = 5;
 
-
 /**
- * The homepage: profile, bio, contact button and services ticker, the latest posts and the site log notes.
+ * The homepage: profile, bio, contact button and services ticker, The Lab (the site's experiments), the
+ * latest posts and the site log notes.
  * Data loads in parallel; each loader caches for 30-60 seconds, so Sanity edits appear without a redeploy.
  */
 export default async function IndexPage() {
-  const [{ posts, postCount, profile }, { services }, siteLog] = await Promise.all([
+  const [{ posts, postCount, profile }, { services }, siteLog, labItems, labTests] = await Promise.all([
     getIndexPageData(),
     getServicesPageData(),
     getSiteLog(),
+    getLabItems(),
+    getLabTestStats(),
   ]);
-    
+
   return (
     <div className="container mx-auto min-h-screen max-w-3xl p-8">
       {profile && (
@@ -53,6 +57,8 @@ export default async function IndexPage() {
           </div>
         </section>
       )}
+
+      <TheLab items={labItems} tests={labTests} />
 
       <HomePosts posts={posts} limit={HOME_POST_LIMIT} total={postCount} />
 

@@ -17,6 +17,12 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.5.0 — 2026-09-27
+
+- Homepage: new "The Lab" section after the intro, showing the site's experiments (Read & Listen, The Deep Drop, Performance, Tests) as a swipeable row of cards. Each card has a small preview, what it is, the question behind it and the tools used. The Tests card shows the latest real test numbers.
+- The Lab's experiments are edited in Sanity ("Lab experiment"), with built-in defaults as a fallback.
+- The row's page bars count scroll steps, not cards, and can be clicked to jump; arrows and bars hide when everything fits.
+
 ## 1.4.4 — 2026-09-27
 
 - Read & Listen: new "Very slow" reading speed. Speeds are now Very slow (half speed, 2-second pause between sentences), Slow (¾ speed, 1-second pause) and Normal.

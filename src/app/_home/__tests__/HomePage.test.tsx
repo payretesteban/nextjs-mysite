@@ -19,6 +19,14 @@ vi.mock("@/lib/siteLog", () => ({
     { _id: "l2", title: "The Miracle", text: "Stared at the code." },
   ]),
 }));
+vi.mock("@/lib/lab", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/lab")>();
+  return {
+    ...actual,
+    getLabItems: vi.fn(async () => actual.DEFAULT_LAB_ITEMS),
+    getLabTestStats: vi.fn(async () => ({ passed: 208, total: 208, coverage: 90.6 })),
+  };
+});
 vi.mock("@/lib/image", () => ({
   urlFor: () => ({ width: () => ({ height: () => ({ url: () => "https://cdn.example/avatar.jpg" }) }) }),
 }));
@@ -59,6 +67,20 @@ describe("Homepage", () => {
     expect(screen.getByText("I build software and lead teams.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /let.s work together/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /see all services/i })).toHaveAttribute("href", "/services");
+  });
+
+  it("shows The Lab right after the intro, with a card for each experiment", async () => {
+    fetchMock.mockResolvedValue({ posts, postCount: 8, profile, links: [] });
+    render(await IndexPage());
+
+    const lab = screen.getByRole("region", { name: "The Lab" });
+    const cards = within(within(lab).getByRole("list", { name: "Experiments" })).getAllByRole("link");
+    expect(cards.map((c) => c.getAttribute("href"))).toEqual(["/read-listen", "/adventure", "/performance", "/tests"]);
+    expect(cards[0]).toHaveTextContent(/Beta/);
+    expect(cards[3]).toHaveTextContent("208 passed");
+    expect(cards[3]).toHaveTextContent("90.6% coverage");
+    // Comes before the posts
+    expect(lab.compareDocumentPosition(screen.getByRole("region", { name: "Posts" })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("shows the first 5 posts, featured first, with a link to all of them", async () => {

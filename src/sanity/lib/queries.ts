@@ -78,6 +78,20 @@ export const allPostsQuery = defineQuery(`
 `);
 
 /** Site log entries in their set order, for the homepage notes and the /site-log page. */
+/** Experiments for the homepage's "The Lab" section, in their set order. */
+export const labItemsQuery = defineQuery(`
+  *[_type == "labItem" && defined(title) && defined(href)] | order(order asc, _createdAt asc) {
+    _id,
+    title,
+    href,
+    blurb,
+    question,
+    tech,
+    status,
+    preview
+  }
+`);
+
 export const siteLogQuery = defineQuery(`
   *[_type == "siteLogEntry" && defined(title)] | order(order asc, _createdAt asc) {
     _id,
