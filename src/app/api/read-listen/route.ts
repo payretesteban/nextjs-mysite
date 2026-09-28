@@ -2,7 +2,7 @@ import { unstable_cache } from "next/cache";
 import { createRateLimiter } from "@/lib/rateLimit";
 import { parseRequest } from "@/lib/readListen/options";
 import { libraryText } from "@/lib/readListen/library";
-import { DEFAULT_GEMINI_MODEL, GeminiError, generateText } from "@/lib/readListen/generate";
+import { DEFAULT_FALLBACK_MODELS, DEFAULT_GEMINI_MODEL, GeminiError, failureReason, generateText } from "@/lib/readListen/generate";
 import { aiCooldown } from "@/lib/readListen/cooldown";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +10,16 @@ export const maxDuration = 30;
 
 /** Generated texts are kept for a week and shared by all visitors. */
 const CACHE_SECONDS = 7 * 24 * 60 * 60;
+
+/** Backup models from GEMINI_FALLBACK_MODELS (comma-separated; set it empty to turn them off). */
+const fallbackModelsFromEnv = () => {
+  const value = process.env.GEMINI_FALLBACK_MODELS;
+  if (value === undefined) return DEFAULT_FALLBACK_MODELS;
+  return value
+    .split(",")
+    .map((m) => m.trim())
+    .filter(Boolean);
+};
 
 /** Thrown instead of calling Google while the AI is paused after a usage limit. */
 class AiPausedError extends Error {}
@@ -34,8 +44,12 @@ export async function POST(request: Request) {
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
-  const fallback = (notice?: "ai-paused" | "ai-unavailable") =>
-    Response.json({ ...libraryText(req.learn, req.know, req.level, req.topic, req.variant), ...(notice ? { notice } : {}) });
+  const fallback = (notice?: "ai-paused" | "ai-unavailable", reason?: string) =>
+    Response.json({
+      ...libraryText(req.learn, req.know, req.level, req.topic, req.variant),
+      ...(notice ? { notice } : {}),
+      ...(reason ? { reason } : {}),
+    });
   if (!apiKey) return fallback();
 
   // The same pair in either order makes the same text, so share one cache entry
@@ -45,7 +59,11 @@ export async function POST(request: Request) {
       // Only runs on a cache miss, so already-written texts are still served while the AI is paused
       async () => {
         if (aiCooldown.isPaused()) throw new AiPausedError();
-        return generateText(req, { apiKey, model: process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL });
+        return generateText(req, {
+          apiKey,
+          model: process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL,
+          fallbackModels: fallbackModelsFromEnv(),
+        });
       },
       // v2: texts saved before the language check (some had a sentence in another language) are dropped
       ["read-listen-v2", pair, req.level, req.topic, String(req.variant)],
@@ -60,7 +78,8 @@ export async function POST(request: Request) {
       console.warn(`[read-listen] Gemini usage limit reached; using built-in texts for ${Math.round((error.retryAfterMs ?? 600_000) / 1000)}s`);
       return fallback("ai-paused");
     }
-    console.error("[read-listen] Falling back to the built-in library:", error);
-    return fallback("ai-unavailable");
+    const reason = failureReason(error);
+    console.error(`[read-listen] Falling back to the built-in library (reason: ${reason}):`, error);
+    return fallback("ai-unavailable", reason);
   }
 }

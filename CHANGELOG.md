@@ -17,6 +17,12 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.5.3 — 2026-09-28
+
+- Read & Listen: when Google's model is overloaded ("high demand") or too slow, the page now tries a backup model (`gemini-3.1-flash-lite`, configurable with `GEMINI_FALLBACK_MODELS`) before falling back to the built-in library.
+- Read & Listen: when the AI fails, the notice shows a short code for why (e.g. "http-503", "timeout", "max-tokens"), and the same code is logged; overloaded models get a "very busy right now" message.
+- Each Gemini request now times out after 12 seconds (was 20) and allows longer answers.
+
 ## 1.5.2 — 2026-09-28
 
 - Faster first paint on phones: the stylesheet is now inlined in the HTML instead of a separate render-blocking download.

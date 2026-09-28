@@ -12,6 +12,20 @@ export class GeminiError extends Error {
   }
 }
 
+/** Why an answer from Gemini couldn't be used (safe to show: no keys or prompt text). */
+export type AnswerProblem = "bad-json" | "mismatch" | "max-tokens" | "blocked" | "empty";
+
+/** Gemini answered, but the answer can't be used; `reason` says why. */
+export class GeminiAnswerError extends Error {
+  constructor(
+    message: string,
+    readonly reason: AnswerProblem
+  ) {
+    super(message);
+    this.name = "GeminiAnswerError";
+  }
+}
+
 /**
  * Reads how long Google asks us to wait: the `Retry-After` header (seconds) or the `RetryInfo`
  * detail in the error body (e.g. "41s"). Returns milliseconds, or null if neither is there.
@@ -25,6 +39,28 @@ export function retryAfterFrom(headers: Headers | undefined, body: string): numb
 
 /** Default Gemini model: a free-tier Flash-Lite model (override with GEMINI_MODEL). */
 export const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite";
+
+/**
+ * Models to try, in order, when the main one is overloaded ("high demand", HTTP 503) or too slow.
+ * Override with GEMINI_FALLBACK_MODELS (comma-separated; empty to turn fallbacks off).
+ */
+export const DEFAULT_FALLBACK_MODELS = ["gemini-3.1-flash-lite"];
+
+/** How long to wait for one answer. Two tries fit inside the route's 30-second limit. */
+const REQUEST_TIMEOUT_MS = 12_000;
+
+/** Short pause before trying the next model, so a brief spike can pass. */
+const FALLBACK_PAUSE_MS = 400;
+
+/**
+ * True for failures worth trying another model for: Google's servers busy or erroring (500, 502, 503,
+ * 504) or no answer in time. Not for usage limits (429), bad keys or bad requests.
+ */
+export function isTemporaryFailure(error: unknown): boolean {
+  if (error instanceof GeminiError) return [500, 502, 503, 504].includes(error.status);
+  const name = (error as { name?: unknown } | null)?.name;
+  return name === "TimeoutError" || name === "AbortError";
+}
 
 const MAX_SENTENCE_CHARS = 400;
 
@@ -120,28 +156,63 @@ export function parseAiSentences(data: unknown, learn: LangCode, know: LangCode)
 
 /**
  * Asks Gemini for a new text and returns it, or throws if the request fails or the answer can't be used
- * (the caller then falls back to the built-in library). An unusable answer (not JSON, sentences that
- * don't line up, or a sentence in another language) is asked for again once before giving up.
+ * (the caller then falls back to the built-in library). When the main model is busy or too slow, the
+ * fallback models are tried in turn; the last error is thrown if none works.
  * @param options.apiKey - Google AI Studio key (server-side only).
- * @param options.model - Model name; defaults to DEFAULT_GEMINI_MODEL.
+ * @param options.model - Main model; defaults to DEFAULT_GEMINI_MODEL.
+ * @param options.fallbackModels - Tried in order after a temporary failure; defaults to DEFAULT_FALLBACK_MODELS.
  */
 export async function generateText(
   req: Required<ReadListenRequest>,
-  { apiKey, model = DEFAULT_GEMINI_MODEL }: { apiKey: string; model?: string }
+  {
+    apiKey,
+    model = DEFAULT_GEMINI_MODEL,
+    fallbackModels = DEFAULT_FALLBACK_MODELS,
+  }: { apiKey: string; model?: string; fallbackModels?: string[] }
 ): Promise<ReadListenText> {
-  let problem = "";
+  const models = [model, ...fallbackModels.filter((m) => m && m !== model)];
+  for (let i = 0; ; i++) {
+    try {
+      return await generateWithModel(req, apiKey, models[i]);
+    } catch (error) {
+      if (i === models.length - 1 || !isTemporaryFailure(error)) throw error;
+      console.warn(`[read-listen] ${models[i]} is busy or slow; trying ${models[i + 1]}`);
+      await new Promise((resolve) => setTimeout(resolve, FALLBACK_PAUSE_MS));
+    }
+  }
+}
+
+/**
+ * Gets a text from one model. An unusable answer (not JSON, sentences that don't line up, a sentence in
+ * another language, cut off or blocked) is asked for again once before giving up.
+ */
+async function generateWithModel(req: Required<ReadListenRequest>, apiKey: string, model: string): Promise<ReadListenText> {
+  let problem = new GeminiAnswerError("Gemini returned an empty answer", "empty");
   for (let attempt = 0; attempt <= RETRIES; attempt++) {
-    const raw = await requestText(req, apiKey, model);
+    const { text: raw, finishReason } = await requestText(req, apiKey, model);
+    // The model stopped early: out of room (thinking counts too) or a safety filter
+    if (finishReason === "MAX_TOKENS") {
+      problem = new GeminiAnswerError("Gemini ran out of output tokens before finishing", "max-tokens");
+      continue;
+    }
+    if (finishReason && /SAFETY|BLOCKLIST|PROHIBITED|RECITATION|SPII/.test(finishReason)) {
+      problem = new GeminiAnswerError(`Gemini stopped the answer (${finishReason})`, "blocked");
+      continue;
+    }
+    if (!raw.trim()) {
+      problem = new GeminiAnswerError(`Gemini returned an empty answer${finishReason ? ` (${finishReason})` : ""}`, "empty");
+      continue;
+    }
     let parsed: unknown;
     try {
       parsed = JSON.parse(raw);
     } catch {
-      problem = "Gemini returned something that isn't JSON";
+      problem = new GeminiAnswerError("Gemini returned something that isn't JSON", "bad-json");
       continue;
     }
     const sentences = parseAiSentences(parsed, req.learn, req.know);
     if (!sentences) {
-      problem = "Gemini's text didn't have matching sentences in both languages";
+      problem = new GeminiAnswerError("Gemini's text didn't have matching sentences in both languages", "mismatch");
       continue;
     }
     return {
@@ -152,11 +223,18 @@ export async function generateText(
       ...(isConversation(req.topic) ? { speakers: speakersFor(req.variant) } : {}),
     };
   }
-  throw new Error(problem);
+  throw problem;
 }
 
-/** Sends one request to Gemini and returns the raw text of its answer; throws `GeminiError` on HTTP errors. */
-async function requestText(req: Required<ReadListenRequest>, apiKey: string, model: string): Promise<string> {
+/**
+ * Sends one request to Gemini and returns the raw text of its answer and why it stopped ("STOP" when
+ * complete); throws `GeminiError` on HTTP errors.
+ */
+async function requestText(
+  req: Required<ReadListenRequest>,
+  apiKey: string,
+  model: string
+): Promise<{ text: string; finishReason: string | null }> {
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
@@ -164,17 +242,36 @@ async function requestText(req: Required<ReadListenRequest>, apiKey: string, mod
       contents: [{ role: "user", parts: [{ text: buildPrompt(req) }] }],
       generationConfig: {
         temperature: 0.8,
-        maxOutputTokens: 1200,
+        // Room for the longest texts plus the model's own (minimal) thinking, which counts toward this limit
+        maxOutputTokens: 2048,
         responseMimeType: "application/json",
         responseSchema: RESPONSE_SCHEMA,
       },
     }),
-    signal: AbortSignal.timeout(20_000),
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
     throw new GeminiError(`Gemini responded ${res.status}: ${detail.slice(0, 300)}`, res.status, retryAfterFrom(res.headers, detail));
   }
   const payload = await res.json();
-  return payload?.candidates?.[0]?.content?.parts?.map((p: { text?: string }) => p.text ?? "").join("") ?? "";
+  const candidate = payload?.candidates?.[0];
+  return {
+    text: candidate?.content?.parts?.map((p: { text?: string }) => p.text ?? "").join("") ?? "",
+    finishReason: candidate?.finishReason ?? payload?.promptFeedback?.blockReason ?? null,
+  };
+}
+
+/**
+ * A short, safe code for why the AI failed, sent with the fallback text and logged: "timeout",
+ * "http-<status>" (e.g. http-404 for a wrong model name, http-400/403 for a bad key), the answer
+ * problem ("bad-json", "mismatch", "max-tokens", "blocked", "empty"), or "error" for anything else.
+ */
+export function failureReason(error: unknown): string {
+  if (error instanceof GeminiError) return `http-${error.status}`;
+  if (error instanceof GeminiAnswerError) return error.reason;
+  // fetch's timeout rejects with a DOMException named "TimeoutError" (not always an Error subclass)
+  const name = (error as { name?: unknown } | null)?.name;
+  if (name === "TimeoutError" || name === "AbortError") return "timeout";
+  return "error";
 }

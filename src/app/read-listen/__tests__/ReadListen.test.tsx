@@ -200,7 +200,23 @@ describe("Read & Listen page", () => {
     expect(screen.getByText(/is a test version/)).toBeInTheDocument();
   });
 
-    it("explains when a built-in text was used because the AI is paused", async () => {
+    it("shows a short code for what went wrong when the AI had a problem", async () => {
+    mockFetch({ ...libraryText("es", "en", "A2", "travel"), notice: "ai-unavailable", reason: "bad-json" });
+    render(<ReadListen initial={initial} />);
+    fireEvent.click(screen.getByRole("button", { name: /new text/i }));
+    const status = await screen.findByRole("status");
+    expect(status).toHaveTextContent(/had a problem/);
+    expect(status).toHaveTextContent("(bad-json)");
+  });
+
+  it("says Google's AI is busy when it's overloaded", async () => {
+    mockFetch({ ...libraryText("es", "en", "A2", "travel"), notice: "ai-unavailable", reason: "http-503" });
+    render(<ReadListen initial={initial} />);
+    fireEvent.click(screen.getByRole("button", { name: /new text/i }));
+    expect(await screen.findByRole("status")).toHaveTextContent(/very busy right now.*\(http-503\)/);
+  });
+
+  it("explains when a built-in text was used because the AI is paused", async () => {
     mockFetch({ ...libraryText("es", "en", "A2", "travel"), notice: "ai-paused" });
     render(<ReadListen initial={initial} />);
     fireEvent.click(screen.getByRole("button", { name: /new text/i }));

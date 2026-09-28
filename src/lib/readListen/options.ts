@@ -73,6 +73,11 @@ export interface ReadListenText {
    * free usage limit was reached, "ai-unavailable" after another error. Absent otherwise.
    */
   notice?: "ai-paused" | "ai-unavailable";
+  /**
+   * With "ai-unavailable": a short code for what went wrong, for the site owner (e.g. "timeout",
+   * "http-404", "max-tokens", "bad-json"). Never contains keys or prompt text.
+   */
+  reason?: string;
 }
 
 /** Request body for `POST /api/read-listen`. */

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { GeminiError, buildPrompt, generateText, parseAiSentences, retryAfterFrom } from "../generate";
+import { GeminiAnswerError, GeminiError, buildPrompt, failureReason, generateText, isTemporaryFailure, parseAiSentences, retryAfterFrom } from "../generate";
 
 const req = { learn: "es", know: "en", level: "B1", topic: "market", variant: 2 } as const;
 const geminiReply = (text: string) => ({
@@ -81,6 +81,69 @@ describe("Writing texts with Gemini", () => {
     vi.stubGlobal("fetch", alwaysBad);
     await expect(generateText(req, { apiKey: "k" })).rejects.toThrow(/matching/);
     expect(alwaysBad).toHaveBeenCalledTimes(2);
+  });
+
+  it("says why an answer was unusable: cut off, blocked or empty", async () => {
+    const stopped = (finishReason: string, text = "") => ({
+      ok: true,
+      json: () => Promise.resolve({ candidates: [{ finishReason, content: { parts: [{ text }] } }] }),
+    });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(stopped("MAX_TOKENS", '{"learn":["Uno.","Do')));
+    await expect(generateText(req, { apiKey: "k" })).rejects.toMatchObject({ reason: "max-tokens" });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(stopped("SAFETY")));
+    await expect(generateText(req, { apiKey: "k" })).rejects.toMatchObject({ reason: "blocked" });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(stopped("STOP")));
+    await expect(generateText(req, { apiKey: "k" })).rejects.toMatchObject({ reason: "empty" });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(geminiReply("not json")));
+    await expect(generateText(req, { apiKey: "k" })).rejects.toBeInstanceOf(GeminiAnswerError);
+  });
+
+  it("turns any failure into a short code that's safe to show", () => {
+    expect(failureReason(new GeminiError("no such model", 404))).toBe("http-404");
+    expect(failureReason(new GeminiAnswerError("x", "bad-json"))).toBe("bad-json");
+    expect(failureReason(Object.assign(new Error("slow"), { name: "TimeoutError" }))).toBe("timeout");
+    expect(failureReason(new Error("?"))).toBe("error");
+  });
+
+  it("leaves room for the model's thinking in the output limit", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(geminiReply(JSON.stringify({ learn: ["Uno.", "Dos."], know: ["One.", "Two."] })));
+    vi.stubGlobal("fetch", fetchMock);
+    await generateText(req, { apiKey: "k" });
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).generationConfig.maxOutputTokens).toBeGreaterThanOrEqual(2048);
+  });
+
+  it("tries the backup model when the main one is overloaded", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const busy = { ok: false, status: 503, text: () => Promise.resolve('{"error":{"message":"This model is currently experiencing high demand."}}') };
+    const good = geminiReply(JSON.stringify({ learn: ["Uno.", "Dos."], know: ["One.", "Two."] }));
+    const fetchMock = vi.fn().mockResolvedValueOnce(busy).mockResolvedValueOnce(good);
+    vi.stubGlobal("fetch", fetchMock);
+    const text = await generateText(req, { apiKey: "k", model: "main-model", fallbackModels: ["backup-model"] });
+    expect(text.sentences.en).toEqual(["One.", "Two."]);
+    expect(fetchMock.mock.calls[0][0]).toContain("/models/main-model:");
+    expect(fetchMock.mock.calls[1][0]).toContain("/models/backup-model:");
+  });
+
+  it("gives up with the last error when every model is busy, and doesn't switch for usage limits", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const busy = vi.fn().mockResolvedValue({ ok: false, status: 503, text: () => Promise.resolve("high demand") });
+    vi.stubGlobal("fetch", busy);
+    await expect(generateText(req, { apiKey: "k", model: "a", fallbackModels: ["b"] })).rejects.toMatchObject({ status: 503 });
+    expect(busy).toHaveBeenCalledTimes(2);
+
+    const limited = vi.fn().mockResolvedValue({ ok: false, status: 429, text: () => Promise.resolve("quota") });
+    vi.stubGlobal("fetch", limited);
+    await expect(generateText(req, { apiKey: "k", model: "a", fallbackModels: ["b"] })).rejects.toMatchObject({ status: 429 });
+    expect(limited).toHaveBeenCalledTimes(1);
+  });
+
+  it("knows which failures are temporary", () => {
+    expect(isTemporaryFailure(new GeminiError("busy", 503))).toBe(true);
+    expect(isTemporaryFailure(new GeminiError("oops", 500))).toBe(true);
+    expect(isTemporaryFailure(Object.assign(new Error("slow"), { name: "TimeoutError" }))).toBe(true);
+    expect(isTemporaryFailure(new GeminiError("quota", 429))).toBe(false);
+    expect(isTemporaryFailure(new GeminiError("bad key", 403))).toBe(false);
+    expect(isTemporaryFailure(new GeminiAnswerError("x", "bad-json"))).toBe(false);
   });
 
   it("tells the model to stay in the two chosen languages", () => {

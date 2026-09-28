@@ -323,7 +323,13 @@ export default function ReadListen({ initial }: { initial: ReadListenText }) {
         >
           {text.notice === "ai-paused"
             ? "The AI writer is taking a break (its free usage limit was reached), so here's a text from the built-in library. New AI texts will be back soon."
-            : "The AI writer couldn't be reached just now, so here's a text from the built-in library."}
+            : text.reason === "http-503" || text.reason === "timeout"
+              ? "Google's AI is very busy right now, so here's a text from the built-in library. Try again in a minute."
+              : "The AI writer had a problem just now, so here's a text from the built-in library."}
+          {/* A short code (e.g. "timeout") so the site owner can tell what went wrong */}
+          {text.notice === "ai-unavailable" && text.reason && (
+            <span className="ml-1 font-mono text-xs text-amber-800 dark:text-amber-300">({text.reason})</span>
+          )}
         </p>
       )}
 

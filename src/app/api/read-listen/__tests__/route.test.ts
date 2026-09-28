@@ -67,7 +67,31 @@ describe("Getting a Read & Listen text", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 500, text: () => Promise.resolve("boom") }));
     const res = await post(valid);
     expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({ source: "library", notice: "ai-unavailable" });
+    expect(await res.json()).toMatchObject({ source: "library", notice: "ai-unavailable", reason: "http-500" });
+  });
+
+  it("uses the backup models from GEMINI_FALLBACK_MODELS, or none when it's empty", async () => {
+    vi.stubEnv("GEMINI_API_KEY", "test-key");
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const busy = vi.fn().mockResolvedValue({ ok: false, status: 503, text: () => Promise.resolve("high demand") });
+    vi.stubGlobal("fetch", busy);
+
+    vi.stubEnv("GEMINI_FALLBACK_MODELS", "backup-one, backup-two");
+    expect(await (await post({ ...valid, variant: 11 })).json()).toMatchObject({ reason: "http-503" });
+    expect(busy.mock.calls.map((c) => String(c[0]).match(/models\/([^:]+)/)?.[1])).toEqual([expect.any(String), "backup-one", "backup-two"]);
+
+    busy.mockClear();
+    vi.stubEnv("GEMINI_FALLBACK_MODELS", "");
+    await post({ ...valid, variant: 12 });
+    expect(busy).toHaveBeenCalledTimes(1);
+  });
+
+  it("says when Gemini took too long", async () => {
+    vi.stubEnv("GEMINI_API_KEY", "test-key");
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(Object.assign(new Error("The operation was aborted due to timeout"), { name: "TimeoutError" })));
+    expect(await (await post({ ...valid, variant: 5 })).json()).toMatchObject({ notice: "ai-unavailable", reason: "timeout" });
   });
 
   it("limits each visitor to 30 texts an hour", async () => {

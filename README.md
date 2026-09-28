@@ -50,6 +50,7 @@ Create a `.env.local` file in the project root (it's git-ignored). All variables
 | `CONTACT_FROM_EMAIL` | The sender address; it must be on a domain verified in Resend. |
 | `GEMINI_API_KEY` | Google AI Studio key for new texts on `/read-listen` (free tier). Without it, the page uses its built-in texts. |
 | `GEMINI_MODEL` | Optional Gemini model name (defaults to `gemini-3.5-flash-lite`). |
+| `GEMINI_FALLBACK_MODELS` | Optional backup models tried when the main one is busy or slow, comma-separated (defaults to `gemini-3.1-flash-lite`; set it empty to turn backups off). |
 | `NEXT_PUBLIC_SITE_URL` | Overrides the site address used for the sitemap and robots.txt (defaults to `https://www.estebanpayret.com`). |
 
 ## Scripts
