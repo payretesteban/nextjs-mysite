@@ -14,13 +14,12 @@ const geistSans = Geist({
   display: "swap",
 });
 
-// Only used in small details further down the page, so it loads when needed instead of being preloaded
-// (preloading it made the browser warn that the file wasn't used right away)
+// Preloaded: the <EP/> logo in the header uses it, so it's needed for the very first paint.
+// (In `npm run dev` Chrome may still say it was "preloaded but not used"; dev pages paint slowly. Not on the live site.)
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
-  preload: false,
 });
 
 /** Next.js metadata for every page (title, description, social cards), loaded from Sanity. */

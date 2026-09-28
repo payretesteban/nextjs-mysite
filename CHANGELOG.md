@@ -17,6 +17,12 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.5.2 — 2026-09-28
+
+- Faster first paint on phones: the stylesheet is now inlined in the HTML instead of a separate render-blocking download.
+- The monospace font used by the header logo is preloaded again, since it's needed for the first paint.
+- Homepage photo is served as WebP/AVIF when supported and loaded with high priority.
+
 ## 1.5.1 — 2026-09-27
 
 - The Lab's cards no longer prefetch their pages, which removes Chrome's "stylesheet preloaded but not used" console warning on the homepage (it was the game's retro font).

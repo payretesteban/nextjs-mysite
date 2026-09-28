@@ -36,10 +36,13 @@ export default async function IndexPage() {
           <div className="flex items-center gap-4">
             {profile.profileImage && (
               <img
-                src={urlFor(profile.profileImage).width(144).height(144).url()}
+                // WebP/AVIF when the browser supports it; loaded early because it's at the top of the page
+                src={urlFor(profile.profileImage).width(144).height(144).auto("format").url()}
                 alt={profile.profileImage.alt || profile.name}
                 width={72}
                 height={72}
+                fetchPriority="high"
+                decoding="async"
                 className="h-16 w-16 shrink-0 rounded-full object-cover shadow-md ring-2 ring-white sm:h-[72px] sm:w-[72px] dark:ring-slate-800"
               />
             )}

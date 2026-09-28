@@ -28,7 +28,7 @@ vi.mock("@/lib/lab", async (importOriginal) => {
   };
 });
 vi.mock("@/lib/image", () => ({
-  urlFor: () => ({ width: () => ({ height: () => ({ url: () => "https://cdn.example/avatar.jpg" }) }) }),
+  urlFor: () => ({ width: () => ({ height: () => ({ auto: () => ({ url: () => "https://cdn.example/avatar.jpg" }) }) }) }),
 }));
 vi.mock("@/lib/animations", () => ({
   default: ({ headline }: { headline: string }) => <p>{headline}</p>,
