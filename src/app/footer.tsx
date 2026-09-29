@@ -24,7 +24,7 @@ export default function Footer({ links = [] }: { links?: SanityLink[] }) {
   ];
 
   return (
-    <footer className="container mx-auto max-w-3xl p-8 text-center text-xs">
+    <footer className="print:hidden container mx-auto max-w-3xl p-8 text-center text-xs">
       <nav aria-label="Elsewhere" className="mb-3 flex items-center justify-center gap-1">
         {socials.map((s) => (
           <a

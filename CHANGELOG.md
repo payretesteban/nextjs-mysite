@@ -17,6 +17,13 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.7.0 — 2026-09-29
+
+- New Project Scoping Assistant (`/scope`): seven quick questions and an optional note, then a project snapshot with size (S–XL), a week range, timeline fit, phases, "What moves the estimate", top risks, first steps and a suggested approach.
+- The estimate comes from transparent rules; an AI-written summary (Gemini) rewords it and is rejected if it invents numbers, with a template summary as fallback.
+- Snapshot actions: book a free consultation with the snapshot prefilled in the booking notes, copy a shareable link (answers only, never the note), save as PDF, start over.
+- New "Project Scoping" card first in The Lab, ⌘K menu entry, sitemap entry, a link from the Services consultation section, and a "Project scoping" area on the tests page.
+
 ## 1.6.0 — 2026-09-29
 
 - Free 30-minute technical consultation: a short invitation right after the homepage intro ("Book a Free Consultation" and "Explore My Services"), and its own section on the Services page.

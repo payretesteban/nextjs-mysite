@@ -47,6 +47,7 @@ describe("Sitemap", () => {
       "https://www.estebanpayret.com/services",
       "https://www.estebanpayret.com/posts",
       "https://www.estebanpayret.com/read-listen",
+      "https://www.estebanpayret.com/scope",
       "https://www.estebanpayret.com/site-log",
       "https://www.estebanpayret.com/adventure",
       "https://www.estebanpayret.com/performance",
@@ -56,7 +57,7 @@ describe("Sitemap", () => {
     ]);
     expect(result[0].lastModified).toEqual(new Date("2026-02-01T00:00:00.000Z"));
     expect(result[1].lastModified).toEqual(new Date("2026-03-01T00:00:00.000Z"));
-    expect(result[9].lastModified).toEqual(new Date("2026-02-01T00:00:00.000Z"));
+    expect(result[10].lastModified).toEqual(new Date("2026-02-01T00:00:00.000Z"));
     expect(result.every((r) => !r.url.includes("/blog/"))).toBe(true);
   });
 
@@ -66,7 +67,7 @@ describe("Sitemap", () => {
 
     const result = await sitemap();
 
-    expect(result).toHaveLength(8);
+    expect(result).toHaveLength(9);
     expect(result[0].url).toBe("https://www.estebanpayret.com");
   });
 });

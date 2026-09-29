@@ -48,15 +48,18 @@ function loadCal(origin: string, onError: () => void): CalFn {
  * @param props.bookingUrl - Booking page from Sanity.
  * @param props.label - Button text.
  * @param props.variant - "dark" (default) for light backgrounds, "light" for dark ones.
+ * @param props.notes - Optional text to prefill in Cal.com's "Additional notes" (e.g. a project snapshot).
  */
 export default function BookButton({
   bookingUrl,
   label,
   variant = "dark",
+  notes,
 }: {
   bookingUrl?: string | null;
   label: string;
   variant?: "dark" | "light";
+  notes?: string;
 }) {
   const contact = useContact();
   const cal = calTargetFrom(bookingUrl);
@@ -83,7 +86,7 @@ export default function BookButton({
       return;
     }
     const dark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-    loadCal(cal.origin, openPage)("modal", { calLink: cal.calLink, config: { layout: "month_view", theme: dark ? "dark" : "light" } });
+    loadCal(cal.origin, openPage)("modal", { calLink: cal.calLink, config: { layout: "month_view", theme: dark ? "dark" : "light", ...(notes ? { notes } : {}) } });
   }
 
   const colors =

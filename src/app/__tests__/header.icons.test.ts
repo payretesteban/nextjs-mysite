@@ -12,6 +12,7 @@ describe("Menu icons", () => {
       ["/site-log", "Site log", "notes"],
       ["/posts", "Posts", "pencil"],
       ["/read-listen", "Read & Listen", "headphones"],
+      ["/scope", "Project Scoping", "ruler"],
     ];
     for (const [url, title, icon] of pages) expect(iconForUrl(url, title), url).toBe(icon);
     expect(new Set(pages.map(([url, title]) => iconForUrl(url, title))).size).toBe(pages.length);

@@ -35,6 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_ORIGIN}/services`, lastModified: toDate(data.servicesUpdatedAt), changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_ORIGIN}/posts`, lastModified: toDate(data.homeUpdatedAt), changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_ORIGIN}/read-listen`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_ORIGIN}/scope`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_ORIGIN}/site-log`, lastModified: toDate(data.siteLogUpdatedAt), changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_ORIGIN}/adventure`, changeFrequency: "yearly", priority: 0.4 },
     { url: `${SITE_ORIGIN}/performance`, changeFrequency: "monthly", priority: 0.3 },

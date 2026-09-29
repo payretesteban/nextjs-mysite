@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Consultation } from "@/lib/consultation";
 import BookButton from "../consultation/BookButton";
 
@@ -25,8 +26,14 @@ export default function ConsultationSection({ consultation }: { consultation: Co
             {consultation.title}
           </h2>
           <p className="mt-2 max-w-xl text-slate-700 dark:text-slate-300">{consultation.text}</p>
-          <div className="mt-5">
+          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
             <BookButton bookingUrl={consultation.bookingUrl} label={consultation.buttonLabel} />
+            <Link
+              href="/scope"
+              className="text-sm font-semibold text-sky-800 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-sky-300"
+            >
+              Not sure what you need? Scope your project →
+            </Link>
           </div>
         </div>
       </div>

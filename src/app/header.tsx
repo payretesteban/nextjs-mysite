@@ -9,7 +9,7 @@ import { useContact } from "./contact/ContactProvider";
 import CommandMenu, { Icon, Kbd, iconForUrl, isExternalUrl, type MenuItem } from "./command-menu";
 
 // Pages that show the same full menu as the homepage
-const FULL_MENU_PATHS = ["/", "/tests", "/performance", "/adventure", "/services", "/posts", "/site-log", "/read-listen"];
+const FULL_MENU_PATHS = ["/", "/tests", "/performance", "/adventure", "/services", "/posts", "/site-log", "/read-listen", "/scope"];
 
 /** Subscribe function for useSyncExternalStore when the value never changes after load. */
 const noopSubscribe = () => () => {};
@@ -160,7 +160,7 @@ export default function Header({
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-md dark:border-slate-800/70 dark:bg-[#0a0a0a]/80">
+    <header className="print:hidden sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-md dark:border-slate-800/70 dark:bg-[#0a0a0a]/80">
       <nav aria-label="Main" className="container mx-auto flex max-w-3xl items-center gap-3 px-8 py-4">
         <Link href="/" aria-label={`${name} — home`} title={name} className="group flex items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
           {/* Code-tag logo: <EP/> with a blinking cursor */}

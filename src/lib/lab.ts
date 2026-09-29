@@ -7,9 +7,9 @@ import type { TestRunResponse } from "./testResults";
  * Which preview a Lab card draws (small CSS/SVG pictures, no screenshots). "generic" is a plain
  * picture for experiments that don't have their own yet.
  */
-export type LabPreview = "game" | "readListen" | "performance" | "tests" | "generic";
+export type LabPreview = "game" | "readListen" | "performance" | "tests" | "scope" | "generic";
 
-const PREVIEWS: LabPreview[] = ["game", "readListen", "performance", "tests", "generic"];
+const PREVIEWS: LabPreview[] = ["game", "readListen", "performance", "tests", "scope", "generic"];
 
 /** One experiment shown in the homepage's "The Lab" section (edited in Sanity as "Lab experiment"). */
 export interface LabItem {
@@ -29,6 +29,16 @@ export interface LabItem {
 
 /** Shown if Sanity has no Lab experiments yet (or can't be reached). Same content as the Studio seed. */
 export const DEFAULT_LAB_ITEMS: LabItem[] = [
+  {
+    _id: "lab-scope",
+    href: "/scope",
+    title: "Project Scoping",
+    blurb: "Seven questions, then a rough size, timeline, phases and risks.",
+    question: "Could an estimate explain itself instead of hiding in a spreadsheet?",
+    tech: ["Rule engine", "Gemini API"],
+    status: "live",
+    preview: "scope",
+  },
   {
     _id: "lab-read-listen",
     href: "/read-listen",

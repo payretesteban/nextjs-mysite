@@ -11,6 +11,7 @@ export default function LabPreview({ kind, tests }: { kind: PreviewKind; tests: 
       {kind === "readListen" && <ReadListenPreview />}
       {kind === "performance" && <PerformancePreview />}
       {kind === "tests" && <TestsPreview stats={tests} />}
+      {kind === "scope" && <ScopePreview />}
       {kind === "generic" && <GenericPreview />}
     </div>
   );
@@ -55,6 +56,29 @@ function PerformancePreview() {
         <line x1="60" y1="62" x2="95" y2="30" stroke="#0f172a" strokeWidth="4" strokeLinecap="round" className="dark:stroke-white" />
         <circle cx="60" cy="62" r="6" className="fill-slate-900 dark:fill-white" />
       </svg>
+    </div>
+  );
+}
+
+/** A mini estimate: the S/M/L/XL size bar and a couple of "what moves it" lines. */
+function ScopePreview() {
+  return (
+    <div className="flex h-full flex-col justify-center gap-1.5 bg-slate-50 px-4 text-[10.5px] text-slate-700 dark:bg-slate-800/60 dark:text-slate-300">
+      <div className="flex gap-1">
+        {["S", "M", "L", "XL"].map((s) => (
+          <span key={s} className={`flex-1 rounded py-0.5 text-center font-bold ${s === "M" ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900" : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"}`}>
+            {s}
+          </span>
+        ))}
+      </div>
+      <div className="flex justify-between">
+        <span>AI features</span>
+        <span className="font-mono">+4 wk</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Existing prototype</span>
+        <span className="font-mono text-emerald-700 dark:text-emerald-400">−2 wk</span>
+      </div>
     </div>
   );
 }
