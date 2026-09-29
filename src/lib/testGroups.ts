@@ -14,7 +14,7 @@ export const TEST_AREAS: TestArea[] = [
   { key: "home", label: "Homepage", description: "The Lab, posts, site log notes and the services link", match: /_home\/|ServicesTicker|site-log|siteLog|lib\/__tests__\/(data|lab)\.test/ },
   { key: "posts", label: "Posts", description: "Each post's page and the list of all posts", match: /\[slug\]|app\/posts\// },
   { key: "contact", label: "Contact form", description: "The Let's Work Together form and sending the email", match: /contact/i },
-  { key: "services", label: "Services", description: "The Services page and its content from Sanity", match: /\/services\/|services\.test/ },
+  { key: "services", label: "Services", description: "The Services page, the free consultation and their content from Sanity", match: /\/services\/|services\.test|consultation/i },
   { key: "adventure", label: "The Deep Drop game", description: "The story, the choices and the game screen", match: /adventure/ },
   { key: "performance", label: "Performance page", description: "Running PageSpeed tests and showing the report", match: /performance|pagespeed/i },
   { key: "menu", label: "Header, menu & footer", description: "The logo, the ⌘K menu and the footer", match: /header|footer/ },

@@ -4,15 +4,10 @@ import IndexPage from "../../page";
 import { getIndexPageData } from "@/lib/data";
 
 vi.mock("@/lib/data", () => ({ getIndexPageData: vi.fn() }));
-vi.mock("@/lib/services", () => ({
-  getServicesPageData: vi.fn(async () => ({
-    page: { title: "Services" },
-    services: [
-      { _id: "s1", title: "Web Development" },
-      { _id: "s2", title: "AI-Assisted Dev Workflows", shortTitle: "AI workflows" },
-    ],
-  })),
-}));
+vi.mock("@/lib/consultation", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/consultation")>();
+  return { ...actual, getConsultation: vi.fn(async () => ({ ...actual.DEFAULT_CONSULTATION, bookingUrl: "https://cal.com/esteban/30min" })) };
+});
 vi.mock("@/lib/siteLog", () => ({
   getSiteLog: vi.fn(async () => [
     { _id: "l1", title: "The Genesis", text: "It all began." },
@@ -57,7 +52,7 @@ describe("Homepage", () => {
     fetchMock.mockReset();
   });
 
-  it("introduces me with a photo, headline, bio and the contact and services links", async () => {
+  it("introduces me with a photo, headline and bio, then offers a free consultation or the services", async () => {
     fetchMock.mockResolvedValue({ posts, postCount: 8, profile, links: [] });
     render(await IndexPage());
 
@@ -65,8 +60,10 @@ describe("Homepage", () => {
     expect(screen.getByRole("img", { name: "Esteban smiling" })).toHaveAttribute("src", "https://cdn.example/avatar.jpg");
     expect(screen.getByText("Tech Lead & People Manager")).toBeInTheDocument();
     expect(screen.getByText("I build software and lead teams.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /let.s work together/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /see all services/i })).toHaveAttribute("href", "/services");
+    expect(screen.getByRole("heading", { level: 2, name: "Have a technical challenge or project in mind?" })).toBeInTheDocument();
+    expect(screen.getByText(/free 30-minute initial consultation/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Book a Free Consultation" })).toHaveAttribute("href", "https://cal.com/esteban/30min");
+    expect(screen.getByRole("link", { name: "Explore My Services" })).toHaveAttribute("href", "/services");
   });
 
   it("shows The Lab right after the intro, with a card for each experiment", async () => {

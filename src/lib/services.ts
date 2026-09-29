@@ -12,6 +12,13 @@ export interface Service {
   icon?: string | null;
 }
 
+/** One point in the services page's "Why work with me" section. */
+export interface WhyPoint {
+  _key?: string;
+  title: string;
+  text?: string | null;
+}
+
 /** Text content of the /services page. */
 export interface ServicesPage {
   title: string;
@@ -19,6 +26,9 @@ export interface ServicesPage {
   /** Heading and text of the call-to-action box at the end of the page. */
   ctaTitle?: string | null;
   ctaText?: string | null;
+  /** "Why work with me" heading and points. */
+  whyTitle?: string | null;
+  whyPoints?: WhyPoint[] | null;
 }
 
 /** Everything the /services page needs: its text and the list of services. */
@@ -33,6 +43,14 @@ export const DEFAULT_SERVICES_PAGE: ServicesPage = {
   intro: "From idea to launch and beyond: software, web, marketing and AI, with the experience of someone who has led engineering teams.",
   ctaTitle: "Have a project in mind?",
   ctaText: "Tell me what you need. I reply within 2 business days.",
+  whyTitle: "Why work with me",
+  // Placeholder points until they're written in Sanity (Services page → "Why work with me")
+  whyPoints: [
+    { title: "Engineering leader, still hands-on", text: "I’ve led engineering teams and still write production code, so advice comes with a working plan." },
+    { title: "AI in real workflows", text: "Practical experience putting AI assistants and automation into everyday development and business work." },
+    { title: "Clear, honest communication", text: "Plain-language updates, realistic estimates and trade-offs explained before decisions are made." },
+    { title: "Quality built in", text: "Tests, performance and accessibility from day one, like the live test and performance pages on this site." },
+  ],
 };
 
 /** Fallback services, also used when Sanity has none. */
@@ -60,8 +78,11 @@ export async function getServicesPageData(): Promise<ServicesPageData> {
       {},
       { next: { revalidate: 60 } }
     );
+    const page = { ...DEFAULT_SERVICES_PAGE, ...withoutEmpty(data?.page) };
+    // An empty list in Sanity means "not written yet": keep the placeholder points
+    const whyPoints = (data?.page?.whyPoints ?? []).filter((p) => p?.title);
     return {
-      page: { ...DEFAULT_SERVICES_PAGE, ...withoutEmpty(data?.page) },
+      page: { ...page, whyPoints: whyPoints.length ? whyPoints : DEFAULT_SERVICES_PAGE.whyPoints },
       services: data?.services?.length ? data.services : DEFAULT_SERVICES,
     };
   } catch (error) {

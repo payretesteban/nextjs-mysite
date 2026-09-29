@@ -44,7 +44,9 @@ export const servicesPageQuery = defineQuery(`{
     title,
     intro,
     ctaTitle,
-    ctaText
+    ctaText,
+    whyTitle,
+    whyPoints[] { _key, title, text }
   },
   "services": *[_type == "service" && defined(title)] | order(coalesce(order, 999) asc, title asc) {
     _id,
@@ -78,6 +80,19 @@ export const allPostsQuery = defineQuery(`
 `);
 
 /** Site log entries in their set order, for the homepage notes and the /site-log page. */
+/** Texts and booking link for the free consultation (homepage block and services page section). */
+export const consultationQuery = defineQuery(`
+  *[_type == "consultation"][0] {
+    homeHeading,
+    homeText,
+    title,
+    text,
+    buttonLabel,
+    servicesLinkLabel,
+    bookingUrl
+  }
+`);
+
 /** Experiments for the homepage's "The Lab" section, in their set order. */
 export const labItemsQuery = defineQuery(`
   *[_type == "labItem" && defined(title) && defined(href)] | order(order asc, _createdAt asc) {

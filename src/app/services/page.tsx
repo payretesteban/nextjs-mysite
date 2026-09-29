@@ -3,6 +3,9 @@ import { Animated } from "@/lib/animations";
 import { getServicesPageData } from "@/lib/services";
 import ServiceList from "./ServiceList";
 import ServicesCta from "./ServicesCta";
+import WhyMe from "./WhyMe";
+import ConsultationSection from "./ConsultationSection";
+import { getConsultation } from "@/lib/consultation";
 
 // Content edits in Sanity show up within a minute
 export const revalidate = 60;
@@ -13,9 +16,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: page.title, description: page.intro ?? undefined };
 }
 
-/** /services page: title, intro, the list of services and a call to action. */
+/**
+ * /services page, in this order: what I can help with (title and intro), the services, the free
+ * consultation, why work with me, and the closing call to action.
+ */
 export default async function ServicesPage() {
-  const { page, services } = await getServicesPageData();
+  const [{ page, services }, consultation] = await Promise.all([getServicesPageData(), getConsultation()]);
 
   return (
     <div className="container mx-auto min-h-screen max-w-3xl p-8">
@@ -27,6 +33,8 @@ export default async function ServicesPage() {
       </section>
 
       <ServiceList services={services} />
+      <ConsultationSection consultation={consultation} />
+      <WhyMe title={page.whyTitle} points={page.whyPoints ?? []} />
       <ServicesCta title={page.ctaTitle} text={page.ctaText} />
     </div>
   );

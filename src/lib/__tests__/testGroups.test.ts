@@ -27,6 +27,8 @@ describe("Grouping tests by part of the site", () => {
       ["src/app/_home/__tests__/HomePage.test.tsx", "Homepage"],
       ["src/app/_home/__tests__/LabStrip.test.tsx", "Homepage"],
       ["src/lib/__tests__/lab.test.ts", "Homepage"],
+      ["src/lib/__tests__/consultation.test.ts", "Services"],
+      ["src/app/consultation/__tests__/BookButton.test.tsx", "Services"],
       ["src/app/[slug]/__tests__/page.test.tsx", "Posts"],
       ["src/app/posts/__tests__/page.test.tsx", "Posts"],
       ["src/app/api/contact/__tests__/route.test.ts", "Contact form"],

@@ -17,6 +17,13 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.6.0 — 2026-09-29
+
+- Free 30-minute technical consultation: a short invitation right after the homepage intro ("Book a Free Consultation" and "Explore My Services"), and its own section on the Services page.
+- The booking button opens a Cal.com calendar as a popup on the site (Cal.com emails the invite to both people); other scheduling links open in a new tab, and without a link it opens the contact form.
+- Services page: new "Why work with me" section. Page order: intro, services, free consultation, why work with me, contact banner.
+- All texts and the booking link are edited in Sanity ("Free consultation" and the "Services page" document).
+
 ## 1.5.3 — 2026-09-28
 
 - Read & Listen: when Google's model is overloaded ("high demand") or too slow, the page now tries a backup model (`gemini-3.1-flash-lite`, configurable with `GEMINI_FALLBACK_MODELS`) before falling back to the built-in library.

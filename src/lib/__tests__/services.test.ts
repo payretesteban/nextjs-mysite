@@ -23,6 +23,19 @@ describe("Loading services from Sanity", () => {
     expect(data.page).toEqual({ ...DEFAULT_SERVICES_PAGE, title: "What I do", intro: "Intro text" });
   });
 
+  it("uses the “Why work with me” points from Sanity, or the placeholders while there are none", async () => {
+    fetchMock.mockResolvedValueOnce({
+      page: { whyTitle: "Why me", whyPoints: [{ _key: "a", title: "Fast", text: "Quick turnaround." }, { _key: "b", title: "" }] },
+      services: [],
+    });
+    const data = await getServicesPageData();
+    expect(data.page.whyTitle).toBe("Why me");
+    expect(data.page.whyPoints).toEqual([{ _key: "a", title: "Fast", text: "Quick turnaround." }]);
+
+    fetchMock.mockResolvedValueOnce({ page: { whyPoints: [] }, services: [] });
+    expect((await getServicesPageData()).page.whyPoints).toEqual(DEFAULT_SERVICES_PAGE.whyPoints);
+  });
+
   it("uses the default services until they exist in Sanity", async () => {
     fetchMock.mockResolvedValueOnce({ page: null, services: [] });
     const data = await getServicesPageData();

@@ -2,27 +2,26 @@ import { PortableText } from "@portabletext/react";
 import { getIndexPageData } from "@/lib/data";
 import { urlFor } from "@/lib/image";
 import AnimatedHeadline from "@/lib/animations";
-import ContactButton from "./contact/ContactButton";
-import ServicesTicker from "./services/ServicesTicker";
-import { getServicesPageData } from "@/lib/services";
 import { getSiteLog } from "@/lib/siteLog";
 import HomePosts from "./_home/HomePosts";
 import SiteLogNotes from "./_home/SiteLogNotes";
 import TheLab from "./_home/TheLab";
+import HomeConsultation from "./_home/HomeConsultation";
+import { getConsultation } from "@/lib/consultation";
 import { getLabItems, getLabTestStats } from "@/lib/lab";
 
 /** How many posts the homepage shows before "See all posts". */
 const HOME_POST_LIMIT = 5;
 
 /**
- * The homepage: profile, bio, contact button and services ticker, The Lab (the site's experiments), the
- * latest posts and the site log notes.
+ * The homepage: profile and bio, the free consultation invitation (book, or explore services), The Lab
+ * (the site's experiments), the latest posts and the site log notes.
  * Data loads in parallel; each loader caches for 30-60 seconds, so Sanity edits appear without a redeploy.
  */
 export default async function IndexPage() {
-  const [{ posts, postCount, profile }, { services }, siteLog, labItems, labTests] = await Promise.all([
+  const [{ posts, postCount, profile }, consultation, siteLog, labItems, labTests] = await Promise.all([
     getIndexPageData(),
-    getServicesPageData(),
+    getConsultation(),
     getSiteLog(),
     getLabItems(),
     getLabTestStats(),
@@ -54,10 +53,8 @@ export default async function IndexPage() {
           <div className="prose prose-slate mt-5 max-w-2xl">
             <PortableText value={profile.bio} />
           </div>
-          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <ContactButton />
-            <ServicesTicker names={services.map((s) => s.shortTitle || s.title)} />
-          </div>
+          {/* Two next steps: book a free call now, or look at the services first */}
+          <HomeConsultation consultation={consultation} />
         </section>
       )}
 
