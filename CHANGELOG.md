@@ -17,6 +17,13 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.8.0 — 2026-09-29
+
+- Fun mode rebuilt: "Some fun" now plays six named, site-wide effects in a shuffled order that never repeats back to back: Confetti (bursts from the logo), Scuba (bubbles and an ocean tint), Skydive (the page drops in while a parachutist drifts by), Retro (the whole site as the game's green screen), Wave (title letters ripple) and Party (rainbow headings).
+- Secret "Deep Drop mode": type ↑↑↓↓←→←→EP anywhere to watch the site logo fall into the water and sink.
+- The header pill shows the effect's name and seconds left, with Next and Stop buttons; screen readers hear which effect started.
+- Calm versions for visitors who prefer reduced motion; the countdown pauses in background tabs, and the animation code only loads the first time it's needed.
+
 ## 1.7.0 — 2026-09-29
 
 - New Project Scoping Assistant (`/scope`): seven quick questions and an optional note, then a project snapshot with size (S–XL), a week range, timeline fit, phases, "What moves the estimate", top risks, first steps and a suggested approach.

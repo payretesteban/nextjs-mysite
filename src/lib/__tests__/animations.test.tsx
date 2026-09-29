@@ -45,7 +45,12 @@ describe("Animated page titles", () => {
         <Animated>My post</Animated>
       </AnimationProvider>
     );
-    fireEvent.click(screen.getByText("Fun"));
-    expect(screen.getByText("My post").className).toMatch(/animate-(bounce|spin|pulse|ping|wiggle)/);
+    // Wave is the only effect that changes the text itself: keep asking until it comes up (6 in a round)
+    for (let i = 0; i < 6 && !document.querySelector(".fun-wave"); i++) fireEvent.click(screen.getByText("Fun"));
+    const title = document.querySelector(".fun-wave")!;
+    expect(title).not.toBeNull();
+    // One span per letter (hidden from screen readers) plus the full text for them
+    expect(title.querySelectorAll('[aria-hidden="true"]')).toHaveLength("My post".length);
+    expect(title.querySelector(".sr-only")).toHaveTextContent("My post");
   });
 });

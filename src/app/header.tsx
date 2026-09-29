@@ -49,14 +49,14 @@ export default function Header({
   const hydrated = useHydrated();
   // Pathname used for rendering: null until hydrated so server and client markup match
   const currentPath = hydrated ? pathname : null;
-  const { getNextAnimation, animationClass, timeLeft } = useAnimation();
+  const { getNextAnimation, effect, timeLeft, stop, reducedMotion, secretFound } = useAnimation();
   const contact = useContact();
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const shortcut = useShortcutLabel();
   const [prevPathname, setPrevPathname] = useState(pathname);
 
-  const animationsRunning = animationClass !== "";
+  const animationsRunning = effect !== null;
 
   // Close the menu when the route changes (adjusting state during render, no effect needed)
   if (prevPathname !== pathname) {
@@ -108,7 +108,7 @@ export default function Header({
       if (link.class?.includes("funky")) {
         result.push({
           id: link._id,
-          label: animationsRunning ? `More Fun (${timeLeft}s)` : link.title,
+          label: animationsRunning && effect ? `Next effect (${effect.name} · ${timeLeft}s)` : link.title,
           group: "Actions",
           icon: "sparkles",
           keywords: `${link.title} fun animation party`,
@@ -151,7 +151,7 @@ export default function Header({
       }
     }
     return result;
-  }, [links, currentPath, animationsRunning, timeLeft, getNextAnimation, copied, contact]);
+  }, [links, currentPath, animationsRunning, effect, timeLeft, getNextAnimation, copied, contact]);
 
   // Reset the "Copied" label whenever the menu closes
   const onOpenChange = useCallback((o: boolean) => {
@@ -184,16 +184,47 @@ export default function Header({
 
         <span className="flex-1" />
 
-        {animationsRunning && (
-          <button
-            type="button"
-            onClick={getNextAnimation}
-            aria-label={`Fun mode: ${timeLeft} seconds left. Try another animation`}
-            className="funky inline-flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-xs tabular-nums"
+        {/* Fun mode pill: which effect is playing, seconds left, Next and Stop */}
+        {effect && (
+          <span className="funky inline-flex shrink-0 items-center gap-1 rounded-full py-1 pr-1 pl-3 text-xs tabular-nums">
+            <span aria-hidden="true">{effect.emoji}</span>
+            <span className="hidden sm:inline">
+              {effect.name}
+              {reducedMotion && " (calm)"}
+            </span>
+            <span aria-hidden="true" className="hidden sm:inline">·</span>
+            <span>{timeLeft}s</span>
+            <button
+              type="button"
+              onClick={getNextAnimation}
+              aria-label={`Fun mode: ${effect.name}, ${timeLeft} seconds left. Next effect`}
+              className="ml-1 rounded-full border border-slate-200 bg-white px-2 py-0.5 font-semibold text-slate-800 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600"
+            >
+              Next ›
+            </button>
+            <button
+              type="button"
+              onClick={stop}
+              aria-label="Stop fun mode"
+              className="rounded-full border border-slate-200 bg-white px-1.5 py-0.5 font-semibold text-slate-800 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600"
+            >
+              ✕
+            </button>
+          </span>
+        )}
+        {/* Announces each new effect once (not every second) */}
+        <span className="sr-only" aria-live="polite">
+          {effect ? `Fun mode: ${effect.name}${reducedMotion ? ", calm version" : ""}` : ""}
+        </span>
+        {secretFound && (
+          <span
+            role="status"
+            className="fixed top-16 left-1/2 z-[70] inline-flex -translate-x-1/2 items-center gap-2 rounded-xl bg-slate-900 px-3.5 py-2.5 text-sm text-white shadow-xl"
           >
-            <Icon name="sparkles" className="h-3.5 w-3.5" />
-            {timeLeft}s
-          </button>
+            <span aria-hidden="true">🕹️</span>
+            Secret unlocked: <b>Deep Drop mode</b>
+            <kbd className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[11px]">↑↑↓↓←→←→EP</kbd>
+          </span>
         )}
 
         <button

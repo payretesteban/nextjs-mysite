@@ -113,7 +113,13 @@ describe("Header and ⌘K menu", () => {
     const funkyBtn = screen.getByText("Funky Mode");
     fireEvent.click(funkyBtn);
 
-    expect(screen.getByText(/More Fun \(10s\)/)).toBeInTheDocument();
+    expect(screen.getByText(/Next effect \(.+ · \d+s\)/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Fun mode: .+ seconds left\. Next effect$/ })).toBeInTheDocument();
+
+    // Stop ends fun mode and removes the pill
+    fireEvent.click(screen.getByRole("button", { name: "Stop fun mode" }));
+    expect(screen.queryByRole("button", { name: /Next effect$/ })).not.toBeInTheDocument();
+    expect(screen.getByText("Funky Mode")).toBeInTheDocument();
   });
 
   it("shows only the logo, linking home with an accessible name", () => {
@@ -169,8 +175,8 @@ describe("Header and ⌘K menu", () => {
     fireEvent.change(input, { target: { value: "funky" } });
     fireEvent.keyDown(input, { key: "Enter" });
 
-    expect(screen.getByText(/More Fun \(10s\)/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /fun mode: 10 seconds left/i })).toBeInTheDocument();
+    expect(screen.getByText(/Next effect \(.+ · \d+s\)/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /fun mode: .+ seconds left/i })).toBeInTheDocument();
   });
 
   it("copies the email address", async () => {

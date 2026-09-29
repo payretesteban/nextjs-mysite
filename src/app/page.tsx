@@ -1,7 +1,7 @@
 import { PortableText } from "@portabletext/react";
 import { getIndexPageData } from "@/lib/data";
 import { urlFor } from "@/lib/image";
-import AnimatedHeadline from "@/lib/animations";
+import AnimatedHeadline, { Animated } from "@/lib/animations";
 import { getSiteLog } from "@/lib/siteLog";
 import HomePosts from "./_home/HomePosts";
 import SiteLogNotes from "./_home/SiteLogNotes";
@@ -46,7 +46,9 @@ export default async function IndexPage() {
               />
             )}
             <div className="min-w-0">
-              <h1 className="text-3xl font-bold sm:text-4xl">{profile.name}</h1>
+              <h1 className="text-3xl font-bold sm:text-4xl">
+                <Animated>{profile.name}</Animated>
+              </h1>
               <AnimatedHeadline headline={profile.headline} className="mt-0.5 text-lg sm:text-xl" />
             </div>
           </div>
