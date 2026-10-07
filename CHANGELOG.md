@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.9.2 — 2026-10-07
+
+- More tests: test coverage is back above 90% (about 96% of lines, 326 tests), now including the fun mode animations, the AI Cost Case page, more contact form cases, every page's intro, the ⌘K menu's keyboard controls and the build step that saves the test results.
+
 ## 1.9.1 — 2026-10-07
 
 - AI Cost Case: the page label now reads "AI cost case" instead of "Demo case".

@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { normalizeCoverage, normalizeReport, runVitest } from "../capture-test-results.mjs";
+import { main, normalizeCoverage, normalizeReport, runVitest } from "../capture-test-results.mjs";
 
 const cwd = "/Users/me/site";
 
@@ -66,6 +66,29 @@ describe("Turning raw results into this report", () => {
   });
 });
 
+describe("Turning unusual results into this report", () => {
+  it("shortens very long failure messages and keeps to-do tests apart", () => {
+    const result = normalizeReport({
+      success: false,
+      testResults: [
+        {
+          name: `${cwd}/src/c.test.ts`,
+          status: "failed",
+          assertionResults: [
+            { ancestorTitles: [], title: "huge", status: "failed", failureMessages: ["x".repeat(5000)] },
+            { ancestorTitles: [], title: "someday", status: "todo", failureMessages: [] },
+          ],
+        },
+      ],
+    }, { cwd, source: "snapshot" });
+    const [huge, someday] = result.files[0].tests;
+    expect(huge.failureMessages[0].length).toBeLessThan(2100);
+    expect(huge.failureMessages[0].endsWith("…")).toBe(true);
+    expect(someday.status).toBe("todo");
+    expect(result.summary.skipped).toBe(1);
+  });
+});
+
 describe("Running the suite for this report", () => {
   // A stand-in for Vitest: writes (or doesn't write) a JSON report to --outputFile
   async function fakeProject(script: string) {
@@ -121,6 +144,76 @@ describe("Running the suite for this report", () => {
 
   it("says so when Vitest isn't installed", async () => {
     await expect(runVitest({ cwd: os.tmpdir() })).rejects.toThrow(/not installed/);
+  });
+
+  it("gives up when Vitest takes too long", async () => {
+    const dir = await fakeProject(`setInterval(() => {}, 1000);`);
+    try {
+      await expect(runVitest({ cwd: dir, timeoutMs: 300 })).rejects.toThrow("Vitest timed out after 0.3s");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("Saving the report during the build", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("writes the results file and prints a one-line summary", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "fake-vitest-"));
+    await mkdir(path.join(dir, "node_modules", "vitest"), { recursive: true });
+    await writeFile(
+      path.join(dir, "node_modules", "vitest", "vitest.mjs"),
+      `import { writeFileSync } from "node:fs";
+       const out = process.argv.find((a) => a.startsWith("--outputFile=")).split("=")[1];
+       writeFileSync(out, JSON.stringify({ success: true, testResults: [
+         { name: process.cwd() + "/src/a.test.ts", status: "passed", assertionResults: [{ ancestorTitles: [], title: "ok", status: "passed", duration: 1, failureMessages: [] }] },
+       ] }));`
+    );
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    try {
+      await main(["--out", "out/results.json", "--source", "live"], { cwd: dir });
+      const saved = JSON.parse(await readFile(path.join(dir, "out", "results.json"), "utf8"));
+      expect(saved).toMatchObject({ source: "live", success: true, summary: { passed: 1, total: 1 } });
+      expect(log).toHaveBeenCalledWith(expect.stringMatching(/^\[tests\] 1\/1 passed, 0 failed → out\/results\.json$/));
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("mentions coverage in the summary when it was measured", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "fake-vitest-"));
+    await mkdir(path.join(dir, "node_modules", "vitest"), { recursive: true });
+    await mkdir(path.join(dir, "node_modules", "@vitest", "coverage-v8"), { recursive: true });
+    await writeFile(
+      path.join(dir, "node_modules", "vitest", "vitest.mjs"),
+      `import { mkdirSync, writeFileSync } from "node:fs";
+       const arg = (name) => process.argv.find((a) => a.startsWith(name + "="))?.split("=")[1];
+       writeFileSync(arg("--outputFile"), JSON.stringify({ success: true, testResults: [] }));
+       mkdirSync(arg("--coverage.reportsDirectory"), { recursive: true });
+       const t = (pct) => ({ pct });
+       writeFileSync(arg("--coverage.reportsDirectory") + "/coverage-summary.json", JSON.stringify({ total: { lines: t(95.2), statements: t(94), functions: t(93), branches: t(85) } }));`
+    );
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    try {
+      await main(["--out", "r.json"], { cwd: dir });
+      expect(log).toHaveBeenCalledWith(expect.stringContaining("95.2% of lines covered"));
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("saves the error instead of failing the build when the tests can't run", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "no-vitest-"));
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      await main([], { cwd: dir });
+      const saved = JSON.parse(await readFile(path.join(dir, "public", "test-results.json"), "utf8"));
+      expect(saved).toMatchObject({ source: "snapshot", error: expect.stringMatching(/not installed/) });
+      expect(warn).toHaveBeenCalledWith(expect.stringMatching(/Could not capture test results/));
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 });
 

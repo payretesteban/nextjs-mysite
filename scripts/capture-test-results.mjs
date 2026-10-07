@@ -189,20 +189,21 @@ export async function runVitest({ cwd = process.cwd(), source = "snapshot", time
 /**
  * CLI entry point: runs the suite and writes the JSON file. Records errors in the file instead of
  * throwing, so the build never fails because of it.
+ * @param {string[]} [args] - Command-line arguments (`--out <file>`, `--source live|snapshot`).
+ * @param {{ cwd?: string }} [options] - Project root (the tests pass a fake project).
  * @returns {Promise<void>}
  */
-async function main() {
-  const args = process.argv.slice(2);
+export async function main(args = process.argv.slice(2), { cwd = process.cwd() } = {}) {
   const arg = (name, fallback) => {
     const i = args.indexOf(name);
     return i >= 0 && args[i + 1] ? args[i + 1] : fallback;
   };
-  const out = path.resolve(arg("--out", "public/test-results.json"));
+  const out = path.resolve(cwd, arg("--out", "public/test-results.json"));
   const source = arg("--source", "snapshot");
 
   let result;
   try {
-    result = await runVitest({ source });
+    result = await runVitest({ cwd, source });
   } catch (error) {
     result = { source, ranAt: new Date().toISOString(), error: String(error?.message ?? error) };
   }
@@ -213,7 +214,7 @@ async function main() {
   else {
     const s = result.summary;
     const cov = result.coverage ? `, ${result.coverage.lines}% of lines covered` : "";
-    console.log(`[tests] ${s.passed}/${s.total} passed, ${s.failed} failed${cov} → ${path.relative(process.cwd(), out)}`);
+    console.log(`[tests] ${s.passed}/${s.total} passed, ${s.failed} failed${cov} → ${path.relative(cwd, out)}`);
   }
 }
 
