@@ -14,6 +14,7 @@ The source code for my personal website, [estebanpayret.com](https://www.esteban
 | `/tests` | Runs this project's test suite and shows the results and code coverage |
 | `/adventure` | *The Deep Drop*, a small skydiving and cave-diving text adventure |
 | `/read-listen` | Read & Listen: short AI-written texts in two languages side by side, from A1 to C2, read aloud by the browser |
+| `/ai-cost-case` | AI Cost Case: a demo case study of a fictional company's AI agents, with a before/after flow diagram, where the money went, the redesign and a cost calculator |
 | `/scope` | Project Scoping Assistant: seven questions, then a rough size, week range, phases, what moves the estimate, risks and an AI-written summary |
 
 Other features: a ⌘K / Ctrl+K command menu, a site-wide "fun mode", a 404 page, a sitemap and robots.txt, and the site version in the footer.

@@ -17,6 +17,13 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.9.0 — 2026-10-07
+
+- New AI Cost Case (`/ai-cost-case`): a demo case study of a fictional company that wired AI agents between its CRM, CMS, marketing suite, store and help desk, and how a leaner design gets the same results for a fraction of the tokens and cost.
+- Interactive before/after flow diagram with moving data (pausable, still for reduced motion); select any box to see what it does and what it costs.
+- Where the money went, the four-step redesign, a box-by-box comparison, a sample weekly report, and a "Try your numbers" calculator that updates every number on the page; all assumptions are listed.
+- New "AI Cost Case" card in The Lab, ⌘K menu entry with its own icon, sitemap entry and an "AI cost case" area on the tests page.
+
 ## 1.8.0 — 2026-09-29
 
 - Fun mode rebuilt: "Some fun" now plays six named, site-wide effects in a shuffled order that never repeats back to back: Confetti (bursts from the logo), Scuba (bubbles and an ocean tint), Skydive (the page drops in while a parachutist drifts by), Retro (the whole site as the game's green screen), Wave (title letters ripple) and Party (rainbow headings).

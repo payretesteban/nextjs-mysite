@@ -72,10 +72,10 @@ describe("Homepage", () => {
 
     const lab = screen.getByRole("region", { name: "The Lab" });
     const cards = within(within(lab).getByRole("list", { name: "Experiments" })).getAllByRole("link");
-    expect(cards.map((c) => c.getAttribute("href"))).toEqual(["/scope", "/read-listen", "/adventure", "/performance", "/tests"]);
-    expect(cards[1]).toHaveTextContent(/Beta/);
-    expect(cards[4]).toHaveTextContent("208 passed");
-    expect(cards[4]).toHaveTextContent("90.6% coverage");
+    expect(cards.map((c) => c.getAttribute("href"))).toEqual(["/scope", "/ai-cost-case", "/read-listen", "/adventure", "/performance", "/tests"]);
+    expect(cards[2]).toHaveTextContent(/Beta/);
+    expect(cards[5]).toHaveTextContent("208 passed");
+    expect(cards[5]).toHaveTextContent("90.6% coverage");
     // Comes before the posts
     expect(lab.compareDocumentPosition(screen.getByRole("region", { name: "Posts" })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });

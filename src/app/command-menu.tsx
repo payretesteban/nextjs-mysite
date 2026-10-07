@@ -32,7 +32,8 @@ export type IconName =
   | "user"
   | "code"
   | "headphones"
-  | "ruler";
+  | "ruler"
+  | "flow";
 
 /** One entry in the command menu: a page link, an external link or an action. */
 export interface MenuItem {
@@ -63,6 +64,7 @@ export function isExternalUrl(url: string) {
 const PAGE_ICON_RULES: [RegExp, IconName][] = [
   [/listen|language/i, "headphones"],
   [/scop|estimat|plan my project/i, "ruler"],
+  [/ai-?cost|cost case|agent/i, "flow"],
   [/servic|consult|hire/i, "briefcase"],
   [/test|quality/i, "flask"],
   [/perform|speed|lighthouse/i, "gauge"],
@@ -374,6 +376,7 @@ const PATHS: Record<string, React.ReactNode> = {
   user: <><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></>,
   code: <path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" />,
   ruler: <><rect x="2.5" y="8" width="19" height="8" rx="1.5" /><path d="M6.5 8v3M10 8v4M13.5 8v3M17 8v4" /></>,
+  flow: <><rect x="2.5" y="3" width="6" height="5" rx="1.2" /><rect x="15.5" y="3" width="6" height="5" rx="1.2" /><rect x="9" y="16" width="6" height="5" rx="1.2" /><path d="M5.5 8v3h13V8M12 11v5" /></>,
   headphones: <><path d="M4 15v-3a8 8 0 0 1 16 0v3" /><rect x="3" y="14" width="4" height="6" rx="1.5" /><rect x="17" y="14" width="4" height="6" rx="1.5" /></>,
   linkedin: <><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7" /></>,
   github: <path d="M9 19c-4 1.5-4-2-6-2.5m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />,

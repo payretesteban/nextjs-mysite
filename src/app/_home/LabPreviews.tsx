@@ -12,6 +12,7 @@ export default function LabPreview({ kind, tests }: { kind: PreviewKind; tests: 
       {kind === "performance" && <PerformancePreview />}
       {kind === "tests" && <TestsPreview stats={tests} />}
       {kind === "scope" && <ScopePreview />}
+      {kind === "aiCost" && <AiCostPreview />}
       {kind === "generic" && <GenericPreview />}
     </div>
   );
@@ -79,6 +80,27 @@ function ScopePreview() {
         <span>Existing prototype</span>
         <span className="font-mono text-emerald-700 dark:text-emerald-400">−2 wk</span>
       </div>
+    </div>
+  );
+}
+
+/** Before vs after AI bill: a long rose bar and a tiny green one. */
+function AiCostPreview() {
+  return (
+    <div className="flex h-full flex-col justify-center gap-2 bg-slate-50 px-4 text-[10.5px] text-slate-700 dark:bg-slate-800/60 dark:text-slate-300">
+      <div className="flex items-center gap-2">
+        <span className="w-10">Before</span>
+        <span className="h-2.5 flex-1 rounded bg-rose-400" />
+        <span className="font-mono">$2,333</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="w-10">After</span>
+        <span className="flex-1">
+          <span className="block h-2.5 w-[4%] rounded bg-emerald-600" />
+        </span>
+        <span className="font-mono text-emerald-700 dark:text-emerald-400">$18</span>
+      </div>
+      <div className="font-mono text-[10px] text-slate-600 dark:text-slate-400">🤖 → ▤ + ✦ · −92% tokens</div>
     </div>
   );
 }

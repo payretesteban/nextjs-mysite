@@ -7,9 +7,9 @@ import type { TestRunResponse } from "./testResults";
  * Which preview a Lab card draws (small CSS/SVG pictures, no screenshots). "generic" is a plain
  * picture for experiments that don't have their own yet.
  */
-export type LabPreview = "game" | "readListen" | "performance" | "tests" | "scope" | "generic";
+export type LabPreview = "game" | "readListen" | "performance" | "tests" | "scope" | "aiCost" | "generic";
 
-const PREVIEWS: LabPreview[] = ["game", "readListen", "performance", "tests", "scope", "generic"];
+const PREVIEWS: LabPreview[] = ["game", "readListen", "performance", "tests", "scope", "aiCost", "generic"];
 
 /** One experiment shown in the homepage's "The Lab" section (edited in Sanity as "Lab experiment"). */
 export interface LabItem {
@@ -38,6 +38,16 @@ export const DEFAULT_LAB_ITEMS: LabItem[] = [
     tech: ["Rule engine", "Gemini API"],
     status: "live",
     preview: "scope",
+  },
+  {
+    _id: "lab-ai-cost",
+    href: "/ai-cost-case",
+    title: "AI Cost Case",
+    blurb: "A demo company's AI agents, redesigned for a fraction of the cost.",
+    question: "What if AI only did the work that needs judgment?",
+    tech: ["Cost model", "SVG"],
+    status: "live",
+    preview: "aiCost",
   },
   {
     _id: "lab-read-listen",
