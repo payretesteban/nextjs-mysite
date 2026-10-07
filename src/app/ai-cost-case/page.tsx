@@ -13,7 +13,7 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "AI Cost Case: From Agent Sprawl to a Lean AI Flow",
   description:
-    "A demo case: a fictional company wired AI agents between its CRM, CMS, marketing suite, store and help desk. See where the tokens went and how a leaner design gets the same results for a fraction of the cost.",
+    "AI cost case: a fictional company wired AI agents between its CRM, CMS, marketing suite, store and help desk. See where the tokens went and how a leaner design gets the same results for a fraction of the cost.",
 };
 
 const TOOLS = ["CRM", "CMS", "Marketing suite", "Store & billing", "Help desk"];
@@ -67,7 +67,7 @@ function Assumptions() {
 }
 
 /**
- * /ai-cost-case: a demo case study about optimizing a fictional company's AI tooling. Intro, the
+ * /ai-cost-case: an AI cost case study about optimizing a fictional company's AI tooling. Intro, the
  * interactive before/after diagram, where the money went, the redesign, a box-by-box table, a sample
  * report, the calculator and a consultation offer. All numbers come from `src/lib/aiCase/model.ts`.
  */
@@ -77,7 +77,7 @@ export default async function AiCostCasePage() {
     <div className="container mx-auto min-h-screen max-w-3xl p-8">
       <CaseProvider>
         <section className="mb-8">
-          <p className="font-mono text-xs font-semibold uppercase tracking-widest text-sky-700 dark:text-sky-400">Lab · Demo case</p>
+          <p className="font-mono text-xs font-semibold uppercase tracking-widest text-sky-700 dark:text-sky-400">Lab · AI cost case</p>
           <h1 className="mt-2 text-4xl font-bold">
             <Animated>Same results, a fraction of the AI bill</Animated>
           </h1>
@@ -170,7 +170,7 @@ export default async function AiCostCasePage() {
             In a free 30-minute call we can look at your tools and AI workflows and find where plain code, a smaller model or caching would do the job.
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-4">
-            <BookButton bookingUrl={consultation.bookingUrl} label={consultation.buttonLabel} notes="From the AI cost demo case: I'd like to review our AI workflows and costs." />
+            <BookButton bookingUrl={consultation.bookingUrl} label={consultation.buttonLabel} notes="From the AI cost case: I'd like to review our AI workflows and costs." />
             <Link
               href="/scope"
               className="text-sm font-semibold text-sky-800 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-sky-300"

@@ -99,35 +99,32 @@ export default function FlowExplorer() {
 
   return (
     <section aria-label="The company's AI flow, before and after">
-      <div className="flex flex-wrap items-center gap-3">
-        <div role="group" aria-label="Show the flow" className="inline-flex rounded-full bg-slate-100 p-1 text-sm font-semibold dark:bg-slate-800">
-          {(["before", "after"] as const).map((m) => (
+      {/* Big Before/After switch: the main control on the page */}
+      <div role="group" aria-label="Show the flow" className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1.5 dark:bg-slate-800">
+        {(["before", "after"] as const).map((m) => {
+          const on = mode === m;
+          return (
             <button
               key={m}
               type="button"
-              aria-pressed={mode === m}
+              aria-pressed={on}
               onClick={() => show(m)}
-              className={`rounded-full px-4 py-1.5 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
-                mode === m
+              className={`flex flex-col items-center rounded-xl px-3 py-3 text-center transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 sm:py-4 ${
+                on
                   ? m === "before"
-                    ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
-                    : "bg-emerald-700 text-white"
-                  : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                    ? "bg-rose-700 text-white shadow-md"
+                    : "bg-emerald-700 text-white shadow-md"
+                  : "bg-white text-slate-700 ring-1 ring-slate-200 hover:ring-slate-400 dark:bg-slate-900 dark:text-slate-200 dark:ring-slate-700 dark:hover:ring-slate-500"
               }`}
             >
-              {m === "before" ? "Before · agents everywhere" : "After · lean flow"}
+              <span className="text-lg font-bold sm:text-xl">
+                <span aria-hidden="true">{m === "before" ? "🤖 " : "✦ "}</span>
+                {m === "before" ? "Before" : "After"}
+              </span>
+              <span className={`text-xs sm:text-sm ${on ? "text-white/90" : "text-slate-600 dark:text-slate-400"}`}>{m === "before" ? "AI agents everywhere" : "The lean AI flow"}</span>
             </button>
-          ))}
-        </div>
-        {!reducedMotion && (
-          <button
-            type="button"
-            onClick={togglePause}
-            className="rounded-full px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-slate-300 dark:hover:text-white"
-          >
-            {paused ? "▶ Play the data" : "❚❚ Pause the data"}
-          </button>
-        )}
+          );
+        })}
       </div>
 
       {/* The diagram: lines and moving dots in SVG, boxes as buttons on top */}
@@ -164,7 +161,18 @@ export default function FlowExplorer() {
           </button>
         ))}
       </div>
-      <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">Select any box to see what it does.</p>
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs text-slate-600 dark:text-slate-400">Select any box to see what it does.</p>
+        {!reducedMotion && (
+          <button
+            type="button"
+            onClick={togglePause}
+            className="rounded-full px-2 py-1 text-xs text-slate-600 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-slate-300 dark:hover:text-white"
+          >
+            {paused ? "▶ Play the data" : "❚❚ Pause the data"}
+          </button>
+        )}
+      </div>
 
       {/* What the selected box does */}
       <div aria-live="polite" className="mt-3 rounded-xl bg-slate-900 p-4 text-sm leading-relaxed text-slate-200 dark:bg-slate-800">

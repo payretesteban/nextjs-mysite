@@ -17,6 +17,11 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.9.1 — 2026-10-07
+
+- AI Cost Case: the page label now reads "AI cost case" instead of "Demo case".
+- Bigger, clearer Before/After switch at the top of the AI Cost Case page; the pause button moved under the diagram.
+
 ## 1.9.0 — 2026-10-07
 
 - New AI Cost Case (`/ai-cost-case`): a demo case study of a fictional company that wired AI agents between its CRM, CMS, marketing suite, store and help desk, and how a leaner design gets the same results for a fraction of the tokens and cost.
