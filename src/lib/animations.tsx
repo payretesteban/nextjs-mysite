@@ -37,7 +37,7 @@ export default function AnimatedHeadline({
   const wave = animationClass === "fun-wave";
 
   return (
-    <p key={animationClass} className={`text-slate-600 ${className} ${animationClass}`.trim()}>
+    <p key={animationClass} className={`text-slate-600 dark:text-slate-400 ${className} ${animationClass}`.trim()}>
       {wave ? <Letters>{headline}</Letters> : headline}
     </p>
   );

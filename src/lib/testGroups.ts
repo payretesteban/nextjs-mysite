@@ -23,6 +23,7 @@ export const TEST_AREAS: TestArea[] = [
   { key: "seo", label: "SEO", description: "Sitemap, robots.txt, page titles and descriptions", match: /robots|sitemap|seo\.test/i },
   { key: "fun", label: "Fun mode", description: "The six effects, the secret code and the site-wide animations", match: /animation|lib\/fun\/|app\/fun\//i },
   { key: "readListen", label: "Read & Listen", description: "Texts in two languages, the AI route and read-aloud", match: /read-?listen/i },
+  { key: "readability", label: "Readability", description: "Text stays readable in light and dark mode", match: /darkMode|readability/i },
   { key: "tests", label: "This tests page", description: "Running the tests and building this report", match: /\/tests\/|capture-test-results|testGroups/ },
 ];
 

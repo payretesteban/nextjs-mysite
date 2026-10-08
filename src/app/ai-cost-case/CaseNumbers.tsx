@@ -55,7 +55,7 @@ export function ChangesTable() {
                 <td className="py-2.5 pr-3 text-slate-800 dark:text-slate-200">{WORKFLOW_CHANGES[b.id].after}</td>
                 <td className="whitespace-nowrap py-2.5 text-right font-mono text-xs tabular-nums">
                   <span className="text-rose-700 dark:text-rose-400">{b.inputTokens + b.outputTokens ? formatTokens(b.inputTokens + b.outputTokens) : "—"}</span>
-                  <span className="text-slate-500" aria-hidden="true"> → </span>
+                  <span className="text-slate-500 dark:text-slate-400" aria-hidden="true"> → </span>
                   <span className="sr-only"> to </span>
                   <span className="text-emerald-700 dark:text-emerald-400">{formatTokens(a.inputTokens + a.outputTokens)}</span>
                 </td>

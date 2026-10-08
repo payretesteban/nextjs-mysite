@@ -230,7 +230,7 @@ export default function CommandMenu({
         <button
           type="button"
           onClick={close}
-          className="shrink-0 rounded-md border border-slate-200 px-1.5 py-0.5 font-mono text-[11px] text-slate-500 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+          className="shrink-0 rounded-md border border-slate-200 px-1.5 py-0.5 font-mono text-[11px] text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
         >
           Esc
         </button>
@@ -238,7 +238,7 @@ export default function CommandMenu({
 
       <div id="command-menu-list" role="listbox" aria-label="Menu items" className="max-h-[min(70vh,560px)] overflow-y-auto p-2">
         {filtered.length === 0 && (
-          <p className="px-3 py-10 text-center text-sm text-slate-500">
+          <p className="px-3 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
             No results for &ldquo;{query}&rdquo;
           </p>
         )}
@@ -332,7 +332,7 @@ export default function CommandMenu({
         })}
       </div>
 
-      <div className="hidden items-center gap-4 border-t border-slate-100 px-4 py-2.5 text-xs text-slate-400 sm:flex dark:border-slate-800">
+      <div className="hidden items-center gap-4 border-t border-slate-100 px-4 py-2.5 text-xs text-slate-500 sm:flex dark:border-slate-800 dark:text-slate-400">
         <span><Kbd>↑</Kbd> <Kbd>↓</Kbd> to navigate</span>
         <span><Kbd>↵</Kbd> to open</span>
         <span><Kbd>esc</Kbd> to close</span>

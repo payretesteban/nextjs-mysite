@@ -233,7 +233,7 @@ export default function ContactProvider({ children }: { children: React.ReactNod
                     className={`rounded-lg px-3 py-2 font-medium transition-all ${
                       form.type === t.id
                         ? "bg-white text-slate-900 shadow-sm dark:bg-slate-950 dark:text-white"
-                        : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                        : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                     }`}
                   >
                     {t.label}

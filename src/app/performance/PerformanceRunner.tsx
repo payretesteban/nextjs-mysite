@@ -139,7 +139,7 @@ export default function PerformanceRunner({ url }: { url: string }) {
                 style={{ width: `${Math.min(95, (1 - Math.exp(-secs / 14)) * 100)}%` }}
               />
             </div>
-            <p className="mt-3 text-xs text-slate-500">This usually takes 15–40 seconds.</p>
+            <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">This usually takes 15–40 seconds.</p>
           </div>
         )}
 
@@ -154,7 +154,7 @@ export default function PerformanceRunner({ url }: { url: string }) {
       </div>
 
       {!data && !running && status !== "error" && (
-        <p className="mt-6 text-sm text-slate-500">
+        <p className="mt-6 text-sm text-slate-500 dark:text-slate-400">
           Tests <span className="font-mono text-slate-700 dark:text-slate-300">{url}</span> — results are shared and
           cached for up to 10 minutes.
         </p>
@@ -170,7 +170,7 @@ function Report({ data }: { data: PerformanceResponse }) {
   const { result, cached } = data;
   return (
     <div className="mt-10">
-      <div className="animate-fade-up flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+      <div className="animate-fade-up flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
         <span className="capitalize">{result.strategy}</span>
         <span aria-hidden="true">·</span>
         <span>{formatDate(result.fetchTime)}</span>
@@ -196,7 +196,7 @@ function Report({ data }: { data: PerformanceResponse }) {
           <Gauge key={c.id} category={c} delay={i * 80} />
         ))}
       </div>
-      <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-slate-500">
+      <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
         <Legend rating="poor" range="0–49" />
         <Legend rating="average" range="50–89" />
         <Legend rating="good" range="90–100" />
@@ -205,7 +205,7 @@ function Report({ data }: { data: PerformanceResponse }) {
       {/* Lab metrics + screenshot */}
       <section className="mt-10">
         <h2 className="text-xl font-semibold">Core metrics</h2>
-        <p className="mt-1 text-sm text-slate-500">From a single simulated visit. Hover a metric to learn what it means.</p>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">From a single simulated visit. Hover a metric to learn what it means.</p>
         <div className="mt-4 flex flex-col gap-4 sm:flex-row">
           <dl className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
             {result.metrics.map((m, i) => (
@@ -233,7 +233,7 @@ function Report({ data }: { data: PerformanceResponse }) {
         <h2 className="text-xl font-semibold">Real visitors</h2>
         {result.field ? (
           <>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Chrome users over the last 28 days ·{" "}
               <span className={RATING[result.field.overall].text}>{RATING[result.field.overall].label}</span>
             </p>
@@ -244,7 +244,7 @@ function Report({ data }: { data: PerformanceResponse }) {
             </div>
           </>
         ) : (
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Chrome doesn&apos;t have enough real-visitor data for this site yet, so the scores above come from a
             simulated visit only.
           </p>
@@ -275,7 +275,7 @@ function Report({ data }: { data: PerformanceResponse }) {
         </div>
       )}
 
-      <p className="mt-10 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-slate-200 pt-5 text-sm text-slate-500 dark:border-slate-800">
+      <p className="mt-10 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-slate-200 pt-5 text-sm text-slate-500 dark:text-slate-400 dark:border-slate-800">
         Scores can shift a few points between runs.
         <a href={result.reportUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-slate-900 underline-offset-4 hover:underline dark:text-white">
           Open the full report on PageSpeed Insights ↗
@@ -343,7 +343,7 @@ function Metric({ metric, delay }: { metric: MetricResult; delay: number }) {
       style={{ animationDelay: `${delay}ms` }}
       title={metric.description}
     >
-      <dt className="flex items-center gap-2 text-xs font-medium text-slate-500">
+      <dt className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
         <span className={`h-2 w-2 shrink-0 rounded-full ${RATING[metric.rating].fill}`} aria-label={RATING[metric.rating].label} />
         {metric.title}
       </dt>
@@ -356,7 +356,7 @@ function Metric({ metric, delay }: { metric: MetricResult; delay: number }) {
 function FieldCard({ metric }: { metric: FieldMetric }) {
   return (
     <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-      <p className="text-xs font-medium text-slate-500">{metric.title}</p>
+      <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{metric.title}</p>
       <p className={`mt-1 font-mono text-xl font-semibold tabular-nums ${RATING[metric.rating].text}`}>{metric.displayValue}</p>
       <p className={`text-xs ${RATING[metric.rating].text}`}>{RATING[metric.rating].label}</p>
     </div>
@@ -373,7 +373,7 @@ function OpportunityRow({ item, delay }: { item: Opportunity; delay: number }) {
           <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
             <p className="font-medium text-slate-900 dark:text-slate-100">{item.title}</p>
             {(item.savings || item.displayValue) && (
-              <span className="shrink-0 font-mono text-xs text-slate-500">
+              <span className="shrink-0 font-mono text-xs text-slate-500 dark:text-slate-400">
                 {item.savings ? `Save ~${item.savings}` : item.displayValue}
               </span>
             )}

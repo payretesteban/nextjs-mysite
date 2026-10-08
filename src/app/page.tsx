@@ -52,7 +52,7 @@ export default async function IndexPage() {
               <AnimatedHeadline headline={profile.headline} className="mt-0.5 text-lg sm:text-xl" />
             </div>
           </div>
-          <div className="prose prose-slate mt-5 max-w-2xl">
+          <div className="prose prose-slate mt-5 max-w-2xl dark:prose-invert">
             <PortableText value={profile.bio} />
           </div>
           {/* Two next steps: book a free call now, or look at the services first */}

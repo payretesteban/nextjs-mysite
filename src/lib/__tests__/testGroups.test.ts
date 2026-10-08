@@ -32,6 +32,7 @@ describe("Grouping tests by part of the site", () => {
       ["src/app/api/scope-summary/__tests__/route.test.ts", "Project scoping"],
       ["src/app/scope/__tests__/ScopeWizard.test.tsx", "Project scoping"],
       ["src/lib/aiCase/__tests__/model.test.ts", "AI cost case"],
+      ["src/lib/__tests__/darkMode.test.ts", "Readability"],
       ["src/app/ai-cost-case/__tests__/AiCostCase.test.tsx", "AI cost case"],
       ["src/app/consultation/__tests__/BookButton.test.tsx", "Services"],
       ["src/app/[slug]/__tests__/page.test.tsx", "Posts"],

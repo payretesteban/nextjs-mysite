@@ -112,7 +112,7 @@ export default function TestRunner({ mode }: { mode: Mode }) {
               ? "Run tests again"
               : "Run tests"}
         </button>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           {mode === "live"
             ? "Runs the suite live on this machine."
             : "Shows the results captured when this version of the site was built."}
@@ -208,8 +208,8 @@ function Results({ result }: { result: TestRunResult }) {
       {/* Stats */}
       <dl className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Passed" value={summary.passed} tone="text-emerald-600" delay={60} />
-        <Stat label="Failed" value={summary.failed} tone={summary.failed ? "text-rose-600" : "text-slate-500"} delay={120} />
-        <Stat label="Skipped" value={summary.skipped} tone={summary.skipped ? "text-amber-600" : "text-slate-500"} delay={180} />
+        <Stat label="Failed" value={summary.failed} tone={summary.failed ? "text-rose-600" : "text-slate-500 dark:text-slate-400"} delay={120} />
+        <Stat label="Skipped" value={summary.skipped} tone={summary.skipped ? "text-amber-600" : "text-slate-500 dark:text-slate-400"} delay={180} />
         {result.coverage ? (
           <CoverageStat pct={result.coverage.lines} delay={240} />
         ) : (
@@ -254,7 +254,7 @@ function Results({ result }: { result: TestRunResult }) {
           <AreaRow key={area.key} area={area} index={i} openByDefault={filter !== "all" || area.status === "failed"} />
         ))}
         {areas.length === 0 && (
-          <li className="p-8 text-center text-sm text-slate-500">Nothing to show for this filter.</li>
+          <li className="p-8 text-center text-sm text-slate-500 dark:text-slate-400">Nothing to show for this filter.</li>
         )}
       </ul>
     </>
@@ -270,7 +270,7 @@ function CoverageStat({ pct, delay }: { pct: number; delay: number }) {
       className="animate-fade-up rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Coverage</dt>
+      <dt className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Coverage</dt>
       <dd className={`mt-1 font-mono text-2xl font-semibold tabular-nums ${tone}`}>
         {pct}%<span className="sr-only"> of lines covered by tests</span>
       </dd>
@@ -288,7 +288,7 @@ function Stat({ label, value, tone, delay }: { label: string; value: number | st
       className="animate-fade-up rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</dt>
+      <dt className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</dt>
       <dd className={`mt-1 font-mono text-2xl font-semibold tabular-nums ${tone}`}>{value}</dd>
     </div>
   );
@@ -400,10 +400,10 @@ function TestRow({ test }: { test: TestCaseResult }) {
           )}
         </span>
         <p className="min-w-0 flex-1 text-sm text-slate-700 dark:text-slate-300">
-          {deeper.length > 0 && <span className="text-slate-500">{deeper.join(" › ")} › </span>}
+          {deeper.length > 0 && <span className="text-slate-500 dark:text-slate-400">{deeper.join(" › ")} › </span>}
           <span className="inline-block first-letter:uppercase">{test.name}</span>
         </p>
-        <span className="shrink-0 font-mono text-xs text-slate-500 tabular-nums">{formatDuration(test.durationMs)}</span>
+        <span className="shrink-0 font-mono text-xs text-slate-500 dark:text-slate-400 tabular-nums">{formatDuration(test.durationMs)}</span>
       </div>
       {test.failureMessages.map((msg, i) => (
         <pre

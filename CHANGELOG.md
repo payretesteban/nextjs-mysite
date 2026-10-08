@@ -17,6 +17,11 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.9.5 — 2026-10-08
+
+- Easier to read in dark mode: the homepage bio and headline, the grey notes on the Performance and Tests pages, the contact form toggle, Read & Listen's voice note and the ⌘K menu now use lighter text on the dark background (every page passes the contrast check in light and dark).
+- New "Readability" test that flags any faint grey text without a dark-mode colour, so this can't creep back in.
+
 ## 1.9.4 — 2026-10-08
 
 - Lab cards can show a screenshot uploaded in Sanity ("Card image", with crop and focus point) instead of the drawn picture, so experiments on other sites look like the real thing.

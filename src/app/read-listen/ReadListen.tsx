@@ -373,7 +373,7 @@ export default function ReadListen({ initial }: { initial: ReadListenText }) {
               <div className="mb-3 flex min-h-9 items-center justify-between gap-3">
                 <h2 className="text-xs font-semibold tracking-wider text-slate-600 uppercase dark:text-slate-400">{lang.name}</h2>
                 {noVoice ? (
-                  <span className="text-xs text-slate-500">No {lang.name} voice on this device</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">No {lang.name} voice on this device</span>
                 ) : (
                   <button
                     type="button"
