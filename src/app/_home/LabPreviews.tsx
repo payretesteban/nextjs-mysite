@@ -1,10 +1,10 @@
-import type { LabPreview as PreviewKind, LabTestStats } from "@/lib/lab";
+import { hostOf, type LabPreview as PreviewKind, type LabTestStats } from "@/lib/lab";
 
 /**
  * Small decorative picture at the top of a Lab card, drawn with CSS/SVG so it costs nothing to load.
  * Hidden from screen readers: the card's title and text say what the experiment is.
  */
-export default function LabPreview({ kind, tests }: { kind: PreviewKind; tests: LabTestStats | null }) {
+export default function LabPreview({ kind, tests, href = "/" }: { kind: PreviewKind; tests: LabTestStats | null; href?: string }) {
   return (
     <div aria-hidden="true" className="relative h-24 overflow-hidden">
       {kind === "game" && <GamePreview />}
@@ -13,6 +13,7 @@ export default function LabPreview({ kind, tests }: { kind: PreviewKind; tests: 
       {kind === "tests" && <TestsPreview stats={tests} />}
       {kind === "scope" && <ScopePreview />}
       {kind === "aiCost" && <AiCostPreview />}
+      {kind === "website" && <WebsitePreview host={hostOf(href)} />}
       {kind === "generic" && <GenericPreview />}
     </div>
   );
@@ -101,6 +102,27 @@ function AiCostPreview() {
         <span className="font-mono text-emerald-700 dark:text-emerald-400">$18</span>
       </div>
       <div className="font-mono text-[10px] text-slate-600 dark:text-slate-400">🤖 → ▤ + ✦ · −92% tokens</div>
+    </div>
+  );
+}
+
+/** A tiny browser window showing the site's address, for experiments that live on another site. */
+function WebsitePreview({ host }: { host: string }) {
+  return (
+    <div className="flex h-full items-center justify-center bg-slate-50 px-4 dark:bg-slate-800/60">
+      <div className="w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <div className="flex items-center gap-1 border-b border-slate-200 bg-slate-100 px-2 py-1 dark:border-slate-700 dark:bg-slate-800">
+          <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          <span className="ml-1.5 truncate rounded bg-white px-1.5 font-mono text-[9px] text-slate-600 dark:bg-slate-900 dark:text-slate-400">{host}</span>
+        </div>
+        <div className="space-y-1 p-2">
+          <div className="h-1.5 w-2/3 rounded bg-slate-300 dark:bg-slate-600" />
+          <div className="h-1.5 w-full rounded bg-slate-200 dark:bg-slate-700" />
+          <div className="h-1.5 w-5/6 rounded bg-slate-200 dark:bg-slate-700" />
+        </div>
+      </div>
     </div>
   );
 }

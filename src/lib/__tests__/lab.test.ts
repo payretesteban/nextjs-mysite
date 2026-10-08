@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { DEFAULT_LAB_ITEMS, getLabItems, getLabTestStats, normalizeLabItem } from "../lab";
+import { DEFAULT_LAB_ITEMS, getLabItems, getLabTestStats, hostOf, isExternalHref, normalizeLabItem } from "../lab";
 import { client } from "@/sanity/client";
 
 vi.mock("@/sanity/client", () => ({ client: { fetch: vi.fn() } }));
@@ -22,10 +22,14 @@ describe("The Lab experiments", () => {
     sanityFetch.mockResolvedValueOnce([
       { _id: "a", title: "New toy", href: "/new-toy", blurb: "Fun.", tech: ["React", null, "CSS", "SVG", "Extra"], status: "beta", preview: "rocket" },
       { _id: "b", title: "No address" },
-      { _id: "c", title: "Outside", href: "https://example.com" },
+      { _id: "c", title: "Outside", href: "https://example.com/demo", preview: "website" },
+      { _id: "d", title: "Not secure", href: "http://example.com" },
+      { _id: "e", title: "Sneaky", href: "javascript:alert(1)" },
+      { _id: "f", title: "Half a link", href: "example.com" },
     ]);
     expect(await getLabItems()).toEqual([
       { _id: "a", title: "New toy", href: "/new-toy", blurb: "Fun.", question: null, tech: ["React", "CSS", "SVG", "Extra"], status: "beta", preview: "generic" },
+      { _id: "c", title: "Outside", href: "https://example.com/demo", blurb: "", question: null, tech: [], status: "live", preview: "website" },
     ]);
   });
 
@@ -35,6 +39,15 @@ describe("The Lab experiments", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     sanityFetch.mockRejectedValueOnce(new Error("offline"));
     expect(await getLabItems()).toBe(DEFAULT_LAB_ITEMS);
+  });
+
+  it("tells links to other sites apart from pages on this site", () => {
+    expect(isExternalHref("https://247631214.hs-sites-na2.com/esteban-payret")).toBe(true);
+    expect(isExternalHref("/scope")).toBe(false);
+    expect(isExternalHref("http://example.com")).toBe(false);
+    expect(isExternalHref("https://localhost")).toBe(false);
+    expect(hostOf("https://www.example.com/a")).toBe("example.com");
+    expect(hostOf("/scope")).toBe("estebanpayret.com");
   });
 
   it("keeps a known preview and the live status by default", () => {

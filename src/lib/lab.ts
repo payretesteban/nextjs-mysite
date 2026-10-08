@@ -7,13 +7,14 @@ import type { TestRunResponse } from "./testResults";
  * Which preview a Lab card draws (small CSS/SVG pictures, no screenshots). "generic" is a plain
  * picture for experiments that don't have their own yet.
  */
-export type LabPreview = "game" | "readListen" | "performance" | "tests" | "scope" | "aiCost" | "generic";
+export type LabPreview = "game" | "readListen" | "performance" | "tests" | "scope" | "aiCost" | "website" | "generic";
 
-const PREVIEWS: LabPreview[] = ["game", "readListen", "performance", "tests", "scope", "aiCost", "generic"];
+const PREVIEWS: LabPreview[] = ["game", "readListen", "performance", "tests", "scope", "aiCost", "website", "generic"];
 
 /** One experiment shown in the homepage's "The Lab" section (edited in Sanity as "Lab experiment"). */
 export interface LabItem {
   _id: string;
+  /** A page on this site ("/scope") or a full https:// link to another site (opens in a new tab). */
   href: string;
   title: string;
   /** One line on what it is. */
@@ -91,15 +92,35 @@ export const DEFAULT_LAB_ITEMS: LabItem[] = [
   },
 ];
 
+/** A page on this site, e.g. "/read-listen". */
+const INTERNAL_HREF = /^\/[a-z0-9/-]*$/i;
+
+/** True for a full https:// link to another site (Lab cards open those in a new tab). */
+export function isExternalHref(href: string): boolean {
+  try {
+    const url = new URL(href);
+    return url.protocol === "https:" && url.hostname.includes(".");
+  } catch {
+    return false;
+  }
+}
+
+/** The site name shown in the "website" card picture, e.g. "247631214.hs-sites-na2.com". */
+export function hostOf(href: string): string {
+  return isExternalHref(href) ? new URL(href).hostname.replace(/^www\./, "") : "estebanpayret.com";
+}
+
 /** A Lab experiment as it comes from Sanity, before cleanup (optional fields may be missing). */
 type RawLabItem = Partial<Omit<LabItem, "tech">> & { tech?: string[] | null };
 
 /**
- * Cleans one experiment from Sanity: needs a title and an internal address ("/something"); fills in
+ * Cleans one experiment from Sanity: needs a title and an address, either on this site ("/something") or
+ * a full https:// link to another site; fills in
  * defaults for the rest (no chips, "live", the generic picture). Returns null for unusable entries.
  */
 export function normalizeLabItem(raw: RawLabItem): LabItem | null {
-  if (!raw._id || !raw.title || !raw.href || !/^\/[a-z0-9/-]*$/i.test(raw.href)) return null;
+  if (!raw._id || !raw.title || !raw.href) return null;
+  if (!INTERNAL_HREF.test(raw.href) && !isExternalHref(raw.href)) return null;
   return {
     _id: raw._id,
     href: raw.href,
