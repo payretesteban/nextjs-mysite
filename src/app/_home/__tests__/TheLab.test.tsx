@@ -32,4 +32,15 @@ describe("The Lab cards", () => {
     expect(card).toHaveAttribute("rel", "noopener noreferrer");
     expect(card).toHaveTextContent("247631214.hs-sites-na2.com");
   });
+
+  it("shows an uploaded screenshot instead of the drawn picture, cropped to the card", () => {
+    const { container } = render(
+      <TheLab items={[item({ _id: "c", title: "HubSpot version", preview: "website", image: { asset: { _ref: "image-abc123-1200x500-png" } } })]} tests={null} />
+    );
+    const img = container.querySelector("img")!;
+    expect(img).toHaveAttribute("alt", "");
+    expect(img.getAttribute("src")).toMatch(/abc123-1200x500\.png\?.*w=232&h=96&fit=crop&auto=format/);
+    expect(img.getAttribute("srcset")).toMatch(/w=464&h=192.* 2x$/);
+    expect(container).not.toHaveTextContent("estebanpayret.com"); // no drawn browser window
+  });
 });

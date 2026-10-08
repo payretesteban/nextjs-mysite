@@ -103,7 +103,8 @@ export const labItemsQuery = defineQuery(`
     question,
     tech,
     status,
-    preview
+    preview,
+    image { asset, hotspot, crop }
   }
 `);
 

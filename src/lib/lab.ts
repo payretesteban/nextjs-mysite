@@ -26,6 +26,15 @@ export interface LabItem {
   /** "beta" adds a Beta tag. */
   status: "live" | "beta";
   preview: LabPreview;
+  /** Optional screenshot uploaded in Sanity; shown instead of the drawn picture. */
+  image?: LabImage;
+}
+
+/** A Sanity image field: the uploaded file plus the editor's crop and focus point. */
+export interface LabImage {
+  asset: { _ref: string };
+  hotspot?: { x: number; y: number; height: number; width: number };
+  crop?: { top: number; bottom: number; left: number; right: number };
 }
 
 /** Shown if Sanity has no Lab experiments yet (or can't be reached). Same content as the Studio seed. */
@@ -111,11 +120,11 @@ export function hostOf(href: string): string {
 }
 
 /** A Lab experiment as it comes from Sanity, before cleanup (optional fields may be missing). */
-type RawLabItem = Partial<Omit<LabItem, "tech">> & { tech?: string[] | null };
+type RawLabItem = Partial<Omit<LabItem, "tech" | "image">> & { tech?: string[] | null; image?: Partial<LabImage> | null };
 
 /**
  * Cleans one experiment from Sanity: needs a title and an address, either on this site ("/something") or
- * a full https:// link to another site; fills in
+ * a full https:// link to another site; keeps an uploaded card image; fills in
  * defaults for the rest (no chips, "live", the generic picture). Returns null for unusable entries.
  */
 export function normalizeLabItem(raw: RawLabItem): LabItem | null {
@@ -130,6 +139,8 @@ export function normalizeLabItem(raw: RawLabItem): LabItem | null {
     tech: (raw.tech ?? []).filter(Boolean).slice(0, 4),
     status: raw.status === "beta" ? "beta" : "live",
     preview: raw.preview && PREVIEWS.includes(raw.preview) ? raw.preview : "generic",
+    // Only keep a screenshot that actually has a file (an emptied image field can leave crop data behind)
+    ...(raw.image?.asset?._ref ? { image: raw.image as LabImage } : {}),
   };
 }
 

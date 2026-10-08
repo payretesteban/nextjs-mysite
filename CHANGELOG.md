@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.9.4 — 2026-10-08
+
+- Lab cards can show a screenshot uploaded in Sanity ("Card image", with crop and focus point) instead of the drawn picture, so experiments on other sites look like the real thing.
+
 ## 1.9.3 — 2026-10-08
 
 - The Lab can now show experiments that live on other sites (e.g. the HubSpot CMS version of this site): their cards open in a new tab, show a ↗ and can use a new "website" picture with the site's address.

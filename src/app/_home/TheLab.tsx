@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { isExternalHref, type LabItem, type LabTestStats } from "@/lib/lab";
+import { urlFor } from "@/lib/image";
+import { isExternalHref, type LabImage, type LabItem, type LabTestStats } from "@/lib/lab";
 import LabPreview from "./LabPreviews";
 import LabStrip from "./LabStrip";
 
@@ -27,6 +28,21 @@ function LabCard({ href, children }: { href: string; children: React.ReactNode }
 }
 
 /**
+ * A screenshot uploaded in Sanity, cropped to the card's picture area (respecting the focus point set in
+ * Studio) and served as WebP/AVIF at 1× and 2×. Decorative: the card's title says what it is.
+ */
+function LabCardImage({ image }: { image: LabImage }) {
+  const src = (scale: number) => urlFor(image).width(232 * scale).height(96 * scale).fit("crop").auto("format").url();
+  return (
+    <div aria-hidden="true" className="h-24 overflow-hidden border-b border-slate-100 bg-slate-100 dark:border-slate-800 dark:bg-slate-800">
+      {/* Sanity's image service already resizes and converts it, so next/image would add nothing */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src(1)} srcSet={`${src(1)} 1x, ${src(2)} 2x`} alt="" width={232} height={96} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+    </div>
+  );
+}
+
+/**
  * The homepage "The Lab" section: experiments (on this site, like the game and Read & Listen, or on other
  * sites, like the HubSpot version of this site) as a swipeable row of cards. Each card links to the
  * experiment (other sites open in a new tab) and says what it is, the question behind it and the main tools used.
@@ -44,7 +60,7 @@ export default function TheLab({ items, tests }: { items: LabItem[]; tests: LabT
       <LabStrip label="Experiments">
         {items.map((item) => (
           <LabCard key={item._id} href={item.href}>
-            <LabPreview kind={item.preview} tests={tests} href={item.href} />
+            {item.image ? <LabCardImage image={item.image} /> : <LabPreview kind={item.preview} tests={tests} href={item.href} />}
             <div className="flex flex-1 flex-col px-3.5 pt-3 pb-3.5">
               <h3 className="flex items-center gap-1.5 font-bold text-slate-900 group-hover:text-sky-700 dark:text-slate-100 dark:group-hover:text-sky-400">
                 {item.title}

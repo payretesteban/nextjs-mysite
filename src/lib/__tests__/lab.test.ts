@@ -50,6 +50,13 @@ describe("The Lab experiments", () => {
     expect(hostOf("/scope")).toBe("estebanpayret.com");
   });
 
+  it("keeps an uploaded card image, but not an emptied one", () => {
+    const image = { asset: { _ref: "image-abc-1200x500-png" }, hotspot: { x: 0.5, y: 0.3, width: 1, height: 1 } };
+    expect(normalizeLabItem({ _id: "x", title: "X", href: "/x", image })?.image).toEqual(image);
+    expect(normalizeLabItem({ _id: "x", title: "X", href: "/x", image: { crop: { top: 0, bottom: 0, left: 0, right: 0 } } })).not.toHaveProperty("image");
+    expect(normalizeLabItem({ _id: "x", title: "X", href: "/x", image: null })).not.toHaveProperty("image");
+  });
+
   it("keeps a known preview and the live status by default", () => {
     expect(normalizeLabItem({ _id: "x", title: "X", href: "/x", preview: "tests" })).toMatchObject({ preview: "tests", status: "live", tech: [] });
   });
