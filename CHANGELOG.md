@@ -17,6 +17,11 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.9.6 — 2026-10-09
+
+- The Lab moves on to the next set of experiments every 5 seconds (and back to the start after the last), with the current page's bar filling up as a countdown. It waits while the mouse is over it, while keyboard focus is inside it, for 8 seconds after a swipe, and while it's off screen or the tab is hidden.
+- New pause/play button next to the arrows; no automatic movement at all for visitors who prefer reduced motion.
+
 ## 1.9.5 — 2026-10-08
 
 - Easier to read in dark mode: the homepage bio and headline, the grey notes on the Performance and Tests pages, the contact form toggle, Read & Listen's voice note and the ⌘K menu now use lighter text on the dark background (every page passes the contrast check in light and dark).

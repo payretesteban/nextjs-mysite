@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
-import LabStrip from "../LabStrip";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import LabStrip, { AUTOPLAY_MS } from "../LabStrip";
 
 /** Gives the list and its cards the sizes a browser would lay out (jsdom has no layout). */
 function fakeLayout(list: HTMLElement, clientWidth: number, scrollLeft: number) {
@@ -73,5 +73,116 @@ describe("The Lab swipe strip", () => {
     fireEvent.scroll(list);
     expect(screen.queryByRole("button", { name: /^Page/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "More experiments" })).not.toBeInTheDocument();
+  });
+
+  describe("moving on by itself", () => {
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.unstubAllGlobals();
+    });
+
+    /** Four cards with two pages, on page 1 (or 2), and a recorder for where it scrolls to. */
+    function setup(scrollLeft = 0) {
+      vi.useFakeTimers();
+      render(
+        <LabStrip label="Experiments">
+          {["A", "B", "C", "D"].map((x) => (
+            <a key={x} href={`/${x}`}>
+              {x}
+            </a>
+          ))}
+        </LabStrip>
+      );
+      const list = screen.getByRole("list", { name: "Experiments" });
+      const scrollTo = vi.fn();
+      list.scrollTo = scrollTo as unknown as typeof list.scrollTo;
+      fakeLayout(list, 736, scrollLeft);
+      fireEvent.scroll(list);
+      return { list, scrollTo, strip: list.parentElement as HTMLElement };
+    }
+    const wait = (ms: number) => act(() => vi.advanceTimersByTime(ms));
+
+    it("moves to the next page every few seconds, then back to the start", () => {
+      const { scrollTo } = setup();
+      wait(AUTOPLAY_MS - 100);
+      expect(scrollTo).not.toHaveBeenCalled();
+      wait(100);
+      expect(scrollTo).toHaveBeenLastCalledWith(expect.objectContaining({ left: 260 }));
+      expect(screen.getByTestId("page-progress")).toHaveClass("animate-lab-progress");
+    });
+
+    it("goes back to the first page after the last one", () => {
+      const { scrollTo } = setup(260);
+      wait(AUTOPLAY_MS);
+      expect(scrollTo).toHaveBeenLastCalledWith(expect.objectContaining({ left: 0 }));
+    });
+
+    it("waits while the mouse is over it, and carries on when it leaves", () => {
+      const { scrollTo, strip } = setup();
+      fireEvent.mouseEnter(strip);
+      wait(AUTOPLAY_MS * 2);
+      expect(scrollTo).not.toHaveBeenCalled();
+      expect(screen.getByTestId("page-progress")).not.toHaveClass("animate-lab-progress");
+      fireEvent.mouseLeave(strip);
+      wait(AUTOPLAY_MS);
+      expect(scrollTo).toHaveBeenCalledTimes(1);
+    });
+
+    it("waits while keyboard focus is inside it", () => {
+      const { scrollTo } = setup();
+      fireEvent.focus(screen.getByRole("link", { name: "A" }));
+      wait(AUTOPLAY_MS * 2);
+      expect(scrollTo).not.toHaveBeenCalled();
+      fireEvent.blur(screen.getByRole("link", { name: "A" }), { relatedTarget: document.body });
+      wait(AUTOPLAY_MS);
+      expect(scrollTo).toHaveBeenCalledTimes(1);
+    });
+
+    it("waits a while after a swipe on a touch screen", () => {
+      const { scrollTo, list } = setup();
+      fireEvent.pointerDown(list, { pointerType: "touch" });
+      wait(AUTOPLAY_MS);
+      expect(scrollTo).not.toHaveBeenCalled();
+      wait(8000 - AUTOPLAY_MS); // the hold ends 8 s after the touch
+      expect(scrollTo).not.toHaveBeenCalled();
+      wait(AUTOPLAY_MS);
+      expect(scrollTo).toHaveBeenCalledTimes(1);
+    });
+
+    it("stops for good with the pause button, and starts again with play", () => {
+      const { scrollTo } = setup();
+      fireEvent.click(screen.getByRole("button", { name: "Pause the slideshow" }));
+      fireEvent.blur(screen.getByRole("button", { name: "Play the slideshow" }), { relatedTarget: document.body });
+      wait(AUTOPLAY_MS * 3);
+      expect(scrollTo).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByRole("button", { name: "Play the slideshow" }));
+      fireEvent.blur(screen.getByRole("button", { name: "Pause the slideshow" }), { relatedTarget: document.body });
+      wait(AUTOPLAY_MS);
+      expect(scrollTo).toHaveBeenCalledTimes(1);
+    });
+
+    it("waits while the tab is in the background", () => {
+      const { scrollTo } = setup();
+      Object.defineProperty(document, "hidden", { configurable: true, value: true });
+      act(() => {
+        document.dispatchEvent(new Event("visibilitychange"));
+      });
+      wait(AUTOPLAY_MS * 2);
+      expect(scrollTo).not.toHaveBeenCalled();
+      Object.defineProperty(document, "hidden", { configurable: true, value: false });
+      act(() => {
+        document.dispatchEvent(new Event("visibilitychange"));
+      });
+      wait(AUTOPLAY_MS);
+      expect(scrollTo).toHaveBeenCalledTimes(1);
+    });
+
+    it("never moves, and has no pause button, for visitors who prefer less motion", () => {
+      vi.stubGlobal("matchMedia", (q: string) => ({ matches: q.includes("reduce"), media: q, addEventListener() {}, removeEventListener() {} }));
+      const { scrollTo } = setup();
+      wait(AUTOPLAY_MS * 3);
+      expect(scrollTo).not.toHaveBeenCalled();
+      expect(screen.queryByRole("button", { name: /slideshow/ })).not.toBeInTheDocument();
+    });
   });
 });
