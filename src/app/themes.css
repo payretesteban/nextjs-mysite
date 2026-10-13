@@ -192,6 +192,81 @@ html[data-theme="circuit"] h2[data-trace]::after {
     radial-gradient(circle at 4.5px 50%, #161720 2.6px, #62c3ea 3.1px, #62c3ea 4.2px, transparent 4.7px) no-repeat,
     linear-gradient(90deg, #62c3ea, #5ac7bc 55%, transparent) no-repeat center / 100% 1.5px;
 }
+/* Header "signal line": the bottom edge is the card's sky → teal → green trace (fading at both ends),
+   with a light pulse running along it every few seconds; the buttons get a sky outline */
+html[data-theme="circuit"] header.sticky {
+  border-bottom-color: transparent;
+}
+html[data-theme="circuit"] header.sticky::before,
+html[data-theme="circuit"] header.sticky::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  pointer-events: none;
+}
+html[data-theme="circuit"] header.sticky::before {
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #62c3ea 20%, #5ac7bc 55%, #5cc488 80%, transparent);
+  opacity: 1;
+}
+html[data-theme="circuit"] header.sticky::after {
+  left: 0;
+  width: 90px;
+  height: 3px;
+  margin-bottom: -1px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, transparent, #ffffff, transparent);
+  filter: drop-shadow(0 0 6px #62c3ea);
+  opacity: 0;
+  animation: theme-circuit-signal 7s ease-in-out 1.5s infinite;
+}
+@keyframes theme-circuit-signal {
+  0% {
+    left: 8%;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 1;
+  }
+  46%,
+  100% {
+    left: calc(92% - 90px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="circuit"] header.sticky::after {
+    display: none;
+  }
+}
+html[data-theme="circuit"] header nav > button[aria-haspopup="dialog"],
+html[data-theme="circuit"] header nav button[aria-label="Theme and colours"] {
+  border-color: rgba(98, 195, 234, 0.4);
+  color: #62c3ea;
+}
+html[data-theme="circuit"] header nav > button[aria-haspopup="dialog"] > span {
+  color: #e9eaee;
+}
+html[data-theme="circuit"] header nav > button[aria-haspopup="dialog"]:hover,
+html[data-theme="circuit"] header nav button[aria-label="Theme and colours"]:hover,
+html[data-theme="circuit"] header nav button[aria-label="Theme and colours"][aria-expanded="true"] {
+  border-color: #62c3ea;
+  background-color: rgba(98, 195, 234, 0.1);
+}
+/* Overlays (⌘K menu, theme picker): light sky border and a soft sky glow so they lift off the page */
+html[data-theme="circuit"] header dialog,
+html[data-theme="circuit"] header div[role="dialog"] {
+  border-color: rgba(98, 195, 234, 0.5);
+  box-shadow:
+    0 24px 48px -16px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(98, 195, 234, 0.12),
+    0 0 32px -8px rgba(98, 195, 234, 0.45);
+}
 /* The Lab: cards with a sky → teal → green edge and a soft glow (stronger on hover) */
 html[data-theme="circuit"] [data-section="lab"] [aria-label="Experiments"] {
   padding-top: 0.6rem;

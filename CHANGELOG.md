@@ -17,6 +17,11 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.12.1 — 2026-10-13
+
+- Circuit header: its bottom edge is now a sky-to-green signal line with a light pulse running along it every few seconds (still for reduced motion), and the theme and Jump to buttons have sky outlines.
+- Circuit: the ⌘K menu and the theme picker panel have a light sky border and a soft sky glow, so they stand out from the page.
+
 ## 1.12.0 — 2026-10-13
 
 - New default theme, Circuit, based on my business card: ink-navy background with a dot grid, the card's circuit traces glowing in the corner, the `<EP/>` logo in sky blue with a green cursor, `//` before section headings, and the free consultation panel in the card's teal.
