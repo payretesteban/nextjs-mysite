@@ -1,4 +1,4 @@
-import { client } from "@/sanity/client";
+import { sanityFetch } from "@/sanity/fetch";
 import { siteLogQuery } from "@/sanity/lib/queries";
 
 /** One note in the site log (a short, mostly funny story from building the site). */
@@ -22,12 +22,12 @@ export const DEFAULT_SITE_LOG: SiteLogEntry[] = [
 ];
 
 /**
- * Loads the site log entries from Sanity, in their set order (cached for 60 seconds).
+ * Loads the site log entries from Sanity, in their set order (updated when content is published; see @/sanity/fetch).
  * Falls back to `DEFAULT_SITE_LOG` when there are no entries or Sanity can't be reached.
  */
 export async function getSiteLog(): Promise<SiteLogEntry[]> {
   try {
-    const entries = await client.fetch<SiteLogEntry[] | null>(siteLogQuery, {}, { next: { revalidate: 60 } });
+    const entries = await sanityFetch<SiteLogEntry[] | null>(siteLogQuery);
     return entries?.length ? entries : DEFAULT_SITE_LOG;
   } catch (error) {
     console.error("[site log] Couldn't load entries from Sanity, using defaults:", error);

@@ -37,7 +37,7 @@ describe("Post page", () => {
     });
     render(await PostPage({ params: params("testing-in-public") }));
 
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("slug.current == $slug"), { slug: "testing-in-public" });
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("slug.current == $slug"), { slug: "testing-in-public" }, { next: { revalidate: 300, tags: ["sanity"] } });
     expect(screen.getByRole("heading", { level: 1, name: "Testing in public" })).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "Testing in public" })).toHaveAttribute("src", "https://cdn.example/cover.jpg");
     expect(screen.getByText("Why I show my tests.")).toBeInTheDocument();
@@ -67,5 +67,11 @@ describe("Post page", () => {
   it("pre-builds a page for every post", async () => {
     fetchMock.mockResolvedValue([{ slug: "a" }, { slug: "b" }]);
     await expect(generateStaticParams()).resolves.toEqual([{ slug: "a" }, { slug: "b" }]);
+  });
+
+  it("doesn't fail the deploy when Sanity can't list the posts", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    fetchMock.mockRejectedValueOnce(new Error("offline"));
+    await expect(generateStaticParams()).resolves.toEqual([]);
   });
 });

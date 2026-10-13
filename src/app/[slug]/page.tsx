@@ -1,5 +1,5 @@
 import { PortableText, type SanityDocument } from "next-sanity";
-import { client } from "@/sanity/client";
+import { sanityFetch } from "@/sanity/fetch";
 import { urlFor } from "@/lib/image";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,17 +15,23 @@ const SLUGS_QUERY = `*[_type == "post"]{"slug": slug.current }`;
 // Rebuild each post page at most once an hour, so edits in Sanity show up without a redeploy
 export const revalidate = 3600;
 
-/** Prebuilds a page for every post at build time; new slugs are rendered on first visit. */
+/**
+ * Prebuilds a page for every post at build time; new slugs are rendered on first visit. If Sanity can't
+ * be reached during the build, nothing is prebuilt (instead of failing the deploy).
+ */
 export async function generateStaticParams() {
-  const posts = await client.fetch<{ slug: string }[]>(SLUGS_QUERY);
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
+  try {
+    const posts = await sanityFetch<{ slug: string }[] | null>(SLUGS_QUERY);
+    return (posts ?? []).map((post) => ({ slug: post.slug }));
+  } catch (error) {
+    console.error("[posts] Couldn't list posts from Sanity; they'll be rendered on first visit:", error);
+    return [];
+  }
 }
 
 /**
  * A single post page at /{slug}: optional cover image, title and body.
- * Revalidated hourly; an unknown slug shows the site's 404 page.
+ * Updated when the post is published in Studio (at most an hour otherwise); an unknown slug shows the site's 404 page.
  */
 export default async function PostPage({
   params,
@@ -34,8 +40,8 @@ export default async function PostPage({
 }) {
   const { slug } = await params;
   
-  // The shared client reads from Sanity's CDN in production (see @/sanity/client)
-  const post = await client.fetch<SanityDocument>(POST_QUERY, { slug });
+  // Cached and refreshed when the post is published (see @/sanity/fetch); errors show the site's error page
+  const post = await sanityFetch<SanityDocument | null>(POST_QUERY, { slug });
 
   // Unknown slug: show the site's 404 page and send a real 404 status (plus noindex) to search engines
   if (!post) notFound();

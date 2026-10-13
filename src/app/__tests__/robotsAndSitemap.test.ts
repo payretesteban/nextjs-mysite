@@ -41,7 +41,7 @@ describe("Sitemap", () => {
 
     const result = await sitemap();
 
-    expect(fetchMock).toHaveBeenCalledWith(sitemapQuery, {}, { next: { revalidate: 3600 } });
+    expect(fetchMock).toHaveBeenCalledWith(sitemapQuery, {}, { next: { revalidate: 3600, tags: ["sanity"] } });
     expect(result.map((r) => r.url)).toEqual([
       "https://www.estebanpayret.com",
       "https://www.estebanpayret.com/services",

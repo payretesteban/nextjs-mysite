@@ -15,7 +15,7 @@ describe("Loading site log notes", () => {
     const entries = [{ _id: "x", title: "Hello", text: "World" }];
     fetchMock.mockResolvedValueOnce(entries);
     await expect(getSiteLog()).resolves.toEqual(entries);
-    expect(client.fetch).toHaveBeenCalledWith(siteLogQuery, {}, { next: { revalidate: 60 } });
+    expect(client.fetch).toHaveBeenCalledWith(siteLogQuery, {}, { next: { revalidate: 300, tags: ["sanity"] } });
   });
 
   it("falls back to the built-in entries when Sanity has none", async () => {

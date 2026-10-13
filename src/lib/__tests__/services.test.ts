@@ -9,7 +9,7 @@ const fetchMock = vi.mocked(client.fetch) as unknown as ReturnType<typeof vi.fn>
 describe("Loading services from Sanity", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("returns the services and page text from Sanity, refreshed every minute", async () => {
+  it("returns the services and page text from Sanity, refreshed when content is published", async () => {
     fetchMock.mockResolvedValueOnce({
       page: { title: "What I do", intro: "Intro text", ctaTitle: null, ctaText: "" },
       services: [{ _id: "1", title: "Web Development", summary: "Sites", icon: "globe" }],
@@ -17,7 +17,7 @@ describe("Loading services from Sanity", () => {
 
     const data = await getServicesPageData();
 
-    expect(fetchMock).toHaveBeenCalledWith(servicesPageQuery, {}, { next: { revalidate: 60 } });
+    expect(fetchMock).toHaveBeenCalledWith(servicesPageQuery, {}, { next: { revalidate: 300, tags: ["sanity"] } });
     expect(data.services).toEqual([{ _id: "1", title: "Web Development", summary: "Sites", icon: "globe" }]);
     // Empty fields fall back to the defaults
     expect(data.page).toEqual({ ...DEFAULT_SERVICES_PAGE, title: "What I do", intro: "Intro text" });

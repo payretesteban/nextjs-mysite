@@ -1,4 +1,4 @@
-import { client } from "@/sanity/client";
+import { sanityFetch } from "@/sanity/fetch";
 import { servicesPageQuery } from "@/sanity/lib/queries";
 
 /** One service offered, as stored in Sanity. */
@@ -68,16 +68,12 @@ function withoutEmpty<T extends object>(obj: T | null | undefined): Partial<T> {
 }
 
 /**
- * Loads the services page text and services from Sanity (cached for 60 seconds).
+ * Loads the services page text and services from Sanity (updated when content is published; see @/sanity/fetch).
  * Missing fields use the defaults, and on any error the whole page falls back to them.
  */
 export async function getServicesPageData(): Promise<ServicesPageData> {
   try {
-    const data = await client.fetch<{ page: ServicesPage | null; services: Service[] | null }>(
-      servicesPageQuery,
-      {},
-      { next: { revalidate: 60 } }
-    );
+    const data = await sanityFetch<{ page: ServicesPage | null; services: Service[] | null }>(servicesPageQuery);
     const page = { ...DEFAULT_SERVICES_PAGE, ...withoutEmpty(data?.page) };
     // An empty list in Sanity means "not written yet": keep the placeholder points
     const whyPoints = (data?.page?.whyPoints ?? []).filter((p) => p?.title);

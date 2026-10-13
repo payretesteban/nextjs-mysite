@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { client } from "@/sanity/client";
+import { sanityFetch } from "@/sanity/fetch";
 import { sitemapQuery } from "@/sanity/lib/queries";
 import { SITE_ORIGIN } from "@/lib/site";
 
@@ -24,7 +24,7 @@ const toDate = (iso?: string | null) => (iso ? new Date(iso) : undefined);
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let data: SitemapData = { posts: [], homeUpdatedAt: null, servicesUpdatedAt: null };
   try {
-    data = await client.fetch<SitemapData>(sitemapQuery, {}, { next: { revalidate } });
+    data = await sanityFetch<SitemapData>(sitemapQuery, {}, revalidate);
   } catch (error) {
     // Still publish the fixed pages if Sanity can't be reached
     console.error("[sitemap] Couldn't load content from Sanity:", error);

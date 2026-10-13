@@ -10,8 +10,6 @@ export const metadata: Metadata = {
 
 /** The /performance page: a short intro and the runner that tests the live homepage. */
 export default function PerformancePage() {
-  const host = new URL(SITE_URL).host;
-
   return (
     <div className="container mx-auto min-h-screen max-w-3xl p-8">
       <section className="mb-10">

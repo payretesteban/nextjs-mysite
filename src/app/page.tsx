@@ -16,7 +16,7 @@ const HOME_POST_LIMIT = 5;
 /**
  * The homepage: profile and bio, the free consultation invitation (book, or explore services), The Lab
  * (the site's experiments), the latest posts and the site log notes.
- * Data loads in parallel; each loader caches for 30-60 seconds, so Sanity edits appear without a redeploy.
+ * Data loads in parallel; each loader is refreshed when content is published in Studio (see @/sanity/fetch).
  */
 export default async function IndexPage() {
   const [{ posts, postCount, profile }, consultation, siteLog, labItems, labTests] = await Promise.all([

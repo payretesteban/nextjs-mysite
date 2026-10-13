@@ -1,4 +1,4 @@
-import { client } from "@/sanity/client";
+import { sanityFetch } from "@/sanity/fetch";
 import { labItemsQuery } from "@/sanity/lib/queries";
 import { SITE_ORIGIN } from "./site";
 import type { TestRunResponse } from "./testResults";
@@ -145,12 +145,12 @@ export function normalizeLabItem(raw: RawLabItem): LabItem | null {
 }
 
 /**
- * Loads the Lab experiments from Sanity in their set order (cached for 60 seconds). Falls back to
+ * Loads the Lab experiments from Sanity in their set order (updated on publish). Falls back to
  * `DEFAULT_LAB_ITEMS` when there are none or Sanity can't be reached.
  */
 export async function getLabItems(): Promise<LabItem[]> {
   try {
-    const raw = await client.fetch<RawLabItem[] | null>(labItemsQuery, {}, { next: { revalidate: 60 } });
+    const raw = await sanityFetch<RawLabItem[] | null>(labItemsQuery);
     const items = (raw ?? []).map(normalizeLabItem).filter((item): item is LabItem => item !== null);
     return items.length ? items : DEFAULT_LAB_ITEMS;
   } catch (error) {

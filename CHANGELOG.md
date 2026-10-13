@@ -17,6 +17,12 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.10.0 — 2026-10-09
+
+- Sturdier when Sanity is slow or down: the header and footer load a small query of their own and fall back to built-in links; the homepage, posts, titles and other pages fall back to built-in content; a friendly error page (with "Try again") replaces crashes, plus a last-resort page if the whole layout fails; the build no longer fails if Sanity can't list the posts.
+- Content changes show up straight away: publishing in Studio calls a Sanity webhook (`/api/revalidate`, signed with `SANITY_REVALIDATE_SECRET`) that refreshes every page; Sanity data is otherwise refreshed at least every 5 minutes.
+- Lint and type check now pass cleanly (no `any` left), ready for automatic checks on GitHub.
+
 ## 1.9.6 — 2026-10-09
 
 - The Lab moves on to the next set of experiments every 5 seconds (and back to the start after the last), with the current page's bar filling up as a countdown. It waits while the mouse is over it, while keyboard focus is inside it, for 8 seconds after a swipe, and while it's off screen or the tab is hidden.

@@ -36,7 +36,7 @@ export interface SanityProfile {
   bio: PortableTextBlock[]; // More specific than 'any' for Sanity text
   profileImage?: {
     /** Sanity image asset reference; pass the whole image to `urlFor`. */
-    asset: any;
+    asset: { _ref: string; _type?: string };
     alt?: string;
   };
 }

@@ -38,6 +38,20 @@ export const indexPageQuery = defineQuery(`{
   }
 }`);
 
+/** What the header and footer need on every page: the links and the owner's name. */
+export const layoutQuery = defineQuery(`{
+  "links": *[_type == "link"] | order(sort asc) {
+    _id,
+    title,
+    url,
+    category,
+    icon,
+    class,
+    sort
+  },
+  "profile": *[_type == "profile"][0] { name }
+}`);
+
 /** The services page text and the list of services (also used by the homepage services ticker). */
 export const servicesPageQuery = defineQuery(`{
   "page": *[_type == "servicesPage"][0] {

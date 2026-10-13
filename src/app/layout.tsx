@@ -1,5 +1,5 @@
 import { getSiteMetadata } from "@/lib/seo";
-import { getIndexPageData } from "@/lib/data";
+import { getLayoutData } from "@/lib/data";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AnimationProvider } from "./context/AnimationContext";
@@ -29,14 +29,14 @@ export async function generateMetadata() {
 
 /**
  * Root layout: fonts, animation and contact providers, header, footer and speed insights.
- * Loads the Sanity links and profile once for the header and footer.
+ * Loads only the Sanity links and owner's name for the header and footer (and never fails: see getLayoutData).
  */
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { links, profile } = await getIndexPageData();
+  const { links, name } = await getLayoutData();
 
   return (
     <html
@@ -46,7 +46,7 @@ export default async function RootLayout({
       <body className={`${geistSans.className} min-h-full flex flex-col bg-white text-slate-900`}>
         <AnimationProvider>          
           <ContactProvider>
-            <Header links={links} name={profile?.name} />
+            <Header links={links} name={name ?? undefined} />
             <main className="flex-grow">{children}</main>
             <Footer links={links} />
           </ContactProvider>

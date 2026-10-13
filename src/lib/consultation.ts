@@ -1,4 +1,4 @@
-import { client } from "@/sanity/client";
+import { sanityFetch } from "@/sanity/fetch";
 import { consultationQuery } from "@/sanity/lib/queries";
 
 /** Texts and booking link for the free consultation (Sanity "Free consultation" document). */
@@ -32,12 +32,12 @@ export const DEFAULT_CONSULTATION: Consultation = {
 };
 
 /**
- * Loads the consultation texts from Sanity (cached for 60 seconds). Empty fields use the defaults, and
+ * Loads the consultation texts from Sanity (updated when content is published; see @/sanity/fetch). Empty fields use the defaults, and
  * on any error everything falls back to them.
  */
 export async function getConsultation(): Promise<Consultation> {
   try {
-    const data = await client.fetch<Partial<Consultation> | null>(consultationQuery, {}, { next: { revalidate: 60 } });
+    const data = await sanityFetch<Partial<Consultation> | null>(consultationQuery);
     const filled = Object.fromEntries(Object.entries(data ?? {}).filter(([, v]) => v != null && String(v).trim() !== ""));
     return { ...DEFAULT_CONSULTATION, ...filled };
   } catch (error) {

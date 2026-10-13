@@ -51,6 +51,7 @@ Create a `.env.local` file in the project root (it's git-ignored). All variables
 | `CONTACT_TO_EMAIL` | Where contact form messages go. Required for the form to send in production; kept out of the code so the address isn't public. |
 | `CONTACT_FROM_EMAIL` | The sender address; it must be on a domain verified in Resend. |
 | `GEMINI_API_KEY` | Google AI Studio key for new texts on `/read-listen` and the summary on `/scope` (free tier). Without it, both use built-in texts. |
+| `SANITY_REVALIDATE_SECRET` | Secret shared with the Sanity webhook that calls `/api/revalidate` when content is published. Without it, pages still refresh on their own within 5 minutes. |
 | `GEMINI_MODEL` | Optional Gemini model name (defaults to `gemini-3.5-flash-lite`). |
 | `GEMINI_FALLBACK_MODELS` | Optional backup models tried when the main one is busy or slow, comma-separated (defaults to `gemini-3.1-flash-lite`; set it empty to turn backups off). |
 | `NEXT_PUBLIC_SITE_URL` | Overrides the site address used for the sitemap and robots.txt (defaults to `https://www.estebanpayret.com`). |
@@ -82,13 +83,17 @@ public/         Static files
 
 ## Content
 
-Posts, the profile, menu links, services and site log notes are edited in Sanity Studio (the `studio-mysite` repository). Pages pick up changes automatically, usually within a minute (individual post pages within an hour), so there's no need to redeploy after editing content.
+Posts, the profile, menu links, services and site log notes are edited in Sanity Studio (the `studio-mysite` repository). Publishing in Studio triggers a Sanity webhook that calls `/api/revalidate`, which refreshes every page straight away. As a safety net, Sanity data is also refreshed at least every 5 minutes (`src/sanity/fetch.ts`; the sitemap hourly). There's no need to redeploy after editing content.
+
+If Sanity can't be reached, pages still render: the header and footer fall back to built-in links, the homepage to a built-in profile, and anything else to a friendly error page (`src/app/error.tsx`).
 
 ## Tests
 
 Tests live next to the code they cover, in `__tests__` folders. On the live site, `/tests` shows the results saved when the site was built. In `npm run dev`, the button runs the suite live.
 
 When you add tests for a new part of the site, add it to the areas in `src/lib/testGroups.ts` so the results are grouped properly on the `/tests` page.
+
+Every push to `main` and every pull request also runs lint, the type check and the tests on GitHub Actions (`.github/workflows/ci.yml`); the result shows as a ✓ or ✗ next to the commit.
 
 ## Releases
 
