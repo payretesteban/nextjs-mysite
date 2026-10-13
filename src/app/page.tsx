@@ -34,6 +34,8 @@ export default async function IndexPage() {
           {/* Small avatar beside the name, so the bio and buttons start on the same left edge as the rest of the page */}
           <div className="flex items-center gap-4">
             {profile.profileImage && (
+              // Sanity's image service already resizes and converts it (WebP/AVIF), so next/image would add nothing
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 // WebP/AVIF when the browser supports it; loaded early because it's at the top of the page
                 src={urlFor(profile.profileImage).width(144).height(144).auto("format").url()}

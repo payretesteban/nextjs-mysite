@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.10.1 — 2026-10-13
+
+- Lint is now completely clean (no warnings): removed an unused Speed Insights import and documented why the homepage avatar uses a plain image (Sanity already optimizes it).
+
 ## 1.10.0 — 2026-10-09
 
 - Sturdier when Sanity is slow or down: the header and footer load a small query of their own and fall back to built-in links; the homepage, posts, titles and other pages fall back to built-in content; a friendly error page (with "Try again") replaces crashes, plus a last-resort page if the whole layout fails; the build no longer fails if Sanity can't list the posts.

@@ -1,7 +1,6 @@
 import { getSiteMetadata } from "@/lib/seo";
 import { getLayoutData } from "@/lib/data";
 import { Geist, Geist_Mono } from "next/font/google";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AnimationProvider } from "./context/AnimationContext";
 import ContactProvider from "./contact/ContactProvider";
 import Header from "./header";
@@ -28,7 +27,7 @@ export async function generateMetadata() {
 }
 
 /**
- * Root layout: fonts, animation and contact providers, header, footer and speed insights.
+ * Root layout: fonts, animation and contact providers, header and footer.
  * Loads only the Sanity links and owner's name for the header and footer (and never fails: see getLayoutData).
  */
 export default async function RootLayout({
