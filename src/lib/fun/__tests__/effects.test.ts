@@ -2,8 +2,9 @@ import { describe, it, expect } from "vitest";
 import { EFFECTS, KONAMI, ROTATION, newRound, pushKey, shuffle } from "../effects";
 
 describe("Fun mode effects", () => {
-  it("has six regular effects plus the secret one, each with a name, emoji and length", () => {
-    expect(ROTATION).toHaveLength(6);
+  it("has five regular effects plus the secret one, each with a name, emoji and length", () => {
+    expect(ROTATION).toHaveLength(5);
+    expect(ROTATION).not.toContain("retro"); // a theme now, not an effect
     expect(ROTATION).not.toContain("deepdrop");
     for (const e of Object.values(EFFECTS)) {
       expect(e.name).toBeTruthy();

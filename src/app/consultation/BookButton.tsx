@@ -1,6 +1,7 @@
 "use client";
 
 import { calTargetFrom } from "@/lib/consultation";
+import { pageLooksDark } from "../theme/useTheme";
 import { useContact } from "../contact/ContactProvider";
 
 /** Cal.com's embed script; only loaded when someone clicks a booking button. */
@@ -85,7 +86,7 @@ export default function BookButton({
       openPage();
       return;
     }
-    const dark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+    const dark = pageLooksDark();
     loadCal(cal.origin, openPage)("modal", { calLink: cal.calLink, config: { layout: "month_view", theme: dark ? "dark" : "light", ...(notes ? { notes } : {}) } });
   }
 

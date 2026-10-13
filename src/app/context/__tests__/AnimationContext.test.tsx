@@ -43,14 +43,14 @@ describe("Fun mode", () => {
     expect(document.documentElement.dataset.fun).toBeUndefined();
   });
 
-  it("goes through all six effects before repeating, never the same twice in a row", () => {
+  it("goes through all five effects before repeating, never the same twice in a row", () => {
     const { result } = renderHook(() => useAnimation(), { wrapper });
     const seen: string[] = [];
     for (let i = 0; i < 18; i++) {
       act(() => result.current.getNextAnimation());
       seen.push(result.current.effect!.id);
     }
-    expect(new Set(seen.slice(0, 6)).size).toBe(6);
+    expect(new Set(seen.slice(0, 5)).size).toBe(5);
     for (let i = 1; i < seen.length; i++) expect(seen[i]).not.toBe(seen[i - 1]);
     expect(seen).not.toContain("deepdrop");
   });

@@ -1,0 +1,724 @@
+/*
+ * Site themes (see src/lib/themes.ts). Every theme other than Default is built on the site's dark-mode
+ * styles (data-mode="dark" is set with it, and dark mode already passes the contrast checks), then
+ * re-tints Tailwind's colour scales: e.g. the greys become greens in Retro, purples in Halloween, and
+ * pure black/white in High contrast. Lightness stays about the same, so contrast is preserved and
+ * every component follows without theme-specific classes. The game's own greens and the monitor's
+ * stone colours are left alone. Decorations live in ThemeDecorations.tsx.
+ */
+/* ── High contrast: black, white and yellow, with strong focus rings ───────────────────────── */
+/* (:root…[data-mode] so these beat the dark-mode page colours in globals.css) */
+:root[data-theme="contrast"][data-mode] {
+  --background: #000000;
+  --foreground: #ffffff;
+  color-scheme: dark;
+  --color-slate-50: #ffffff;
+  --color-slate-100: #ffffff;
+  --color-slate-200: #ffffff;
+  --color-slate-300: #ffffff;
+  --color-slate-400: #ebebeb;
+  --color-slate-500: #c7c7c7;
+  --color-slate-600: #a3a3a3;
+  --color-slate-700: #5c5c5c;
+  --color-slate-800: #3d3d3d;
+  --color-slate-900: #000000;
+  --color-slate-950: #000000;
+  --color-gray-50: #ffffff;
+  --color-gray-100: #ffffff;
+  --color-gray-200: #ffffff;
+  --color-gray-300: #ffffff;
+  --color-gray-400: #ebebeb;
+  --color-gray-500: #c7c7c7;
+  --color-gray-600: #a3a3a3;
+  --color-gray-700: #5c5c5c;
+  --color-gray-800: #3d3d3d;
+  --color-gray-900: #000000;
+  --color-gray-950: #000000;
+  --color-zinc-50: #ffffff;
+  --color-zinc-100: #ffffff;
+  --color-zinc-200: #ffffff;
+  --color-zinc-300: #ffffff;
+  --color-zinc-400: #ebebeb;
+  --color-zinc-500: #c7c7c7;
+  --color-zinc-600: #a3a3a3;
+  --color-zinc-700: #5c5c5c;
+  --color-zinc-800: #3d3d3d;
+  --color-zinc-900: #000000;
+  --color-zinc-950: #000000;
+  --color-neutral-50: #ffffff;
+  --color-neutral-100: #ffffff;
+  --color-neutral-200: #ffffff;
+  --color-neutral-300: #ffffff;
+  --color-neutral-400: #ebebeb;
+  --color-neutral-500: #c7c7c7;
+  --color-neutral-600: #a3a3a3;
+  --color-neutral-700: #5c5c5c;
+  --color-neutral-800: #3d3d3d;
+  --color-neutral-900: #000000;
+  --color-neutral-950: #000000;
+  --color-sky-50: #ffff00;
+  --color-sky-100: #ffff00;
+  --color-sky-200: #ffff00;
+  --color-sky-300: #ffff00;
+  --color-sky-400: #ffff00;
+  --color-sky-500: #e6e600;
+  --color-sky-600: #5c5c00;
+  --color-sky-700: #5c5c00;
+  --color-sky-800: #4d4d00;
+  --color-sky-900: #3d3d00;
+  --color-sky-950: #2e2e00;
+  --color-blue-50: #ffff00;
+  --color-blue-100: #ffff00;
+  --color-blue-200: #ffff00;
+  --color-blue-300: #ffff00;
+  --color-blue-400: #ffff00;
+  --color-blue-500: #e6e600;
+  --color-blue-600: #5c5c00;
+  --color-blue-700: #5c5c00;
+  --color-blue-800: #4d4d00;
+  --color-blue-900: #3d3d00;
+  --color-blue-950: #2e2e00;
+  --color-indigo-50: #ffff00;
+  --color-indigo-100: #ffff00;
+  --color-indigo-200: #ffff00;
+  --color-indigo-300: #ffff00;
+  --color-indigo-400: #ffff00;
+  --color-indigo-500: #e6e600;
+  --color-indigo-600: #5c5c00;
+  --color-indigo-700: #5c5c00;
+  --color-indigo-800: #4d4d00;
+  --color-indigo-900: #3d3d00;
+  --color-indigo-950: #2e2e00;
+  --color-violet-50: #ffff00;
+  --color-violet-100: #ffff00;
+  --color-violet-200: #ffff00;
+  --color-violet-300: #ffff00;
+  --color-violet-400: #ffff00;
+  --color-violet-500: #e6e600;
+  --color-violet-600: #5c5c00;
+  --color-violet-700: #5c5c00;
+  --color-violet-800: #4d4d00;
+  --color-violet-900: #3d3d00;
+  --color-violet-950: #2e2e00;
+  --color-purple-50: #ffff00;
+  --color-purple-100: #ffff00;
+  --color-purple-200: #ffff00;
+  --color-purple-300: #ffff00;
+  --color-purple-400: #ffff00;
+  --color-purple-500: #e6e600;
+  --color-purple-600: #5c5c00;
+  --color-purple-700: #5c5c00;
+  --color-purple-800: #4d4d00;
+  --color-purple-900: #3d3d00;
+  --color-purple-950: #2e2e00;
+  --color-cyan-50: #ffff00;
+  --color-cyan-100: #ffff00;
+  --color-cyan-200: #ffff00;
+  --color-cyan-300: #ffff00;
+  --color-cyan-400: #ffff00;
+  --color-cyan-500: #e6e600;
+  --color-cyan-600: #5c5c00;
+  --color-cyan-700: #5c5c00;
+  --color-cyan-800: #4d4d00;
+  --color-cyan-900: #3d3d00;
+  --color-cyan-950: #2e2e00;
+  --color-teal-50: #ffff00;
+  --color-teal-100: #ffff00;
+  --color-teal-200: #ffff00;
+  --color-teal-300: #ffff00;
+  --color-teal-400: #ffff00;
+  --color-teal-500: #e6e600;
+  --color-teal-600: #5c5c00;
+  --color-teal-700: #5c5c00;
+  --color-teal-800: #4d4d00;
+  --color-teal-900: #3d3d00;
+  --color-teal-950: #2e2e00;
+  --color-pink-50: #ffff00;
+  --color-pink-100: #ffff00;
+  --color-pink-200: #ffff00;
+  --color-pink-300: #ffff00;
+  --color-pink-400: #ffff00;
+  --color-pink-500: #e6e600;
+  --color-pink-600: #5c5c00;
+  --color-pink-700: #5c5c00;
+  --color-pink-800: #4d4d00;
+  --color-pink-900: #3d3d00;
+  --color-pink-950: #2e2e00;
+  --color-fuchsia-50: #ffff00;
+  --color-fuchsia-100: #ffff00;
+  --color-fuchsia-200: #ffff00;
+  --color-fuchsia-300: #ffff00;
+  --color-fuchsia-400: #ffff00;
+  --color-fuchsia-500: #e6e600;
+  --color-fuchsia-600: #5c5c00;
+  --color-fuchsia-700: #5c5c00;
+  --color-fuchsia-800: #4d4d00;
+  --color-fuchsia-900: #3d3d00;
+  --color-fuchsia-950: #2e2e00;
+  --color-amber-50: #ffff00;
+  --color-amber-100: #ffff00;
+  --color-amber-200: #ffff00;
+  --color-amber-300: #ffff00;
+  --color-amber-400: #ffff00;
+  --color-amber-500: #e6e600;
+  --color-amber-600: #5c5c00;
+  --color-amber-700: #5c5c00;
+  --color-amber-800: #4d4d00;
+  --color-amber-900: #3d3d00;
+  --color-amber-950: #2e2e00;
+  --color-yellow-50: #ffff00;
+  --color-yellow-100: #ffff00;
+  --color-yellow-200: #ffff00;
+  --color-yellow-300: #ffff00;
+  --color-yellow-400: #ffff00;
+  --color-yellow-500: #e6e600;
+  --color-yellow-600: #5c5c00;
+  --color-yellow-700: #5c5c00;
+  --color-yellow-800: #4d4d00;
+  --color-yellow-900: #3d3d00;
+  --color-yellow-950: #2e2e00;
+  --color-orange-50: #ffff00;
+  --color-orange-100: #ffff00;
+  --color-orange-200: #ffff00;
+  --color-orange-300: #ffff00;
+  --color-orange-400: #ffff00;
+  --color-orange-500: #e6e600;
+  --color-orange-600: #5c5c00;
+  --color-orange-700: #5c5c00;
+  --color-orange-800: #4d4d00;
+  --color-orange-900: #3d3d00;
+  --color-orange-950: #2e2e00;
+  --color-emerald-50: #00ff7f;
+  --color-emerald-100: #00ff7f;
+  --color-emerald-200: #00ff7f;
+  --color-emerald-300: #00ff7f;
+  --color-emerald-400: #00ff7f;
+  --color-emerald-500: #00e070;
+  --color-emerald-600: #00663a;
+  --color-emerald-700: #005c2e;
+  --color-emerald-800: #004d26;
+  --color-emerald-900: #003d1f;
+  --color-emerald-950: #002e17;
+  --color-rose-50: #ff8080;
+  --color-rose-100: #ff8080;
+  --color-rose-200: #ff8080;
+  --color-rose-300: #ff8080;
+  --color-rose-400: #ff8080;
+  --color-rose-500: #ff6666;
+  --color-rose-600: #a30000;
+  --color-rose-700: #8f0000;
+  --color-rose-800: #7a0000;
+  --color-rose-900: #660000;
+  --color-rose-950: #4d0000;
+  --color-red-50: #ff8080;
+  --color-red-100: #ff8080;
+  --color-red-200: #ff8080;
+  --color-red-300: #ff8080;
+  --color-red-400: #ff8080;
+  --color-red-500: #ff6666;
+  --color-red-600: #a30000;
+  --color-red-700: #8f0000;
+  --color-red-800: #7a0000;
+  --color-red-900: #660000;
+  --color-red-950: #4d0000;
+}
+html[data-theme="contrast"] :focus-visible {
+  outline: 3px solid #ffff00 !important;
+  outline-offset: 2px !important;
+}
+html[data-theme="contrast"] main a:not([class*="rounded"]) {
+  text-decoration-line: underline;
+}
+
+/* ── Retro CRT: The Deep Drop's green phosphor screen, VT323 text and scanlines ─────────────── */
+/* (:root…[data-mode] so these beat the dark-mode page colours in globals.css) */
+:root[data-theme="retro"][data-mode] {
+  --background: #03170c;
+  --foreground: #bbf7d0;
+  color-scheme: dark;
+  --color-white: #d7fbe2;
+  --color-slate-50: #f0fdf4;
+  --color-slate-100: #dcfce7;
+  --color-slate-200: #bbf7d0;
+  --color-slate-300: #86efac;
+  --color-slate-400: #4ade80;
+  --color-slate-500: #3fae66;
+  --color-slate-600: #24683f;
+  --color-slate-700: #1a4d2e;
+  --color-slate-800: #0f2e1b;
+  --color-slate-900: #08200f;
+  --color-slate-950: #03120a;
+  --color-gray-50: #f0fdf4;
+  --color-gray-100: #dcfce7;
+  --color-gray-200: #bbf7d0;
+  --color-gray-300: #86efac;
+  --color-gray-400: #4ade80;
+  --color-gray-500: #3fae66;
+  --color-gray-600: #24683f;
+  --color-gray-700: #1a4d2e;
+  --color-gray-800: #0f2e1b;
+  --color-gray-900: #08200f;
+  --color-gray-950: #03120a;
+  --color-zinc-50: #f0fdf4;
+  --color-zinc-100: #dcfce7;
+  --color-zinc-200: #bbf7d0;
+  --color-zinc-300: #86efac;
+  --color-zinc-400: #4ade80;
+  --color-zinc-500: #3fae66;
+  --color-zinc-600: #24683f;
+  --color-zinc-700: #1a4d2e;
+  --color-zinc-800: #0f2e1b;
+  --color-zinc-900: #08200f;
+  --color-zinc-950: #03120a;
+  --color-neutral-50: #f0fdf4;
+  --color-neutral-100: #dcfce7;
+  --color-neutral-200: #bbf7d0;
+  --color-neutral-300: #86efac;
+  --color-neutral-400: #4ade80;
+  --color-neutral-500: #3fae66;
+  --color-neutral-600: #24683f;
+  --color-neutral-700: #1a4d2e;
+  --color-neutral-800: #0f2e1b;
+  --color-neutral-900: #08200f;
+  --color-neutral-950: #03120a;
+  --color-sky-50: #f0fdf4;
+  --color-sky-100: #dcfce7;
+  --color-sky-200: #bbf7d0;
+  --color-sky-300: #86efac;
+  --color-sky-400: #4ade80;
+  --color-sky-500: #3fae66;
+  --color-sky-600: #24683f;
+  --color-sky-700: #1a4d2e;
+  --color-sky-800: #0f2e1b;
+  --color-sky-900: #08200f;
+  --color-sky-950: #03120a;
+  --color-blue-50: #f0fdf4;
+  --color-blue-100: #dcfce7;
+  --color-blue-200: #bbf7d0;
+  --color-blue-300: #86efac;
+  --color-blue-400: #4ade80;
+  --color-blue-500: #3fae66;
+  --color-blue-600: #24683f;
+  --color-blue-700: #1a4d2e;
+  --color-blue-800: #0f2e1b;
+  --color-blue-900: #08200f;
+  --color-blue-950: #03120a;
+  --color-indigo-50: #f0fdf4;
+  --color-indigo-100: #dcfce7;
+  --color-indigo-200: #bbf7d0;
+  --color-indigo-300: #86efac;
+  --color-indigo-400: #4ade80;
+  --color-indigo-500: #3fae66;
+  --color-indigo-600: #24683f;
+  --color-indigo-700: #1a4d2e;
+  --color-indigo-800: #0f2e1b;
+  --color-indigo-900: #08200f;
+  --color-indigo-950: #03120a;
+  --color-violet-50: #f0fdf4;
+  --color-violet-100: #dcfce7;
+  --color-violet-200: #bbf7d0;
+  --color-violet-300: #86efac;
+  --color-violet-400: #4ade80;
+  --color-violet-500: #3fae66;
+  --color-violet-600: #24683f;
+  --color-violet-700: #1a4d2e;
+  --color-violet-800: #0f2e1b;
+  --color-violet-900: #08200f;
+  --color-violet-950: #03120a;
+  --color-purple-50: #f0fdf4;
+  --color-purple-100: #dcfce7;
+  --color-purple-200: #bbf7d0;
+  --color-purple-300: #86efac;
+  --color-purple-400: #4ade80;
+  --color-purple-500: #3fae66;
+  --color-purple-600: #24683f;
+  --color-purple-700: #1a4d2e;
+  --color-purple-800: #0f2e1b;
+  --color-purple-900: #08200f;
+  --color-purple-950: #03120a;
+  --color-cyan-50: #f0fdf4;
+  --color-cyan-100: #dcfce7;
+  --color-cyan-200: #bbf7d0;
+  --color-cyan-300: #86efac;
+  --color-cyan-400: #4ade80;
+  --color-cyan-500: #3fae66;
+  --color-cyan-600: #24683f;
+  --color-cyan-700: #1a4d2e;
+  --color-cyan-800: #0f2e1b;
+  --color-cyan-900: #08200f;
+  --color-cyan-950: #03120a;
+  --color-teal-50: #f0fdf4;
+  --color-teal-100: #dcfce7;
+  --color-teal-200: #bbf7d0;
+  --color-teal-300: #86efac;
+  --color-teal-400: #4ade80;
+  --color-teal-500: #3fae66;
+  --color-teal-600: #24683f;
+  --color-teal-700: #1a4d2e;
+  --color-teal-800: #0f2e1b;
+  --color-teal-900: #08200f;
+  --color-teal-950: #03120a;
+  --color-pink-50: #f0fdf4;
+  --color-pink-100: #dcfce7;
+  --color-pink-200: #bbf7d0;
+  --color-pink-300: #86efac;
+  --color-pink-400: #4ade80;
+  --color-pink-500: #3fae66;
+  --color-pink-600: #24683f;
+  --color-pink-700: #1a4d2e;
+  --color-pink-800: #0f2e1b;
+  --color-pink-900: #08200f;
+  --color-pink-950: #03120a;
+  --color-fuchsia-50: #f0fdf4;
+  --color-fuchsia-100: #dcfce7;
+  --color-fuchsia-200: #bbf7d0;
+  --color-fuchsia-300: #86efac;
+  --color-fuchsia-400: #4ade80;
+  --color-fuchsia-500: #3fae66;
+  --color-fuchsia-600: #24683f;
+  --color-fuchsia-700: #1a4d2e;
+  --color-fuchsia-800: #0f2e1b;
+  --color-fuchsia-900: #08200f;
+  --color-fuchsia-950: #03120a;
+  --color-amber-50: #f0fdf4;
+  --color-amber-100: #dcfce7;
+  --color-amber-200: #bbf7d0;
+  --color-amber-300: #86efac;
+  --color-amber-400: #4ade80;
+  --color-amber-500: #3fae66;
+  --color-amber-600: #24683f;
+  --color-amber-700: #1a4d2e;
+  --color-amber-800: #0f2e1b;
+  --color-amber-900: #08200f;
+  --color-amber-950: #03120a;
+  --color-yellow-50: #f0fdf4;
+  --color-yellow-100: #dcfce7;
+  --color-yellow-200: #bbf7d0;
+  --color-yellow-300: #86efac;
+  --color-yellow-400: #4ade80;
+  --color-yellow-500: #3fae66;
+  --color-yellow-600: #24683f;
+  --color-yellow-700: #1a4d2e;
+  --color-yellow-800: #0f2e1b;
+  --color-yellow-900: #08200f;
+  --color-yellow-950: #03120a;
+  --color-orange-50: #f0fdf4;
+  --color-orange-100: #dcfce7;
+  --color-orange-200: #bbf7d0;
+  --color-orange-300: #86efac;
+  --color-orange-400: #4ade80;
+  --color-orange-500: #3fae66;
+  --color-orange-600: #24683f;
+  --color-orange-700: #1a4d2e;
+  --color-orange-800: #0f2e1b;
+  --color-orange-900: #08200f;
+  --color-orange-950: #03120a;
+  --color-emerald-50: #f0fdf4;
+  --color-emerald-100: #dcfce7;
+  --color-emerald-200: #bbf7d0;
+  --color-emerald-300: #86efac;
+  --color-emerald-400: #4ade80;
+  --color-emerald-500: #3fae66;
+  --color-emerald-600: #24683f;
+  --color-emerald-700: #1a4d2e;
+  --color-emerald-800: #0f2e1b;
+  --color-emerald-900: #08200f;
+  --color-emerald-950: #03120a;
+}
+html[data-theme="retro"] body,
+html[data-theme="retro"] body * {
+  font-family: var(--font-vt323, "VT323"), ui-monospace, "SFMono-Regular", Menlo, monospace !important;
+  text-shadow: 0 0 5px rgba(34, 197, 94, 0.45);
+}
+html[data-theme="retro"] body {
+  font-size: 1.12rem; /* VT323 runs small */
+}
+html[data-theme="retro"] body img {
+  filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(3) brightness(0.85);
+}
+html[data-theme="retro"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+  z-index: 55;
+}
+@media print {
+  html[data-theme="retro"] body::after {
+    display: none;
+  }
+}
+
+/* ── Halloween: midnight purple, pumpkin orange; bats in ThemeDecorations ───────────────────── */
+/* (:root…[data-mode] so these beat the dark-mode page colours in globals.css) */
+:root[data-theme="halloween"][data-mode] {
+  --background: #150b1e;
+  --foreground: #f3ecf9;
+  color-scheme: dark;
+  --color-white: #fff7ed;
+  --color-slate-50: #faf8fc;
+  --color-slate-100: #f3eff8;
+  --color-slate-200: #e7dff0;
+  --color-slate-300: #d3c6e2;
+  --color-slate-400: #a998bf;
+  --color-slate-500: #7d6b93;
+  --color-slate-600: #5c4970;
+  --color-slate-700: #44355a;
+  --color-slate-800: #2c1f3e;
+  --color-slate-900: #1b102c;
+  --color-slate-950: #0d0518;
+  --color-gray-50: #faf8fc;
+  --color-gray-100: #f3eff8;
+  --color-gray-200: #e7dff0;
+  --color-gray-300: #d3c6e2;
+  --color-gray-400: #a998bf;
+  --color-gray-500: #7d6b93;
+  --color-gray-600: #5c4970;
+  --color-gray-700: #44355a;
+  --color-gray-800: #2c1f3e;
+  --color-gray-900: #1b102c;
+  --color-gray-950: #0d0518;
+  --color-zinc-50: #faf8fc;
+  --color-zinc-100: #f3eff8;
+  --color-zinc-200: #e7dff0;
+  --color-zinc-300: #d3c6e2;
+  --color-zinc-400: #a998bf;
+  --color-zinc-500: #7d6b93;
+  --color-zinc-600: #5c4970;
+  --color-zinc-700: #44355a;
+  --color-zinc-800: #2c1f3e;
+  --color-zinc-900: #1b102c;
+  --color-zinc-950: #0d0518;
+  --color-neutral-50: #faf8fc;
+  --color-neutral-100: #f3eff8;
+  --color-neutral-200: #e7dff0;
+  --color-neutral-300: #d3c6e2;
+  --color-neutral-400: #a998bf;
+  --color-neutral-500: #7d6b93;
+  --color-neutral-600: #5c4970;
+  --color-neutral-700: #44355a;
+  --color-neutral-800: #2c1f3e;
+  --color-neutral-900: #1b102c;
+  --color-neutral-950: #0d0518;
+  --color-sky-50: #fff7ed;
+  --color-sky-100: #ffedd5;
+  --color-sky-200: #fed7aa;
+  --color-sky-300: #fdba74;
+  --color-sky-400: #fb923c;
+  --color-sky-500: #f97316;
+  --color-sky-600: #ea580c;
+  --color-sky-700: #c2410c;
+  --color-sky-800: #9a3412;
+  --color-sky-900: #7c2d12;
+  --color-sky-950: #431407;
+  --color-blue-50: #fff7ed;
+  --color-blue-100: #ffedd5;
+  --color-blue-200: #fed7aa;
+  --color-blue-300: #fdba74;
+  --color-blue-400: #fb923c;
+  --color-blue-500: #f97316;
+  --color-blue-600: #ea580c;
+  --color-blue-700: #c2410c;
+  --color-blue-800: #9a3412;
+  --color-blue-900: #7c2d12;
+  --color-blue-950: #431407;
+  --color-cyan-50: #fff7ed;
+  --color-cyan-100: #ffedd5;
+  --color-cyan-200: #fed7aa;
+  --color-cyan-300: #fdba74;
+  --color-cyan-400: #fb923c;
+  --color-cyan-500: #f97316;
+  --color-cyan-600: #ea580c;
+  --color-cyan-700: #c2410c;
+  --color-cyan-800: #9a3412;
+  --color-cyan-900: #7c2d12;
+  --color-cyan-950: #431407;
+  --color-teal-50: #fff7ed;
+  --color-teal-100: #ffedd5;
+  --color-teal-200: #fed7aa;
+  --color-teal-300: #fdba74;
+  --color-teal-400: #fb923c;
+  --color-teal-500: #f97316;
+  --color-teal-600: #ea580c;
+  --color-teal-700: #c2410c;
+  --color-teal-800: #9a3412;
+  --color-teal-900: #7c2d12;
+  --color-teal-950: #431407;
+  --color-indigo-50: #f5f3ff;
+  --color-indigo-100: #ede9fe;
+  --color-indigo-200: #ddd6fe;
+  --color-indigo-300: #c4b5fd;
+  --color-indigo-400: #a78bfa;
+  --color-indigo-500: #8b5cf6;
+  --color-indigo-600: #7c3aed;
+  --color-indigo-700: #6d28d9;
+  --color-indigo-800: #5b21b6;
+  --color-indigo-900: #4c1d95;
+  --color-indigo-950: #2e1065;
+  --color-pink-50: #f5f3ff;
+  --color-pink-100: #ede9fe;
+  --color-pink-200: #ddd6fe;
+  --color-pink-300: #c4b5fd;
+  --color-pink-400: #a78bfa;
+  --color-pink-500: #8b5cf6;
+  --color-pink-600: #7c3aed;
+  --color-pink-700: #6d28d9;
+  --color-pink-800: #5b21b6;
+  --color-pink-900: #4c1d95;
+  --color-pink-950: #2e1065;
+  --color-fuchsia-50: #f5f3ff;
+  --color-fuchsia-100: #ede9fe;
+  --color-fuchsia-200: #ddd6fe;
+  --color-fuchsia-300: #c4b5fd;
+  --color-fuchsia-400: #a78bfa;
+  --color-fuchsia-500: #8b5cf6;
+  --color-fuchsia-600: #7c3aed;
+  --color-fuchsia-700: #6d28d9;
+  --color-fuchsia-800: #5b21b6;
+  --color-fuchsia-900: #4c1d95;
+  --color-fuchsia-950: #2e1065;
+}
+/* Pumpkin-orange headings and logo */
+html[data-theme="halloween"] main h1,
+html[data-theme="halloween"] main h2 {
+  color: #fb923c;
+}
+html[data-theme="halloween"] header a > span:first-child,
+html[data-theme="halloween"] header a > span:first-child > span {
+  background-color: #f97316;
+  color: #1c0a00;
+}
+/* Tiny jack-o'-lanterns next to the section headings (a background image, so screen readers skip it) */
+html[data-theme="halloween"] main h2::after {
+  content: "";
+  display: inline-block;
+  width: 0.85em;
+  height: 0.8em;
+  margin-left: 0.35em;
+  vertical-align: -0.05em;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 60'%3E%3Cpath d='M31 12C30 6 32 3 36 1c1 2-1 5-1 11z' fill='%233f6212'/%3E%3Cellipse cx='18' cy='36' rx='15' ry='20' fill='%23c2410c'/%3E%3Cellipse cx='46' cy='36' rx='15' ry='20' fill='%23c2410c'/%3E%3Cellipse cx='32' cy='36' rx='17' ry='22' fill='%23ea580c'/%3E%3Cg fill='%23fde047'%3E%3Cpath d='M18 30h7l-3.5-7zM39 30h7l-3.5-7zM30 33h4l-2 4zM15 41c7 9 27 9 34 0l-4 1-2 4-3-3-4 4-4-4-4 4-4-4-3 3-2-4z'/%3E%3C/g%3E%3C/svg%3E")
+    no-repeat center / contain;
+}
+
+/* Bats: fly across the screen while their wings flap */
+.theme-bat {
+  position: absolute;
+  left: -60px;
+  animation-name: theme-bat-fly;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.theme-bat-wing {
+  transform-box: fill-box;
+  animation: theme-bat-flap 0.3s ease-in-out infinite alternate;
+}
+.theme-bat-wing-left {
+  transform-origin: 100% 40%;
+}
+.theme-bat-wing-right {
+  transform-origin: 0% 40%;
+}
+.theme-bat-wing-right {
+  animation-name: theme-bat-flap-right;
+}
+@keyframes theme-bat-flap {
+  from {
+    transform: rotate(-28deg) scaleY(0.85);
+  }
+  to {
+    transform: rotate(22deg) scaleY(1);
+  }
+}
+@keyframes theme-bat-flap-right {
+  from {
+    transform: rotate(28deg) scaleY(0.85);
+  }
+  to {
+    transform: rotate(-22deg) scaleY(1);
+  }
+}
+@keyframes theme-bat-fly {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(22vw, -30px);
+  }
+  40% {
+    transform: translate(44vw, 14px);
+  }
+  60% {
+    transform: translate(66vw, -24px);
+  }
+  80% {
+    transform: translate(88vw, 8px);
+  }
+  100% {
+    transform: translate(calc(100vw + 120px), -10px);
+  }
+}
+
+/* Skeleton: sways gently on its thread */
+.theme-skeleton {
+  transform-origin: 50% 0;
+  animation: theme-sway 4.5s ease-in-out infinite alternate;
+}
+@keyframes theme-sway {
+  from {
+    transform: rotate(-7deg);
+  }
+  to {
+    transform: rotate(7deg);
+  }
+}
+
+/* Jack-o'-lanterns: the candle inside flickers */
+.theme-pumpkin-glow {
+  animation: theme-flicker 2.4s steps(1, end) infinite;
+  filter: drop-shadow(0 0 3px #facc15);
+}
+@keyframes theme-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  12% {
+    opacity: 0.75;
+  }
+  18% {
+    opacity: 0.95;
+  }
+  41% {
+    opacity: 0.6;
+  }
+  47% {
+    opacity: 1;
+  }
+  73% {
+    opacity: 0.8;
+  }
+}
+
+/* Reduced motion: nothing flies, flaps, sways or flickers */
+@media (prefers-reduced-motion: reduce) {
+  .theme-bat {
+    animation: none;
+    left: auto;
+    right: 4%;
+    opacity: 0.45;
+  }
+  .theme-bat:nth-child(n + 2) {
+    display: none;
+  }
+  .theme-bat-wing,
+  .theme-skeleton,
+  .theme-pumpkin-glow {
+    animation: none;
+  }
+}
+
+/* The sticky header's see-through background takes each theme's page colour */
+html[data-theme] header.sticky {
+  background-color: color-mix(in srgb, var(--background) 82%, transparent);
+}

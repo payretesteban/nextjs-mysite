@@ -7,6 +7,9 @@ import { SanityLink } from "@/lib/types";
 import { useAnimation } from "./context/AnimationContext";
 import { useContact } from "./contact/ContactProvider";
 import CommandMenu, { Icon, Kbd, iconForUrl, isExternalUrl, type MenuItem } from "./command-menu";
+import ThemePicker from "./theme/ThemePicker";
+import { setTheme, useTheme } from "./theme/useTheme";
+import { availableThemes } from "@/lib/themes";
 
 // Pages that show the same full menu as the homepage
 const FULL_MENU_PATHS = ["/", "/tests", "/performance", "/adventure", "/services", "/posts", "/site-log", "/read-listen", "/scope", "/ai-cost-case"];
@@ -33,7 +36,8 @@ function useShortcutLabel() {
 }
 
 /**
- * Sticky site header: the <EP/> logo, the fun mode timer and the button that opens the command menu.
+ * Sticky site header: the <EP/> logo, the fun mode timer, the theme picker and the button that opens the
+ * command menu (which also lists the themes).
  * Builds the menu items from the Sanity links and handles the ⌘K, Ctrl+K and "/" shortcuts.
  * @param props.links - Sanity links shown in the menu (internal ones only on FULL_MENU_PATHS pages).
  * @param props.name - Owner's name; used for the logo initials and the home link label.
@@ -57,6 +61,7 @@ export default function Header({
   const [prevPathname, setPrevPathname] = useState(pathname);
 
   const animationsRunning = effect !== null;
+  const { theme } = useTheme();
 
   // Close the menu when the route changes (adjusting state during render, no effect needed)
   if (prevPathname !== pathname) {
@@ -150,8 +155,22 @@ export default function Header({
         });
       }
     }
+    // Themes (after hydration, so seasonal ones match today's date)
+    if (hydrated) {
+      for (const t of availableThemes(new Date())) {
+        result.push({
+          id: `theme-${t.id}`,
+          label: `Theme: ${t.name}`,
+          group: "Actions",
+          icon: "palette",
+          hint: t.id === theme ? "Current" : undefined,
+          keywords: `theme colours colors look appearance ${t.description}`,
+          run: () => setTheme(t.id),
+        });
+      }
+    }
     return result;
-  }, [links, currentPath, animationsRunning, effect, timeLeft, getNextAnimation, copied, contact]);
+  }, [links, currentPath, animationsRunning, effect, timeLeft, getNextAnimation, copied, contact, hydrated, theme]);
 
   // Reset the "Copied" label whenever the menu closes
   const onOpenChange = useCallback((o: boolean) => {
@@ -226,6 +245,8 @@ export default function Header({
             <kbd className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[11px]">↑↑↓↓←→←→EP</kbd>
           </span>
         )}
+
+        <ThemePicker />
 
         <button
           type="button"

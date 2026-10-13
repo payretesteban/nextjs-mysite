@@ -17,6 +17,13 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.11.0 — 2026-10-13
+
+- Site themes: a new 🎨 button in the header opens a theme panel with preview cards: Default, High contrast, Retro CRT (moved out of "Some fun") and Halloween (offered Oct 1 – Nov 1: midnight purple and pumpkin orange, bats flapping across the screen, a swaying skeleton, flickering jack-o'-lanterns in the corners and next to section headings; all still for reduced motion). Themes are also in the ⌘K menu.
+- Light, dark or follow-the-device for the Default theme, chosen in the same panel.
+- Your choice is remembered and applied before the page appears (no flash). From Oct 15, a one-time corner invitation suggests the Halloween theme.
+- "Some fun" now has five effects (Confetti, Scuba, Skydive, Wave, Party) plus the secret Deep Drop mode.
+
 ## 1.10.1 — 2026-10-13
 
 - Lint is now completely clean (no warnings): removed an unused Speed Insights import and documented why the homepage avatar uses a plain image (Sanity already optimizes it).

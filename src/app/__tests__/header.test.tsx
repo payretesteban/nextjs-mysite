@@ -203,4 +203,20 @@ describe("Header and ⌘K menu", () => {
     const dialogs = document.querySelectorAll("dialog");
     expect([...dialogs].some((d) => d.getAttribute("aria-labelledby") === "contact-title" && d.hasAttribute("open"))).toBe(true);
   });
+
+  it("lists the themes in the menu and switches theme from there", () => {
+    renderHeader();
+    fireEvent.click(screen.getByRole("button", { name: /menu|jump to/i }));
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "retro" } });
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
+    expect(document.documentElement.dataset.theme).toBe("retro");
+    delete document.documentElement.dataset.theme;
+    delete document.documentElement.dataset.mode;
+    localStorage.clear();
+  });
+
+  it("has the theme picker next to the menu button", () => {
+    renderHeader();
+    expect(screen.getByRole("button", { name: "Theme and colours" })).toBeInTheDocument();
+  });
 });

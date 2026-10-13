@@ -5,7 +5,7 @@
  */
 
 /** Effects in the random rotation. */
-export type RegularEffectId = "confetti" | "scuba" | "skydive" | "retro" | "wave" | "party";
+export type RegularEffectId = "confetti" | "scuba" | "skydive" | "wave" | "party";
 /** Every effect, including the secret one. */
 export type EffectId = RegularEffectId | "deepdrop";
 
@@ -24,7 +24,6 @@ export const EFFECTS: Record<EffectId, Effect> = {
   confetti: { id: "confetti", name: "Confetti", emoji: "🎉", seconds: 6, overlay: true },
   scuba: { id: "scuba", name: "Scuba", emoji: "🫧", seconds: 8, overlay: true },
   skydive: { id: "skydive", name: "Skydive", emoji: "🪂", seconds: 6, overlay: true },
-  retro: { id: "retro", name: "Retro", emoji: "📺", seconds: 9, overlay: false },
   wave: { id: "wave", name: "Wave", emoji: "🌊", seconds: 8, overlay: false },
   party: { id: "party", name: "Party", emoji: "🌈", seconds: 8, overlay: false },
   // Secret (Konami code only): skydive in, then sink underwater with bubbles
@@ -32,7 +31,7 @@ export const EFFECTS: Record<EffectId, Effect> = {
 };
 
 /** The effects "Some fun" picks from, in a fixed order (shuffled when played). */
-export const ROTATION: RegularEffectId[] = ["confetti", "scuba", "skydive", "retro", "wave", "party"];
+export const ROTATION: RegularEffectId[] = ["confetti", "scuba", "skydive", "wave", "party"]; // Retro is a theme now (src/lib/themes.ts)
 
 /** Returns a shuffled copy (Fisher–Yates, so every order is equally likely). */
 export function shuffle<T>(items: T[], random: () => number = Math.random): T[] {

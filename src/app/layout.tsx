@@ -1,11 +1,17 @@
 import { getSiteMetadata } from "@/lib/seo";
 import { getLayoutData } from "@/lib/data";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, VT323 } from "next/font/google";
+import { themeInitScript } from "@/lib/themes";
 import { AnimationProvider } from "./context/AnimationContext";
 import ContactProvider from "./contact/ContactProvider";
 import Header from "./header";
 import Footer from "./footer";
+import SeasonalNudge from "./theme/SeasonalNudge";
+import ThemeDecorations from "./theme/ThemeDecorations";
 import "./globals.css";
+
+// The Retro theme's terminal font: only downloaded when that theme is on (not preloaded)
+const vt323 = VT323({ weight: "400", subsets: ["latin"], display: "swap", variable: "--font-vt323", preload: false });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,16 +44,24 @@ export default async function RootLayout({
   const { links, name } = await getLayoutData();
 
   return (
+    // suppressHydrationWarning: the head script sets data-theme/data-mode before React loads
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${vt323.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Applies the saved theme and light/dark choice before the first paint (no flash) */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript() }} />
+      </head>
       <body className={`${geistSans.className} min-h-full flex flex-col bg-white text-slate-900`}>
         <AnimationProvider>          
           <ContactProvider>
             <Header links={links} name={name ?? undefined} />
             <main className="flex-grow">{children}</main>
             <Footer links={links} />
+            <ThemeDecorations />
+            <SeasonalNudge />
           </ContactProvider>
         </AnimationProvider>
       </body>

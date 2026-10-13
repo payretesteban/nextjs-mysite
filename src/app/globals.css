@@ -1,5 +1,21 @@
 @import "tailwindcss";
+@import "./themes.css";
 @plugin "@tailwindcss/typography";
+
+/*
+ * `dark:` styles follow the visitor's choice in the theme picker: data-mode="dark" forces them,
+ * data-mode="light" turns them off, and with no data-mode they follow the device setting.
+ */
+@custom-variant dark {
+  &:where([data-mode="dark"], [data-mode="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-mode]), :root:not([data-mode]) *) {
+      @slot;
+    }
+  }
+}
 
 
 /* Show the hand cursor on everything clickable (Tailwind v4 defaults buttons to the arrow) */
@@ -122,10 +138,17 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Dark page colours: chosen in the picker, or the device setting when nothing is chosen */
+:root[data-mode="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  color-scheme: dark;
+}
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-mode]) {
     --background: #0a0a0a;
     --foreground: #ededed;
+    color-scheme: dark;
   }
 }
 
@@ -198,12 +221,6 @@ body {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
-@keyframes fun-flicker {
-  0%, 100% { opacity: 1; }
-  48% { opacity: 0.93; }
-  50% { opacity: 0.8; }
-  52% { opacity: 0.95; }
-}
 
 /* 🌊 Wave: <Animated> and the homepage headline split their text into letters (--i = position) */
 .fun-wave > span {
@@ -266,32 +283,4 @@ html[data-fun="deepdrop"][data-fun-calm] body::after {
   animation-name: fun-fade-in;
 }
 
-/* 📺 Retro: the whole site becomes The Deep Drop's green CRT screen */
-html[data-fun="retro"] body {
-  background: #052e16 !important;
-}
-html[data-fun="retro"] body * {
-  color: #4ade80 !important;
-  border-color: #166534 !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  box-shadow: none !important;
-  text-shadow: 0 0 6px rgba(34, 197, 94, 0.7);
-  font-family: var(--font-vt323), ui-monospace, "SFMono-Regular", Menlo, monospace !important;
-}
-html[data-fun="retro"] body img {
-  filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(3) brightness(0.8);
-}
-html[data-fun="retro"] body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.28) 0 1px, transparent 1px 3px);
-  pointer-events: none;
-  z-index: 55;
-  animation: fun-flicker 0.25s steps(2) infinite;
-}
-html[data-fun="retro"][data-fun-calm] body::after {
-  animation: none;
-}
 

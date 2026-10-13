@@ -87,6 +87,10 @@ Posts, the profile, menu links, services and site log notes are edited in Sanity
 
 If Sanity can't be reached, pages still render: the header and footer fall back to built-in links, the homepage to a built-in profile, and anything else to a friendly error page (`src/app/error.tsx`).
 
+## Themes
+
+The 🎨 button in the header (and the ⌘K menu) switches between themes: Default (with System / Light / Dark), High contrast, Retro CRT and seasonal ones like Halloween (in the picker Oct 1 – Nov 1; the corner invitation shows from Oct 15). The list lives in `src/lib/themes.ts` and the colours in `src/app/themes.css`; themes re-tint Tailwind's colour scales on top of the dark-mode styles, so components need no theme-specific classes. The choice is saved in the browser and applied by a tiny script in `<head>` before the page paints. Add `?theme=halloween` to any address to preview a theme out of season.
+
 ## Tests
 
 Tests live next to the code they cover, in `__tests__` folders. On the live site, `/tests` shows the results saved when the site was built. In `npm run dev`, the button runs the suite live.
