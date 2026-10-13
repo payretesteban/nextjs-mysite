@@ -8,7 +8,7 @@ import BookButton from "../consultation/BookButton";
  */
 export default function HomeConsultation({ consultation }: { consultation: Consultation }) {
   return (
-    <div className="mt-6 max-w-2xl rounded-2xl border border-sky-200 bg-sky-50/70 p-5 dark:border-sky-900 dark:bg-sky-950/30">
+    <div data-panel="consultation" className="mt-6 max-w-2xl rounded-2xl border border-sky-200 bg-sky-50/70 p-5 dark:border-sky-900 dark:bg-sky-950/30">
       <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">{consultation.homeHeading}</h2>
       <p className="mt-1 text-slate-700 dark:text-slate-300">{consultation.homeText}</p>
       <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3">

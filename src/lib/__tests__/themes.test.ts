@@ -1,14 +1,15 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { THEMES, availableThemes, currentSeason, getTheme, inSeason, isMode, isThemeId, modeAttribute, themeInitScript } from "../themes";
+import { DEFAULT_THEME, THEMES, availableThemes, currentSeason, getTheme, inSeason, isMode, isThemeId, modeAttribute, themeInitScript } from "../themes";
 
 const halloween = getTheme("halloween");
 const day = (month: number, date: number) => new Date(2026, month - 1, date, 12);
 
 describe("Themes", () => {
-  it("lists Default, High contrast, Retro and Halloween, each with a preview", () => {
-    expect(THEMES.map((t) => t.id)).toEqual(["default", "contrast", "retro", "halloween"]);
+  it("lists Circuit (the default), Minimalist, High contrast, Retro and Halloween, each with a preview", () => {
+    expect(THEMES.map((t) => t.id)).toEqual(["circuit", "minimalist", "contrast", "retro", "halloween"]);
+    expect(DEFAULT_THEME).toBe("circuit");
     for (const t of THEMES) expect(t.swatches).toHaveLength(3);
-    expect(getTheme("nope").id).toBe("default");
+    expect(getTheme("nope").id).toBe("circuit");
     expect(isThemeId("retro")).toBe(true);
     expect(isThemeId("summer")).toBe(false);
     expect(isMode("dark")).toBe(true);
@@ -20,7 +21,7 @@ describe("Themes", () => {
     expect(inSeason(halloween, day(10, 1))).toBe(true);
     expect(inSeason(halloween, day(11, 1))).toBe(true);
     expect(inSeason(halloween, day(11, 2))).toBe(false);
-    expect(availableThemes(day(9, 30)).map((t) => t.id)).toEqual(["default", "contrast", "retro"]);
+    expect(availableThemes(day(9, 30)).map((t) => t.id)).toEqual(["circuit", "minimalist", "contrast", "retro"]);
     expect(availableThemes(day(10, 13)).map((t) => t.id)).toContain("halloween");
     expect(currentSeason(day(10, 14))).toBeNull(); // in the picker, but no invitation yet
     expect(currentSeason(day(10, 15))?.id).toBe("halloween");
@@ -35,11 +36,12 @@ describe("Themes", () => {
     expect(inSeason(winter, day(2, 1))).toBe(false);
   });
 
-  it("builds every theme but Default on the dark styles; Default follows the visitor", () => {
+  it("builds every theme but Minimalist on the dark styles; Minimalist follows the visitor", () => {
     expect(modeAttribute("retro", "light")).toBe("dark");
-    expect(modeAttribute("default", "system")).toBeNull();
-    expect(modeAttribute("default", "light")).toBe("light");
-    expect(modeAttribute("default", "dark")).toBe("dark");
+    expect(modeAttribute("circuit", "light")).toBe("dark");
+    expect(modeAttribute("minimalist", "system")).toBeNull();
+    expect(modeAttribute("minimalist", "light")).toBe("light");
+    expect(modeAttribute("minimalist", "dark")).toBe("dark");
   });
 });
 
@@ -67,10 +69,9 @@ describe("Applying the saved theme before the page paints", () => {
     delete root.dataset.mode;
   });
 
-  it("does nothing for a first-time visitor (Default theme, device light/dark)", () => {
+  it("shows a first-time visitor the Circuit theme", () => {
     run();
-    expect(root.dataset.theme).toBeUndefined();
-    expect(root.dataset.mode).toBeUndefined();
+    expect(root.dataset).toMatchObject({ theme: "circuit", mode: "dark" });
   });
 
   it("applies a saved theme and mode", () => {
@@ -78,24 +79,35 @@ describe("Applying the saved theme before the page paints", () => {
     run();
     expect(root.dataset).toMatchObject({ theme: "retro", mode: "dark" });
 
-    delete root.dataset.theme;
-    delete root.dataset.mode;
-    localStorage.setItem("ep-theme", "default");
+    localStorage.setItem("ep-theme", "minimalist");
     localStorage.setItem("ep-mode", "light");
     run();
     expect(root.dataset.theme).toBeUndefined();
     expect(root.dataset.mode).toBe("light");
-  });
 
-  it("drops a seasonal theme once its season is over, and ignores junk", () => {
-    localStorage.setItem("ep-theme", "halloween");
-    run("", day(11, 10));
-    expect(root.dataset.theme).toBeUndefined();
-    localStorage.setItem("ep-theme", "<script>");
-    localStorage.setItem("ep-mode", "sepia");
+    // Minimalist following the device: the server's default attributes are removed
+    root.dataset.theme = "circuit";
+    root.dataset.mode = "dark";
+    localStorage.setItem("ep-mode", "system");
     run();
     expect(root.dataset.theme).toBeUndefined();
     expect(root.dataset.mode).toBeUndefined();
+  });
+
+  it("treats the old saved \"default\" theme as Minimalist", () => {
+    localStorage.setItem("ep-theme", "default");
+    run();
+    expect(root.dataset.theme).toBeUndefined();
+  });
+
+  it("goes back to Circuit once a seasonal theme's season is over, and ignores junk", () => {
+    localStorage.setItem("ep-theme", "halloween");
+    run("", day(11, 10));
+    expect(root.dataset.theme).toBe("circuit");
+    localStorage.setItem("ep-theme", "<script>");
+    localStorage.setItem("ep-mode", "sepia");
+    run();
+    expect(root.dataset).toMatchObject({ theme: "circuit", mode: "dark" });
   });
 
   it("lets a ?theme= link preview any theme, even out of season, and remembers it", () => {

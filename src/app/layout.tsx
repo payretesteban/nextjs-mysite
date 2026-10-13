@@ -1,7 +1,8 @@
 import { getSiteMetadata } from "@/lib/seo";
 import { getLayoutData } from "@/lib/data";
 import { Geist, Geist_Mono, VT323 } from "next/font/google";
-import { themeInitScript } from "@/lib/themes";
+import Script from "next/script";
+import { DEFAULT_THEME, themeInitScript } from "@/lib/themes";
 import { AnimationProvider } from "./context/AnimationContext";
 import ContactProvider from "./contact/ContactProvider";
 import Header from "./header";
@@ -48,11 +49,14 @@ export default async function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${vt323.variable} h-full antialiased`}
+      // The default theme, so the page looks right even before (or without) JavaScript
+      data-theme={DEFAULT_THEME}
+      data-mode="dark"
       suppressHydrationWarning
     >
       <head>
         {/* Applies the saved theme and light/dark choice before the first paint (no flash) */}
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript() }} />
+        <Script id="theme-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeInitScript() }} />
       </head>
       <body className={`${geistSans.className} min-h-full flex flex-col bg-white text-slate-900`}>
         <AnimationProvider>          

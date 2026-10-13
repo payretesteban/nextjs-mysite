@@ -16,6 +16,14 @@ vi.mock("../LabStrip", () => ({
 const item = (over: Partial<LabItem>): LabItem => ({ _id: "x", href: "/x", title: "X", blurb: "", tech: [], status: "live", preview: "generic", ...over });
 
 describe("The Lab cards", () => {
+  it("marks the section, its heading and every card so themes can style them", () => {
+    const { container } = render(
+      <TheLab items={[item({ _id: "a", href: "/scope" }), item({ _id: "b", href: "https://example.com/demo" })]} tests={null} />
+    );
+    expect(container.querySelector('section[data-section="lab"] h2[data-trace]')).toHaveTextContent("The Lab");
+    expect(container.querySelectorAll("[data-lab-card]")).toHaveLength(2);
+  });
+
   it("opens pages on this site in the same tab", () => {
     render(<TheLab items={[item({ _id: "a", href: "/scope", title: "Project Scoping" })]} tests={null} />);
     const card = screen.getByRole("link", { name: /Project Scoping/ });

@@ -9,6 +9,7 @@ import BookButton from "../consultation/BookButton";
 export default function ConsultationSection({ consultation }: { consultation: Consultation }) {
   return (
     <section
+      data-panel="consultation"
       aria-labelledby="consultation-heading"
       className="mt-12 rounded-3xl bg-gradient-to-br from-sky-50 to-indigo-50 p-6 ring-1 ring-sky-200 sm:p-8 dark:from-sky-950/40 dark:to-indigo-950/40 dark:ring-sky-900"
     >

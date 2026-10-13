@@ -42,7 +42,7 @@ export default function PostList({ posts }: { posts: SanityPost[] }) {
   const regular = posts.filter((post) => !post.featured);
 
   return (
-    <div>
+    <div data-post-list>
       {featured.length > 0 && (
         <ul className="space-y-2" aria-label="Featured posts">
           {featured.map((post) => (
@@ -56,7 +56,7 @@ export default function PostList({ posts }: { posts: SanityPost[] }) {
                   <span className="text-lg leading-snug font-semibold tracking-tight text-slate-900 transition-colors group-hover:text-sky-700 dark:text-slate-100 dark:group-hover:text-sky-400">
                     {post.title}
                   </span>
-                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-amber-800 uppercase sm:ml-auto">
+                  <span data-pill className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-amber-800 uppercase sm:ml-auto">
                     Featured
                   </span>
                 </span>

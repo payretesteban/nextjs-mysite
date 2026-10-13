@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { STORAGE, isMode, isThemeId, modeAttribute, type Mode, type ThemeId } from "@/lib/themes";
+import { BASE_THEME, DEFAULT_THEME, STORAGE, isMode, isThemeId, modeAttribute, type Mode, type ThemeId } from "@/lib/themes";
 
 /** Components showing the theme, re-rendered when it changes. */
 const listeners = new Set<() => void>();
@@ -24,10 +24,10 @@ function write(name: string, value: string) {
   }
 }
 
-/** The theme on the page (set by the head script or by a choice in the picker). */
+/** The theme on the page (set by the server/head script or by a choice in the picker); no attribute = Minimalist. */
 function currentTheme(): ThemeId {
   const value = document.documentElement.dataset.theme;
-  return isThemeId(value) ? value : "default";
+  return isThemeId(value) ? value : BASE_THEME;
 }
 
 /** The visitor's light/dark choice (kept even while another theme is on). */
@@ -39,7 +39,7 @@ function currentMode(): Mode {
 /** Puts a theme and mode on <html>, where the CSS picks them up. */
 function apply(theme: ThemeId, mode: Mode) {
   const root = document.documentElement;
-  if (theme === "default") delete root.dataset.theme;
+  if (theme === BASE_THEME) delete root.dataset.theme;
   else root.dataset.theme = theme;
   const attribute = modeAttribute(theme, mode);
   if (attribute) root.dataset.mode = attribute;
@@ -67,13 +67,13 @@ function subscribe(listener: () => void) {
 
 /**
  * The current theme and mode, e.g. { theme: "retro", mode: "system" }. The server render assumes the
- * defaults; the real values (already applied to the page by the head script) take over after hydration.
+ * default theme; the real values (already applied to the page by the head script) take over after hydration.
  */
 export function useTheme(): { theme: ThemeId; mode: Mode } {
   const snapshot = useSyncExternalStore(
     subscribe,
     () => `${currentTheme()}|${currentMode()}`,
-    () => "default|system"
+    () => `${DEFAULT_THEME}|system`
   );
   const [theme, mode] = snapshot.split("|") as [ThemeId, Mode];
   return { theme, mode };
@@ -82,7 +82,7 @@ export function useTheme(): { theme: ThemeId; mode: Mode } {
 /** True when the page currently looks dark (a dark theme, dark mode, or the device's dark setting). */
 export function pageLooksDark(): boolean {
   const root = document.documentElement;
-  if (root.dataset.theme && root.dataset.theme !== "default") return true;
+  if (root.dataset.theme) return true; // every theme except Minimalist is dark
   if (root.dataset.mode) return root.dataset.mode === "dark";
   return Boolean(window.matchMedia?.("(prefers-color-scheme: dark)").matches);
 }

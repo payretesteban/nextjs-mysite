@@ -15,13 +15,13 @@ const CARD_CLASS =
 function LabCard({ href, children }: { href: string; children: React.ReactNode }) {
   if (isExternalHref(href)) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={CARD_CLASS}>
+      <a href={href} target="_blank" rel="noopener noreferrer" data-lab-card className={CARD_CLASS}>
         {children}
       </a>
     );
   }
   return (
-    <Link href={href} prefetch={false} className={CARD_CLASS}>
+    <Link href={href} prefetch={false} data-lab-card className={CARD_CLASS}>
       {children}
     </Link>
   );
@@ -52,8 +52,8 @@ function LabCardImage({ image }: { image: LabImage }) {
  */
 export default function TheLab({ items, tests }: { items: LabItem[]; tests: LabTestStats | null }) {
   return (
-    <section aria-labelledby="lab-heading" className="mb-14">
-      <h2 id="lab-heading" className="text-2xl font-bold tracking-tight">
+    <section aria-labelledby="lab-heading" data-section="lab" className="mb-14">
+      <h2 id="lab-heading" data-trace className="text-2xl font-bold tracking-tight">
         The Lab
       </h2>
       <p className="mt-1 mb-4 text-sm text-slate-600 dark:text-slate-400">Experiments I built, on this site and beyond. Try them.</p>

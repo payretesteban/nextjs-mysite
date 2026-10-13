@@ -82,15 +82,62 @@ function Skeleton({ height }: { height: number }) {
   );
 }
 
+/** The traces from the business card: lines that step in from the right edge and end in a node. */
+const TRACES = [
+  "M230 10 H190 L160 40 H70",
+  "M230 62 H200 L180 82 H120",
+  "M230 124 H170 L140 154 H40",
+  "M230 176 H190 L170 196 H90",
+  "M230 238 H160 L130 268 H60",
+];
+const NODES: [number, number][] = [
+  [64, 40],
+  [114, 82],
+  [34, 154],
+  [84, 196],
+  [54, 268],
+];
+
+/** Circuit theme: the card's traces in the top-right corner of the page (scrolls away with it), with a pulse. */
+function CircuitTraces() {
+  return (
+    <div aria-hidden="true" data-testid="theme-decorations" className="pointer-events-none absolute top-24 right-0 hidden w-[230px] opacity-80 xl:block print:hidden">
+      <svg viewBox="0 0 230 300" fill="none" strokeWidth="1.6" className="block w-full">
+        <defs>
+          <linearGradient id="circuit-trace" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#62c3ea" />
+            <stop offset="0.5" stopColor="#5ac7bc" />
+            <stop offset="1" stopColor="#5cc488" />
+          </linearGradient>
+        </defs>
+        <g stroke="url(#circuit-trace)">
+          {TRACES.map((d) => (
+            <path key={d} d={d} />
+          ))}
+          {NODES.map(([cx, cy]) => (
+            <circle key={cx + "," + cy} cx={cx} cy={cy} r="5" />
+          ))}
+        </g>
+        <g stroke="#ffffff" strokeWidth="2" strokeLinecap="round">
+          {TRACES.map((d, i) => (
+            <path key={d} d={d} className="theme-circuit-pulse" style={{ animationDelay: `${i * 0.9}s` }} />
+          ))}
+        </g>
+      </svg>
+    </div>
+  );
+}
+
 /**
  * Small extras for themes that have them, drawn above the page but ignoring the mouse and hidden from
- * screen readers. Halloween: bats flapping across the screen, a skeleton hanging in the top corner and
+ * screen readers. Circuit: the business card's traces in the top-right corner (wide screens only). Halloween: bats flapping across the screen, a skeleton hanging in the top corner and
  * jack-o'-lanterns flickering in the bottom corners (corner pieces only on wide screens, so they never
  * cover the text); section headings get a tiny pumpkin too (themes.css). Everything holds still for
  * visitors who prefer reduced motion.
  */
 export default function ThemeDecorations() {
   const { theme } = useTheme();
+  if (theme === "circuit") return <CircuitTraces />;
   if (theme !== "halloween") return null;
   return (
     <div aria-hidden="true" data-testid="theme-decorations" className="pointer-events-none fixed inset-0 z-[55] overflow-hidden print:hidden">

@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { STORAGE, currentSeason, type Theme } from "@/lib/themes";
+import { BASE_THEME, DEFAULT_THEME, STORAGE, currentSeason, type Theme } from "@/lib/themes";
 import { setTheme, useTheme } from "./useTheme";
+
+/** True on the everyday themes (Circuit or Minimalist), where a seasonal invitation makes sense. */
+const onEverydayTheme = (theme: string) => theme === DEFAULT_THEME || theme === BASE_THEME;
 
 /** Storage key for "already invited this season", e.g. "ep-theme-nudge:halloween-2026". */
 const nudgeKey = (theme: Theme, date: Date) => `${STORAGE.nudge}:${theme.id}-${date.getFullYear()}`;
@@ -27,15 +30,15 @@ function remember(key: string, answer: string) {
 
 /**
  * A small, one-time invitation in the corner during a theme's season ("It's spooky season. Try the
- * Halloween theme?"). Appears a few seconds after the page loads, only if the visitor is on the Default
- * theme and hasn't answered it this year. Either button closes it for the rest of the season.
+ * Halloween theme?"). Appears a few seconds after the page loads, only if the visitor is on an everyday
+ * theme (Circuit or Minimalist) and hasn't answered it this year. Either button closes it for the rest of the season.
  */
 export default function SeasonalNudge() {
   const { theme: current } = useTheme();
   const [offer, setOffer] = useState<{ theme: Theme; key: string } | null>(null);
 
   useEffect(() => {
-    if (current !== "default") return;
+    if (!onEverydayTheme(current)) return;
     const now = new Date();
     const season = currentSeason(now);
     if (!season) return;
@@ -45,7 +48,7 @@ export default function SeasonalNudge() {
     return () => clearTimeout(timer);
   }, [current]);
 
-  if (!offer || current !== "default") return null;
+  if (!offer || !onEverydayTheme(current)) return null;
 
   /** Closes the invitation for the season, optionally switching to the theme. */
   const answer = (accept: boolean) => {

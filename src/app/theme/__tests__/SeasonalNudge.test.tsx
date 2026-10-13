@@ -27,6 +27,14 @@ describe("Seasonal theme invitation", () => {
     expect(screen.queryByRole("region", { name: "Seasonal theme" })).not.toBeInTheDocument();
   });
 
+  it("also invites visitors on the Circuit theme", () => {
+    vi.setSystemTime(new Date(2026, 9, 20, 12));
+    act(() => setTheme("circuit"));
+    render(<SeasonalNudge />);
+    act(() => vi.advanceTimersByTime(4000));
+    expect(screen.getByRole("region", { name: "Seasonal theme" })).toBeInTheDocument();
+  });
+
   it("asks only once a season", () => {
     vi.setSystemTime(new Date(2026, 9, 20, 12));
     const { unmount } = render(<SeasonalNudge />);
@@ -61,6 +69,14 @@ describe("Seasonal theme invitation", () => {
 });
 
 describe("Theme decorations", () => {
+  it("draws the business card's circuit traces in the Circuit theme", () => {
+    act(() => setTheme("circuit"));
+    const { container } = render(<ThemeDecorations />);
+    expect(container.querySelector("[data-testid=theme-decorations]")).toHaveAttribute("aria-hidden", "true");
+    expect(container.querySelectorAll(".theme-circuit-pulse")).toHaveLength(5);
+    act(() => setTheme("minimalist"));
+  });
+
   beforeEach(() => {
     delete root.dataset.theme;
   });
@@ -75,7 +91,7 @@ describe("Theme decorations", () => {
     expect(layer.querySelectorAll(".theme-bat-wing")).toHaveLength(6); // two flapping wings per bat
     expect(layer.querySelectorAll(".theme-pumpkin")).toHaveLength(2);
     expect(layer.querySelectorAll(".theme-skeleton")).toHaveLength(1);
-    act(() => setTheme("default"));
+    act(() => setTheme("minimalist"));
     expect(container).toBeEmptyDOMElement();
   });
 });

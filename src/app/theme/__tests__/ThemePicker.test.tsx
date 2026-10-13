@@ -17,11 +17,12 @@ describe("Theme picker", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     open();
     expect(screen.getByRole("button", { name: "Theme and colours" })).toHaveAttribute("aria-expanded", "true");
-    expect(screen.getByRole("radio", { name: /Default/ })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radio", { name: /Minimalist/ })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radio", { name: /Circuit/ })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /High contrast/ })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Retro CRT/ })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /System/ })).toHaveAttribute("aria-checked", "true");
-    expect(screen.getByRole("radio", { name: /Default/ })).toHaveFocus();
+    expect(screen.getByRole("radio", { name: /Minimalist/ })).toHaveFocus();
   });
 
   it("switches the theme straight away and remembers it", () => {
@@ -33,10 +34,10 @@ describe("Theme picker", () => {
     expect(screen.getByRole("radio", { name: /Retro CRT/ })).toHaveAttribute("aria-checked", "true");
     // Light/dark only applies to the Default theme
     expect(screen.getByRole("radio", { name: /Light/ })).toBeDisabled();
-    expect(screen.getByText("Light and dark apply to the Default theme.")).toBeInTheDocument();
+    expect(screen.getByText("Light and dark apply to the Minimalist theme.")).toBeInTheDocument();
   });
 
-  it("switches light and dark for the Default theme, or follows the device", () => {
+  it("switches light and dark for the Minimalist theme, or follows the device", () => {
     render(<ThemePicker />);
     open();
     fireEvent.click(screen.getByRole("radio", { name: /Dark/ }));
@@ -46,10 +47,17 @@ describe("Theme picker", () => {
     expect(root.dataset.mode).toBeUndefined();
   });
 
+  it("switches to Circuit, the default theme", () => {
+    render(<ThemePicker />);
+    open();
+    fireEvent.click(screen.getByRole("radio", { name: /Circuit/ }));
+    expect(root.dataset).toMatchObject({ theme: "circuit", mode: "dark" });
+  });
+
   it("moves between themes with the arrow keys", () => {
     render(<ThemePicker />);
     open();
-    fireEvent.keyDown(screen.getByRole("radio", { name: /Default/ }), { key: "ArrowRight" });
+    fireEvent.keyDown(screen.getByRole("radio", { name: /Minimalist/ }), { key: "ArrowRight" });
     expect(root.dataset.theme).toBe("contrast");
     expect(screen.getByRole("radio", { name: /High contrast/ })).toHaveFocus();
     fireEvent.keyDown(screen.getByRole("radio", { name: /High contrast/ }), { key: "ArrowLeft" });

@@ -97,6 +97,7 @@ export default function BookButton({
 
   return (
     <a
+      data-book-button
       href={bookingUrl || "#contact"}
       target={bookingUrl ? "_blank" : undefined}
       rel={bookingUrl ? "noopener noreferrer" : undefined}

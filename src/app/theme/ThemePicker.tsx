@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
-import { THEMES, availableThemes, type Mode, type Theme } from "@/lib/themes";
+import { BASE_THEME, THEMES, availableThemes, type Mode, type Theme } from "@/lib/themes";
 import { setMode, setTheme, useTheme } from "./useTheme";
 
 const MODE_OPTIONS: { id: Mode; label: string; icon: string }[] = [
@@ -47,7 +47,7 @@ function Preview({ theme }: { theme: Theme }) {
 /**
  * The 🎨 button in the header and its panel (full width under the header on phones): theme cards
  * (seasonal ones only in season) and the
- * System / Light / Dark switch, which applies to the Default theme. Closes on Esc, a click outside or
+ * System / Light / Dark switch, which applies to the Minimalist theme. Closes on Esc, a click outside or
  * after picking; focus goes back to the button.
  */
 export default function ThemePicker() {
@@ -94,7 +94,7 @@ export default function ThemePicker() {
     next.click();
   }
 
-  const modeApplies = theme === "default";
+  const modeApplies = theme === BASE_THEME;
 
   return (
     <div className="relative">
@@ -189,7 +189,7 @@ export default function ThemePicker() {
           </div>
           {!modeApplies && (
             <p id={`${panelId}-mode-note`} className="mt-2 px-1 text-xs text-slate-600 dark:text-slate-400">
-              Light and dark apply to the Default theme.
+              Light and dark apply to the Minimalist theme.
             </p>
           )}
         </div>

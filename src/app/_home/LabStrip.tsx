@@ -174,7 +174,7 @@ export default function LabStrip({ label, children }: { label: string; children:
           </li>
         ))}
       </ul>
-      <div className="mt-1 flex items-center justify-between gap-4">
+      <div data-lab-controls className="mt-1 flex items-center justify-between gap-4">
         {/* One bar per page (scroll position), not per card; hidden when everything fits */}
         {pages > 1 ? (
           <div className="flex gap-1.5">

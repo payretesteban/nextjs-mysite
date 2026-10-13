@@ -14,6 +14,13 @@ const post = (i: number, extra = {}) => ({
 const posts = Array.from({ length: 8 }, (_, i) => post(i + 1));
 
 describe("Posts list", () => {
+  it("marks the list, the featured pill and the homepage section so themes can style them", () => {
+    const { container } = render(<HomePosts posts={[post(1, { featured: true }), post(2)]} limit={5} total={2} />);
+    expect(container.querySelector('section[data-section="posts"] h2[data-trace]')).toHaveTextContent("Posts");
+    expect(container.querySelector("[data-post-list]")).toBeInTheDocument();
+    expect(container.querySelector("[data-pill]")).toHaveTextContent("Featured");
+  });
+
   it("shows featured posts first in their own highlighted list, then the rest", () => {
     render(<PostList posts={[post(1), post(2, { featured: true }), post(3)]} />);
     const featured = screen.getByRole("list", { name: /featured posts/i });

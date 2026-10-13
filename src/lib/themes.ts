@@ -8,10 +8,18 @@
  * a decoration in ThemeDecorations.tsx.
  */
 
-export const THEME_IDS = ["default", "contrast", "retro", "halloween"] as const;
+export const THEME_IDS = ["circuit", "minimalist", "contrast", "retro", "halloween"] as const;
 export type ThemeId = (typeof THEME_IDS)[number];
 
-/** Light/dark preference; only applies to the Default theme (the others have their own colours). */
+/** What first-time visitors see (also rendered by the server, so the page looks right without JavaScript). */
+export const DEFAULT_THEME: ThemeId = "circuit";
+/**
+ * The theme that needs no `data-theme` attribute: the site's base styles, light or dark. Every other
+ * theme is a `data-theme` value on <html>.
+ */
+export const BASE_THEME: ThemeId = "minimalist";
+
+/** Light/dark preference; only applies to the Minimalist theme (the others have their own colours). */
 export const MODES = ["system", "light", "dark"] as const;
 export type Mode = (typeof MODES)[number];
 
@@ -41,7 +49,8 @@ export interface Theme {
 }
 
 export const THEMES: Theme[] = [
-  { id: "default", name: "Default", description: "The usual look, light or dark", swatches: ["#ffffff", "#0f172a", "#0ea5e9"], dark: false },
+  { id: "circuit", name: "Circuit", description: "Ink navy, sky and teal, like my business card", swatches: ["#161720", "#f4f5f7", "#5ac7bc"], dark: true },
+  { id: "minimalist", name: "Minimalist", description: "Clean and simple, light or dark", swatches: ["#ffffff", "#0f172a", "#0ea5e9"], dark: false },
   { id: "contrast", name: "High contrast", description: "Black and white with yellow accents", swatches: ["#000000", "#ffffff", "#ffff00"], dark: true },
   { id: "retro", name: "Retro CRT", description: "Green phosphor terminal, like The Deep Drop", swatches: ["#03170c", "#4ade80", "#bbf7d0"], dark: true },
   {
@@ -59,9 +68,9 @@ const BY_ID = new Map(THEMES.map((t) => [t.id, t]));
 /** Browser storage keys. */
 export const STORAGE = { theme: "ep-theme", mode: "ep-mode", nudge: "ep-theme-nudge" } as const;
 
-/** The theme with this id (Default for anything unknown). */
+/** The theme with this id (the default theme for anything unknown). */
 export function getTheme(id: string | null | undefined): Theme {
-  return BY_ID.get(id as ThemeId) ?? BY_ID.get("default")!;
+  return BY_ID.get(id as ThemeId) ?? BY_ID.get(DEFAULT_THEME)!;
 }
 
 /** True for a known theme id. */
@@ -96,25 +105,26 @@ export function currentSeason(date: Date): Theme | null {
 }
 
 /**
- * The light/dark attribute for the page: themes other than Default are built on the dark styles (they
- * re-tint them, see themes.css); Default follows the visitor's mode (no attribute = follow the device).
+ * The light/dark attribute for the page: themes other than Minimalist are built on the dark styles (they
+ * re-tint them, see themes.css); Minimalist follows the visitor's mode (no attribute = follow the device).
  */
 export function modeAttribute(theme: ThemeId, mode: Mode): "light" | "dark" | null {
-  if (theme !== "default") return "dark";
+  if (theme !== BASE_THEME) return "dark";
   return mode === "system" ? null : mode;
 }
 
 /**
  * The script that runs in <head> before anything is drawn: reads the saved theme and mode (or a
  * `?theme=` link, handy for previewing a seasonal theme out of season) and sets `data-theme` and
- * `data-mode` on <html>, so there's no flash of the wrong colours. Kept tiny and self-contained.
+ * `data-mode` on <html>, so there's no flash of the wrong colours. The server already renders the
+ * default theme's attributes; this corrects them for returning visitors. Kept tiny and self-contained.
  */
 export function themeInitScript(): string {
   const seasons = Object.fromEntries(THEMES.filter((t) => t.season).map((t) => [t.id, [key(t.season!.from), key(t.season!.to)]]));
-  const config = { ids: THEME_IDS, modes: MODES, seasons, keys: STORAGE };
+  const config = { ids: THEME_IDS, modes: MODES, seasons, keys: STORAGE, fallback: DEFAULT_THEME, base: BASE_THEME };
   return `(function(){try{var c=${JSON.stringify(config)},d=document.documentElement,ls=window.localStorage,now=new Date(),k=(now.getMonth()+1)*100+now.getDate();
-var p=new URLSearchParams(location.search).get("theme"),t=ls.getItem(c.keys.theme),m=ls.getItem(c.keys.mode);
+var p=new URLSearchParams(location.search).get("theme"),t=ls.getItem(c.keys.theme),m=ls.getItem(c.keys.mode);if(t==="default")t=c.base;
 if(p&&c.ids.indexOf(p)>=0){t=p;ls.setItem(c.keys.theme,p);}else{var s=c.seasons[t];if(s&&!(s[0]<=s[1]?k>=s[0]&&k<=s[1]:k>=s[0]||k<=s[1]))t=null;}
-if(c.ids.indexOf(t)<0)t="default";if(c.modes.indexOf(m)<0)m="system";
-if(t!=="default")d.setAttribute("data-theme",t);var a=t!=="default"?"dark":(m==="system"?null:m);if(a)d.setAttribute("data-mode",a);}catch(e){}})();`;
+if(c.ids.indexOf(t)<0)t=c.fallback;if(c.modes.indexOf(m)<0)m="system";
+if(t===c.base)d.removeAttribute("data-theme");else d.setAttribute("data-theme",t);var a=t!==c.base?"dark":(m==="system"?null:m);if(a)d.setAttribute("data-mode",a);else d.removeAttribute("data-mode");}catch(e){}})();`;
 }

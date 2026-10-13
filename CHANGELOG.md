@@ -17,6 +17,13 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.12.0 — 2026-10-13
+
+- New default theme, Circuit, based on my business card: ink-navy background with a dot grid, the card's circuit traces glowing in the corner, the `<EP/>` logo in sky blue with a green cursor, `//` before section headings, and the free consultation panel in the card's teal.
+- Circuit makes The Lab and Posts stand out: Lab cards get a sky-to-green glowing edge and sky tech chips, section headings run into a circuit line, and posts hang off a teal trace like nodes (featured posts in teal, an arrow on hover); the Lab's page bars and arrow buttons are sky blue).
+- The previous look is now the Minimalist theme (with System / Light / Dark), still one click away in the 🎨 picker. Anyone who had picked it keeps it.
+- The theme is now set by the server too, so the page looks right even before JavaScript loads.
+
 ## 1.11.0 — 2026-10-13
 
 - Site themes: a new 🎨 button in the header opens a theme panel with preview cards: Default, High contrast, Retro CRT (moved out of "Some fun") and Halloween (offered Oct 1 – Nov 1: midnight purple and pumpkin orange, bats flapping across the screen, a swaying skeleton, flickering jack-o'-lanterns in the corners and next to section headings; all still for reduced motion). Themes are also in the ⌘K menu.
