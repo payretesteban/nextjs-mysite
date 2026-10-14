@@ -146,13 +146,13 @@ export default function ThemeDecorations() {
           <Bat size={bat.size} flap={bat.flap} />
         </span>
       ))}
-      <span className="theme-skeleton absolute top-16 right-[3%] hidden lg:block xl:hidden min-[1440px]:block">
+      <span className="theme-skeleton absolute top-16 right-[3%] hidden lg:block">
         <Skeleton height={150} />
       </span>
-      <span className="theme-pumpkin absolute bottom-3 left-[2%] hidden lg:block xl:hidden min-[1440px]:block">
+      <span className="theme-pumpkin absolute bottom-3 left-[1.5%] hidden lg:block">
         <Pumpkin size={72} />
       </span>
-      <span className="theme-pumpkin absolute right-[2.5%] bottom-3 hidden lg:block xl:hidden min-[1440px]:block">
+      <span className="theme-pumpkin absolute right-[2.5%] bottom-3 hidden lg:block">
         <Pumpkin size={48} />
       </span>
     </div>

@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.13.2 — 2026-10-14
+
+- Fixed the Halloween skeleton and pumpkins being hidden on screens 1280px and wider (since 1.13.0 they only showed on medium screens). They show on all large screens again; the left pumpkin moved slightly closer to the edge so it never touches the wider content.
+
 ## 1.13.1 — 2026-10-14
 
 - Fixed the /tests page on the live site showing "Couldn't run the tests – Vitest timed out after 120s". The test suite (now 385 tests, with coverage) took about 3 minutes on the build machine. Tests now reuse the browser-like test environment instead of rebuilding it for every file, which makes the full run with coverage about twice as fast (≈1.5 minutes on 2 CPUs), and the time limit is raised to 5 minutes.
