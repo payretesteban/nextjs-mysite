@@ -103,6 +103,7 @@ export const consultationQuery = defineQuery(`
     text,
     buttonLabel,
     servicesLinkLabel,
+    homeSteps[] { title, text },
     bookingUrl
   }
 `);

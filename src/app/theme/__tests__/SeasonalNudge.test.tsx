@@ -74,7 +74,7 @@ describe("Theme decorations", () => {
     const { container } = render(<ThemeDecorations />);
     expect(container.querySelector("[data-testid=theme-decorations]")).toHaveAttribute("aria-hidden", "true");
     expect(container.querySelectorAll(".theme-circuit-pulse")).toHaveLength(5);
-    act(() => setTheme("minimalist"));
+    act(() => setTheme("clean"));
   });
 
   beforeEach(() => {
@@ -91,7 +91,7 @@ describe("Theme decorations", () => {
     expect(layer.querySelectorAll(".theme-bat-wing")).toHaveLength(6); // two flapping wings per bat
     expect(layer.querySelectorAll(".theme-pumpkin")).toHaveLength(2);
     expect(layer.querySelectorAll(".theme-skeleton")).toHaveLength(1);
-    act(() => setTheme("minimalist"));
+    act(() => setTheme("clean"));
     expect(container).toBeEmptyDOMElement();
   });
 });

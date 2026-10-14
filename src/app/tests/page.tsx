@@ -17,7 +17,7 @@ export default function TestsPage() {
   const mode = process.env.NODE_ENV === "development" ? "live" : "snapshot";
 
   return (
-    <div className="container mx-auto min-h-screen max-w-3xl p-8">
+    <div className="container mx-auto min-h-screen max-w-3xl xl:max-w-6xl p-8">
       <section className="mb-10">
         <h1 className="text-4xl font-bold">
           <Animated>Test Suite</Animated>

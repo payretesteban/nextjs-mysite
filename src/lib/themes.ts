@@ -8,7 +8,7 @@
  * a decoration in ThemeDecorations.tsx.
  */
 
-export const THEME_IDS = ["circuit", "minimalist", "contrast", "retro", "halloween"] as const;
+export const THEME_IDS = ["circuit", "clean", "contrast", "retro", "halloween"] as const;
 export type ThemeId = (typeof THEME_IDS)[number];
 
 /** What first-time visitors see (also rendered by the server, so the page looks right without JavaScript). */
@@ -17,9 +17,9 @@ export const DEFAULT_THEME: ThemeId = "circuit";
  * The theme that needs no `data-theme` attribute: the site's base styles, light or dark. Every other
  * theme is a `data-theme` value on <html>.
  */
-export const BASE_THEME: ThemeId = "minimalist";
+export const BASE_THEME: ThemeId = "clean";
 
-/** Light/dark preference; only applies to the Minimalist theme (the others have their own colours). */
+/** Light/dark preference; only applies to the Clean theme (the others have their own colours). */
 export const MODES = ["system", "light", "dark"] as const;
 export type Mode = (typeof MODES)[number];
 
@@ -50,7 +50,7 @@ export interface Theme {
 
 export const THEMES: Theme[] = [
   { id: "circuit", name: "Circuit", description: "Ink navy, sky and teal, like my business card", swatches: ["#161720", "#f4f5f7", "#5ac7bc"], dark: true },
-  { id: "minimalist", name: "Minimalist", description: "Clean and simple, light or dark", swatches: ["#ffffff", "#0f172a", "#0ea5e9"], dark: false },
+  { id: "clean", name: "Clean", description: "Simple and calm, light or dark", swatches: ["#ffffff", "#0f172a", "#0ea5e9"], dark: false },
   { id: "contrast", name: "High contrast", description: "Black and white with yellow accents", swatches: ["#000000", "#ffffff", "#ffff00"], dark: true },
   { id: "retro", name: "Retro CRT", description: "Green phosphor terminal, like The Deep Drop", swatches: ["#03170c", "#4ade80", "#bbf7d0"], dark: true },
   {
@@ -105,8 +105,8 @@ export function currentSeason(date: Date): Theme | null {
 }
 
 /**
- * The light/dark attribute for the page: themes other than Minimalist are built on the dark styles (they
- * re-tint them, see themes.css); Minimalist follows the visitor's mode (no attribute = follow the device).
+ * The light/dark attribute for the page: themes other than Clean are built on the dark styles (they
+ * re-tint them, see themes.css); Clean follows the visitor's mode (no attribute = follow the device).
  */
 export function modeAttribute(theme: ThemeId, mode: Mode): "light" | "dark" | null {
   if (theme !== BASE_THEME) return "dark";
@@ -123,7 +123,7 @@ export function themeInitScript(): string {
   const seasons = Object.fromEntries(THEMES.filter((t) => t.season).map((t) => [t.id, [key(t.season!.from), key(t.season!.to)]]));
   const config = { ids: THEME_IDS, modes: MODES, seasons, keys: STORAGE, fallback: DEFAULT_THEME, base: BASE_THEME };
   return `(function(){try{var c=${JSON.stringify(config)},d=document.documentElement,ls=window.localStorage,now=new Date(),k=(now.getMonth()+1)*100+now.getDate();
-var p=new URLSearchParams(location.search).get("theme"),t=ls.getItem(c.keys.theme),m=ls.getItem(c.keys.mode);if(t==="default")t=c.base;
+var p=new URLSearchParams(location.search).get("theme"),t=ls.getItem(c.keys.theme),m=ls.getItem(c.keys.mode);if(t==="default"||t==="minimalist")t=c.base;
 if(p&&c.ids.indexOf(p)>=0){t=p;ls.setItem(c.keys.theme,p);}else{var s=c.seasons[t];if(s&&!(s[0]<=s[1]?k>=s[0]&&k<=s[1]:k>=s[0]||k<=s[1]))t=null;}
 if(c.ids.indexOf(t)<0)t=c.fallback;if(c.modes.indexOf(m)<0)m="system";
 if(t===c.base)d.removeAttribute("data-theme");else d.setAttribute("data-theme",t);var a=t!==c.base?"dark":(m==="system"?null:m);if(a)d.setAttribute("data-mode",a);else d.removeAttribute("data-mode");}catch(e){}})();`;

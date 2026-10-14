@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 /** Shown for unknown addresses and for posts that don't exist (Next.js sends a 404 status). */
 export default function NotFound() {
   return (
-    <div className="container mx-auto min-h-[60vh] max-w-3xl p-8">
+    <div className="container mx-auto min-h-[60vh] max-w-3xl xl:max-w-6xl p-8">
       <p className="font-mono text-sm font-semibold text-sky-700 dark:text-sky-400">404</p>
       <h1 className="mt-2 text-4xl font-bold">
         <Animated>Page not found</Animated>

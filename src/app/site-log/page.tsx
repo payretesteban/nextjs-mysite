@@ -19,7 +19,7 @@ export default async function SiteLogPage() {
   const entries = await getSiteLog();
 
   return (
-    <div className="container mx-auto min-h-screen max-w-3xl p-8">
+    <div className="container mx-auto min-h-screen max-w-3xl xl:max-w-6xl p-8">
       <section className="mb-12">
         <h1 className="text-4xl font-bold">
           <Animated>Site log</Animated>

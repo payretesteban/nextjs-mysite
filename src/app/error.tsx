@@ -13,7 +13,7 @@ export default function PageError({ error, reset }: { error: Error & { digest?: 
   }, [error]);
 
   return (
-    <div className="container mx-auto min-h-[60vh] max-w-3xl p-8">
+    <div className="container mx-auto min-h-[60vh] max-w-3xl xl:max-w-6xl p-8">
       <p className="font-mono text-sm font-semibold text-sky-700 dark:text-sky-400">Something went wrong</p>
       <h1 className="mt-2 text-4xl font-bold">This page didn&apos;t load</h1>
       <p className="mt-3 max-w-xl text-slate-600 dark:text-slate-400">

@@ -9,6 +9,7 @@ import TheLab from "./_home/TheLab";
 import HomeConsultation from "./_home/HomeConsultation";
 import { getConsultation } from "@/lib/consultation";
 import { getLabItems, getLabTestStats } from "@/lib/lab";
+import { getServicesPageData } from "@/lib/services";
 
 /** How many posts the homepage shows before "See all posts". */
 const HOME_POST_LIMIT = 5;
@@ -19,18 +20,22 @@ const HOME_POST_LIMIT = 5;
  * Data loads in parallel; each loader is refreshed when content is published in Studio (see @/sanity/fetch).
  */
 export default async function IndexPage() {
-  const [{ posts, postCount, profile }, consultation, siteLog, labItems, labTests] = await Promise.all([
+  const [{ posts, postCount, profile }, consultation, siteLog, labItems, labTests, { services }] = await Promise.all([
     getIndexPageData(),
     getConsultation(),
     getSiteLog(),
     getLabItems(),
     getLabTestStats(),
+    getServicesPageData(),
   ]);
+  // Short names for the rotating "incl. …" beside the services button
+  const serviceNames = services.map((s) => s.shortTitle?.trim() || s.title);
 
   return (
-    <div className="container mx-auto min-h-screen max-w-3xl p-8">
+    // On wide screens (xl): intro and The Lab across the full width, Posts and Site log side by side
+    <div className="container mx-auto min-h-screen max-w-3xl p-8 xl:grid xl:max-w-6xl xl:grid-cols-2 xl:items-start xl:gap-x-12">
       {profile && (
-        <section className="mb-12">
+        <section className="mb-12 xl:col-span-2">
           {/* Small avatar beside the name, so the bio and buttons start on the same left edge as the rest of the page */}
           <div className="flex items-center gap-4">
             {profile.profileImage && (
@@ -54,11 +59,11 @@ export default async function IndexPage() {
               <AnimatedHeadline headline={profile.headline} className="mt-0.5 text-lg sm:text-xl" />
             </div>
           </div>
-          <div className="prose prose-slate mt-5 max-w-2xl dark:prose-invert">
+          <div className="prose prose-slate mt-5 max-w-2xl hyphens-auto sm:text-justify dark:prose-invert xl:max-w-none">
             <PortableText value={profile.bio} />
           </div>
           {/* Two next steps: book a free call now, or look at the services first */}
-          <HomeConsultation consultation={consultation} />
+          <HomeConsultation consultation={consultation} serviceNames={serviceNames} />
         </section>
       )}
 
@@ -67,7 +72,7 @@ export default async function IndexPage() {
       <HomePosts posts={posts} limit={HOME_POST_LIMIT} total={postCount} />
 
       {/* overflow-x-clip keeps tossed notes from causing sideways scrolling on phones */}
-      <section aria-labelledby="sitelog-heading" className="-mx-4 mt-16 overflow-x-clip px-4 pb-2">
+      <section aria-labelledby="sitelog-heading" className="-mx-4 mt-16 overflow-x-clip px-4 pb-2 xl:mt-0">
         <h2 id="sitelog-heading" className="text-2xl font-bold tracking-tight">Site log</h2>
         <p className="mt-1 mb-8 text-sm text-slate-500 dark:text-slate-400">
           Notes from building this site, mostly the funny parts. Tap a note for the next one.

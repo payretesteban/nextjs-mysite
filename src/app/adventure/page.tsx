@@ -17,7 +17,7 @@ const vt323 = VT323({ weight: "400", subsets: ["latin"], display: "swap", variab
 export default function AdventurePage() {
   return (
     <>
-      <div className="container mx-auto max-w-3xl px-8 pt-8">
+      <div className="container mx-auto max-w-3xl xl:max-w-6xl px-8 pt-8">
         <h1 className="text-4xl font-bold">
           <Animated>The Deep Drop</Animated>
         </h1>
@@ -38,7 +38,7 @@ export default function AdventurePage() {
         </div>
       </section>
 
-      <div className="container mx-auto max-w-3xl px-8 pt-6 pb-8">
+      <div className="container mx-auto max-w-3xl xl:max-w-6xl px-8 pt-6 pb-8">
         <p className="text-xs text-slate-500 dark:text-slate-400">
           Based on real skydiving and scuba diving safety practices, simplified for a game. It isn&apos;t training:
           skydiving and diving require proper instruction and certification.

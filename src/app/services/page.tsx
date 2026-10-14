@@ -24,7 +24,7 @@ export default async function ServicesPage() {
   const [{ page, services }, consultation] = await Promise.all([getServicesPageData(), getConsultation()]);
 
   return (
-    <div className="container mx-auto min-h-screen max-w-3xl p-8">
+    <div className="container mx-auto min-h-screen max-w-3xl xl:max-w-6xl p-8">
       <section className="mb-10">
         <h1 className="text-4xl font-bold">
           <Animated>{page.title}</Animated>

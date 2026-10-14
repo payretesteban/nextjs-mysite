@@ -24,7 +24,7 @@ function write(name: string, value: string) {
   }
 }
 
-/** The theme on the page (set by the server/head script or by a choice in the picker); no attribute = Minimalist. */
+/** The theme on the page (set by the server/head script or by a choice in the picker); no attribute = Clean. */
 function currentTheme(): ThemeId {
   const value = document.documentElement.dataset.theme;
   return isThemeId(value) ? value : BASE_THEME;
@@ -82,7 +82,7 @@ export function useTheme(): { theme: ThemeId; mode: Mode } {
 /** True when the page currently looks dark (a dark theme, dark mode, or the device's dark setting). */
 export function pageLooksDark(): boolean {
   const root = document.documentElement;
-  if (root.dataset.theme) return true; // every theme except Minimalist is dark
+  if (root.dataset.theme) return true; // every theme except Clean is dark
   if (root.dataset.mode) return root.dataset.mode === "dark";
   return Boolean(window.matchMedia?.("(prefers-color-scheme: dark)").matches);
 }

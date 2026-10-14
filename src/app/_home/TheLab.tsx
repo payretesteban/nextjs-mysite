@@ -52,7 +52,7 @@ function LabCardImage({ image }: { image: LabImage }) {
  */
 export default function TheLab({ items, tests }: { items: LabItem[]; tests: LabTestStats | null }) {
   return (
-    <section aria-labelledby="lab-heading" data-section="lab" className="mb-14">
+    <section aria-labelledby="lab-heading" data-section="lab" className="mb-14 xl:col-span-2">
       <h2 id="lab-heading" data-trace className="text-2xl font-bold tracking-tight">
         The Lab
       </h2>

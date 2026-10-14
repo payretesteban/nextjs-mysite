@@ -101,7 +101,7 @@ const NODES: [number, number][] = [
 /** Circuit theme: the card's traces in the top-right corner of the page (scrolls away with it), with a pulse. */
 function CircuitTraces() {
   return (
-    <div aria-hidden="true" data-testid="theme-decorations" className="pointer-events-none absolute top-24 right-0 hidden w-[230px] opacity-80 xl:block print:hidden">
+    <div aria-hidden="true" data-testid="theme-decorations" className="pointer-events-none absolute top-24 right-0 hidden w-[230px] opacity-80 min-[1560px]:block print:hidden">
       <svg viewBox="0 0 230 300" fill="none" strokeWidth="1.6" className="block w-full">
         <defs>
           <linearGradient id="circuit-trace" x1="0" y1="0" x2="0" y2="1">
@@ -130,7 +130,7 @@ function CircuitTraces() {
 
 /**
  * Small extras for themes that have them, drawn above the page but ignoring the mouse and hidden from
- * screen readers. Circuit: the business card's traces in the top-right corner (wide screens only). Halloween: bats flapping across the screen, a skeleton hanging in the top corner and
+ * screen readers. Circuit: the business card's traces in the top-right corner (very wide screens only, clear of the content). Halloween: bats flapping across the screen, a skeleton hanging in the top corner and
  * jack-o'-lanterns flickering in the bottom corners (corner pieces only on wide screens, so they never
  * cover the text); section headings get a tiny pumpkin too (themes.css). Everything holds still for
  * visitors who prefer reduced motion.
@@ -146,13 +146,13 @@ export default function ThemeDecorations() {
           <Bat size={bat.size} flap={bat.flap} />
         </span>
       ))}
-      <span className="theme-skeleton absolute top-16 right-[3%] hidden lg:block">
+      <span className="theme-skeleton absolute top-16 right-[3%] hidden lg:block xl:hidden min-[1440px]:block">
         <Skeleton height={150} />
       </span>
-      <span className="theme-pumpkin absolute bottom-3 left-[2%] hidden lg:block">
+      <span className="theme-pumpkin absolute bottom-3 left-[2%] hidden lg:block xl:hidden min-[1440px]:block">
         <Pumpkin size={72} />
       </span>
-      <span className="theme-pumpkin absolute right-[2.5%] bottom-3 hidden lg:block">
+      <span className="theme-pumpkin absolute right-[2.5%] bottom-3 hidden lg:block xl:hidden min-[1440px]:block">
         <Pumpkin size={48} />
       </span>
     </div>

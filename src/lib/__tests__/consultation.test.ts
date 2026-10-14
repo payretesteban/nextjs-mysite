@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { DEFAULT_CONSULTATION, calTargetFrom, getConsultation } from "../consultation";
+import { DEFAULT_CONSULTATION, calTargetFrom, cleanSteps, getConsultation } from "../consultation";
 import { client } from "@/sanity/client";
 
 vi.mock("@/sanity/client", () => ({ client: { fetch: vi.fn() } }));
@@ -33,5 +33,23 @@ describe("Free consultation content", () => {
     expect(calTargetFrom("https://cal.com/")).toBeNull();
     expect(calTargetFrom("not a url")).toBeNull();
     expect(calTargetFrom(null)).toBeNull();
+  });
+});
+
+describe("How it works steps", () => {
+  it("keeps up to 3 steps with a title, trimmed, and drops empty details", () => {
+    expect(
+      cleanSteps([{ title: " Book " , text: " Pick a slot " }, { title: "" }, { title: "Call", text: "  " }, { title: "Plan" }, { title: "Extra" }])
+    ).toEqual([
+      { title: "Book", text: "Pick a slot" },
+      { title: "Call", text: null },
+      { title: "Plan", text: null },
+    ]);
+  });
+
+  it("uses the built-in steps when Sanity has none", () => {
+    expect(cleanSteps(undefined)).toBe(DEFAULT_CONSULTATION.homeSteps);
+    expect(cleanSteps([{ title: "  " }])).toBe(DEFAULT_CONSULTATION.homeSteps);
+    expect(DEFAULT_CONSULTATION.homeSteps).toHaveLength(3);
   });
 });

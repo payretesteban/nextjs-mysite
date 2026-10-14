@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 /** The /performance page: a short intro and the runner that tests the live homepage. */
 export default function PerformancePage() {
   return (
-    <div className="container mx-auto min-h-screen max-w-3xl p-8">
+    <div className="container mx-auto min-h-screen max-w-3xl xl:max-w-6xl p-8">
       <section className="mb-10">
         <h1 className="text-4xl font-bold">
           <Animated>Performance</Animated>

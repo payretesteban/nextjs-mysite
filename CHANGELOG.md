@@ -17,6 +17,15 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.13.0 — 2026-10-13
+
+- Wider layout on large screens (1280px and up): the header, pages and footer grow from about 770px to 1150px. On the homepage the intro (with the bio justified on tablets and up), the free consultation panel and The Lab run across the full width, and Posts and the Site log sit side by side. Post pages keep a narrow column for easy reading; phones, tablets and laptops look the same as before.
+- The Circuit traces on the right edge only show on very wide screens (1560px and up), and the Halloween skeleton and pumpkins skip the 1280–1439px range, so they never cover the wider content.
+- Free consultation panel: on wide screens the right half shows "how it works" as three numbered steps on a line (Pick a time → 30-minute call → Your next step), behind a thin divider. Steps are editable in Sanity (Free consultation → Homepage → How it works).
+- "Explore My Services" is now an outlined button with a briefcase icon and a moving arrow, followed by "5 services · incl. …" with the service names rotating (hidden on phones; screen readers get the full list).
+- Circuit header: the single glowing blip along the bottom line is replaced by two small, faint dashes that travel along it slowly, like the pulses on the circuit traces.
+- The Minimalist theme is now called Clean. Anyone who had picked it keeps it.
+
 ## 1.12.1 — 2026-10-13
 
 - Circuit header: its bottom edge is now a sky-to-green signal line with a light pulse running along it every few seconds (still for reduced motion), and the theme and Jump to buttons have sky outlines.

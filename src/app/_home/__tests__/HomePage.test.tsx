@@ -66,6 +66,16 @@ describe("Homepage", () => {
     expect(screen.getByRole("link", { name: "Explore My Services" })).toHaveAttribute("href", "/services");
   });
 
+  it("uses the width of large screens: intro, consultation and Lab across the full width, Posts and Site log side by side", async () => {
+    fetchMock.mockResolvedValue({ posts, postCount: 8, profile, links: [] });
+    const { container } = render(await IndexPage());
+    const page = container.firstElementChild!;
+    expect(page).toHaveClass("max-w-3xl", "xl:max-w-6xl", "xl:grid", "xl:grid-cols-2");
+    expect(container.querySelector("[data-panel=consultation]")).toHaveClass("xl:max-w-none");
+    expect(screen.getByText("I build software and lead teams.").closest(".prose")).toHaveClass("sm:text-justify", "xl:max-w-none");
+    expect(container.querySelector('[data-section="lab"]')).toHaveClass("xl:col-span-2");
+  });
+
   it("shows The Lab right after the intro, with a card for each experiment", async () => {
     fetchMock.mockResolvedValue({ posts, postCount: 8, profile, links: [] });
     render(await IndexPage());

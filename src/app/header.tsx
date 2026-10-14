@@ -180,7 +180,7 @@ export default function Header({
 
   return (
     <header className="print:hidden sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-md dark:border-slate-800/70 dark:bg-[#0a0a0a]/80">
-      <nav aria-label="Main" className="container mx-auto flex max-w-3xl items-center gap-3 px-8 py-4">
+      <nav aria-label="Main" className="container mx-auto flex max-w-3xl xl:max-w-6xl items-center gap-3 px-8 py-4">
         <Link href="/" aria-label={`${name} — home`} title={name} className="group flex items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
           {/* Code-tag logo: <EP/> with a blinking cursor */}
           <span

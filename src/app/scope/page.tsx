@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function ScopePage() {
   const consultation = await getConsultation();
   return (
-    <div className="container mx-auto min-h-screen max-w-3xl p-8">
+    <div className="container mx-auto min-h-screen max-w-3xl xl:max-w-6xl p-8">
       <section className="mb-8 print:mb-4">
         <h1 className="text-4xl font-bold">
           <Animated>Project Scoping Assistant</Animated>

@@ -74,7 +74,7 @@ function Assumptions() {
 export default async function AiCostCasePage() {
   const consultation = await getConsultation();
   return (
-    <div className="container mx-auto min-h-screen max-w-3xl p-8">
+    <div className="container mx-auto min-h-screen max-w-3xl xl:max-w-6xl p-8">
       <CaseProvider>
         <section className="mb-8">
           <p className="font-mono text-xs font-semibold uppercase tracking-widest text-sky-700 dark:text-sky-400">Lab · AI cost case</p>

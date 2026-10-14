@@ -17,7 +17,7 @@ export default function ReadListenPage() {
   const initial = libraryText("es", "en", "A2", "market");
 
   return (
-    <div className="container mx-auto min-h-screen max-w-3xl p-8">
+    <div className="container mx-auto min-h-screen max-w-3xl xl:max-w-6xl p-8">
       <section className="mb-8">
         <h1 className="text-4xl font-bold">
           <Animated>Read &amp; Listen</Animated>
