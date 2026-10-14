@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
-import { BASE_THEME, THEMES, availableThemes, type Mode, type Theme } from "@/lib/themes";
+import { BASE_THEME, STORAGE, THEMES, availableThemes, currentSeason, type Mode, type Theme } from "@/lib/themes";
 import { setMode, setTheme, useTheme } from "./useTheme";
 
 const MODE_OPTIONS: { id: Mode; label: string; icon: string }[] = [
@@ -32,6 +32,46 @@ function PaletteIcon() {
   );
 }
 
+/** When the "try the themes" tip appears after the page loads, and how long it stays if ignored. */
+const TIP_DELAY_MS = 2500;
+const TIP_VISIBLE_MS = 12000;
+
+/** Reads a saved value; null when storage is blocked. */
+function readStorage(key: string): string | null {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Whether to offer the "try the themes" tip: not once the visitor has tried them (opened the picker,
+ * picked a theme or closed the tip), and not while a seasonal invitation is due (that one already
+ * invites them to a theme). Blocked storage → no tip, so it can't nag on every page.
+ */
+function shouldOfferTip(): boolean {
+  try {
+    const ls = window.localStorage;
+    if (ls.getItem(STORAGE.tip) || ls.getItem(STORAGE.theme)) return false;
+    const now = new Date();
+    const season = currentSeason(now);
+    if (season && ls.getItem(`${STORAGE.nudge}:${season.id}-${now.getFullYear()}`) === null) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Remembers that the visitor has tried the themes (or doesn't want the tip). */
+function rememberTip() {
+  try {
+    window.localStorage.setItem(STORAGE.tip, "done");
+  } catch {
+    // Storage blocked: the tip doesn't show anyway
+  }
+}
+
 /** A theme's mini preview: its background with a heading bar, a text line and an accent. */
 function Preview({ theme }: { theme: Theme }) {
   const [bg, text, accent] = theme.swatches;
@@ -54,11 +94,40 @@ export default function ThemePicker() {
   const { theme, mode } = useTheme();
   const today = useToday();
   const [open, setOpen] = useState(false);
+  const [tip, setTip] = useState(false);
+  // The theme when the page loaded: once it changes, the visitor has tried the themes
+  const [initialTheme] = useState(theme);
+  const triedElsewhere = theme !== initialTheme;
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
   // Seasonal themes only in season, plus the current one (e.g. previewed with a ?theme= link)
   const themes = THEMES.filter((t) => t.id === theme || (today ? availableThemes(today).includes(t) : !t.season));
+
+  // A light "try the themes" tip under the button a moment after the page loads, until they've tried them
+  useEffect(() => {
+    if (!shouldOfferTip()) return;
+    const show = setTimeout(() => setTip(true), TIP_DELAY_MS);
+    const hide = setTimeout(() => setTip(false), TIP_DELAY_MS + TIP_VISIBLE_MS);
+    return () => {
+      clearTimeout(show);
+      clearTimeout(hide);
+    };
+  }, []);
+
+  // Picking a theme anywhere (e.g. the ⌘K menu or the seasonal invitation) counts as trying them
+  useEffect(() => {
+    if (triedElsewhere && !readStorage(STORAGE.tip)) rememberTip();
+  }, [triedElsewhere]);
+
+  /** Opens or closes the panel; opening it counts as trying the themes. */
+  function toggle() {
+    if (!open) {
+      rememberTip();
+      setTip(false);
+    }
+    setOpen(!open);
+  }
 
   // Close on Esc or a click outside the panel
   useEffect(() => {
@@ -101,7 +170,7 @@ export default function ThemePicker() {
       <button
         ref={buttonRef}
         type="button"
-        onClick={() => setOpen(!open)}
+        onClick={toggle}
         aria-expanded={open}
         aria-controls={panelId}
         aria-label="Theme and colours"
@@ -110,6 +179,35 @@ export default function ThemePicker() {
       >
         <PaletteIcon />
       </button>
+
+      {tip && !open && !triedElsewhere && (
+        <div
+          role="note"
+          data-theme-tip
+          className="animate-fade-up absolute top-full right-0 z-50 mt-3 flex w-max max-w-[15rem] items-center gap-2 rounded-xl bg-white py-2 pr-1.5 pl-3 text-sm text-slate-700 shadow-lg ring-1 ring-slate-200 print:hidden dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700"
+        >
+          {/* Little arrow pointing up at the 🎨 button */}
+          <span
+            aria-hidden="true"
+            className="absolute -top-1.5 right-3 h-3 w-3 rotate-45 bg-white ring-1 ring-slate-200 [clip-path:polygon(0_0,100%_0,0_100%)] dark:bg-slate-800 dark:ring-slate-700"
+          />
+          <button type="button" onClick={toggle} className="text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+            <span aria-hidden="true">✨ </span>
+            Try the site themes: Circuit, Clean, Retro and more
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              rememberTip();
+              setTip(false);
+            }}
+            aria-label="Dismiss the theme tip"
+            className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-800 focus-visible:outline-2 focus-visible:outline-blue-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {open && (
         <div

@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.14.0 — 2026-10-14
+
+- A light tip under the 🎨 button invites first-time visitors to "Try the site themes: Circuit, Clean, Retro and more". It appears a couple of seconds after the page loads and fades away after 12 seconds if ignored. Once the visitor opens the theme picker (from the tip or the button), picks a theme anywhere (⌘K menu, seasonal invitation) or closes the tip with ✕, it never shows again. It also stays away while the seasonal invitation (e.g. Halloween) is due, so only one invitation shows at a time.
+
 ## 1.13.2 — 2026-10-14
 
 - Fixed the Halloween skeleton and pumpkins being hidden on screens 1280px and wider (since 1.13.0 they only showed on medium screens). They show on all large screens again; the left pumpkin moved slightly closer to the edge so it never touches the wider content.

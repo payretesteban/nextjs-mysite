@@ -274,9 +274,10 @@ html[data-theme="circuit"] header nav button[aria-label="Theme and colours"][ari
   border-color: #62c3ea;
   background-color: rgba(98, 195, 234, 0.1);
 }
-/* Overlays (⌘K menu, theme picker): light sky border and a soft sky glow so they lift off the page */
+/* Overlays (⌘K menu, theme picker, theme tip): light sky border and a soft sky glow so they lift off the page */
 html[data-theme="circuit"] header dialog,
-html[data-theme="circuit"] header div[role="dialog"] {
+html[data-theme="circuit"] header div[role="dialog"],
+html[data-theme="circuit"] header [data-theme-tip] {
   border-color: rgba(98, 195, 234, 0.5);
   box-shadow:
     0 24px 48px -16px rgba(0, 0, 0, 0.7),

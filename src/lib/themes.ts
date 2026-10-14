@@ -66,7 +66,7 @@ export const THEMES: Theme[] = [
 const BY_ID = new Map(THEMES.map((t) => [t.id, t]));
 
 /** Browser storage keys. */
-export const STORAGE = { theme: "ep-theme", mode: "ep-mode", nudge: "ep-theme-nudge" } as const;
+export const STORAGE = { theme: "ep-theme", mode: "ep-mode", nudge: "ep-theme-nudge", tip: "ep-theme-tip" } as const;
 
 /** The theme with this id (the default theme for anything unknown). */
 export function getTheme(id: string | null | undefined): Theme {
