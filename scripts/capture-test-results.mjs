@@ -124,11 +124,12 @@ export function normalizeReport(report, { cwd = process.cwd(), source = "snapsho
 }
 
 /**
- * Run Vitest once and return the normalized result.
+ * Run Vitest once and return the normalized result. The 5-minute limit leaves room for slow build machines
+ * (the full suite with coverage takes about 1.5 minutes on 2 CPUs).
  * @param {{ cwd?: string, source?: "live" | "snapshot", timeoutMs?: number }} [options]
  * @returns {Promise<TestRunResult>}
  */
-export async function runVitest({ cwd = process.cwd(), source = "snapshot", timeoutMs = 120_000 } = {}) {
+export async function runVitest({ cwd = process.cwd(), source = "snapshot", timeoutMs = 300_000 } = {}) {
   const vitestBin = path.join(cwd, "node_modules", "vitest", "vitest.mjs");
   if (!existsSync(vitestBin)) throw new Error("Vitest is not installed (node_modules/vitest missing).");
 

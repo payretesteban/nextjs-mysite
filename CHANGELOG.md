@@ -17,6 +17,10 @@ The version shown in the site footer comes from `package.json`.
 
 Versions before 1.0.0 were added retroactively on Sept 24, 2026 by tagging past commits.
 
+## 1.13.1 — 2026-10-14
+
+- Fixed the /tests page on the live site showing "Couldn't run the tests – Vitest timed out after 120s". The test suite (now 385 tests, with coverage) took about 3 minutes on the build machine. Tests now reuse the browser-like test environment instead of rebuilding it for every file, which makes the full run with coverage about twice as fast (≈1.5 minutes on 2 CPUs), and the time limit is raised to 5 minutes.
+
 ## 1.13.0 — 2026-10-13
 
 - Wider layout on large screens (1280px and up): the header, pages and footer grow from about 770px to 1150px. On the homepage the intro (with the bio justified on tablets and up), the free consultation panel and The Lab run across the full width, and Posts and the Site log sit side by side. Post pages keep a narrow column for easy reading; phones, tablets and laptops look the same as before.
